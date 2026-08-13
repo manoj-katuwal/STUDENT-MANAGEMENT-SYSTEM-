@@ -7,6 +7,7 @@ const errorHandler = (err, req, res, next) => {
     success: false,
     status,
     message: err.message || "Internal Server Error",
+    requestId: req.requestId,
   });
 };
 

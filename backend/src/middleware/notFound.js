@@ -3,6 +3,7 @@ const notFound = (req, res, next) => {
     success: false,
     status: "fail",
     message: `Route not found: ${req.method} ${req.originalUrl}`,
+    requestId: req.requestId,
   });
 };
 
