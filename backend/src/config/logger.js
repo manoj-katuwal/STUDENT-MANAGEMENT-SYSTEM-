@@ -1,7 +1,7 @@
 import winston from "winston";
 
 const logger = winston.createLogger({
-  level: "info",
+  level: "http",
   format: winston.format.combine(
     winston.format.timestamp(),
     winston.format.errors({ stack: true }),

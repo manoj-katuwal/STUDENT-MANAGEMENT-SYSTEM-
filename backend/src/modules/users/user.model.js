@@ -6,39 +6,32 @@ const userSchema = new mongoose.Schema(
       type: String,
       required: true,
       trim: true,
-      minlength: 2,
-      maxlength: 100,
     },
-
     email: {
       type: String,
       required: true,
       unique: true,
       lowercase: true,
       trim: true,
-      index: true,
     },
-
     password: {
       type: String,
       required: true,
-      minlength: 8,
       select: false,
     },
-
     role: {
       type: String,
-      enum: ["admin", "student"],
-      default: "student",
-      index: true,
+      enum: ["ADMIN", "ACCOUNTANT", "PRINCIPAL", "STUDENT"],
+      default: "STUDENT",
     },
-
     isActive: {
       type: Boolean,
       default: true,
-      index: true,
     },
-
+    isEmailVerified: {
+      type: Boolean,
+      default: false,
+    },
     lastLoginAt: {
       type: Date,
       default: null,
@@ -48,6 +41,8 @@ const userSchema = new mongoose.Schema(
     timestamps: true,
   },
 );
+
+
 
 const User = mongoose.model("User", userSchema);
 
