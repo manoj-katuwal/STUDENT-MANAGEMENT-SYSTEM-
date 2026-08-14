@@ -2,6 +2,9 @@ import AppError from "../shared/utils/error/AppError.js";
 
 const authorize = (...allowedRoles) => {
   return (req, res, next) => {
+    console.log("USER:", req.user);
+    console.log("USER ROLE:", req.user?.role);
+    console.log("ALLOWED ROLES:", allowedRoles);
     if (!req.user) {
       throw new AppError("Authentication required", 401);
     }
