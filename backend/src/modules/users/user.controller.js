@@ -11,3 +11,13 @@ export const createUser = asyncHandler(async (req, res) => {
     data: user,
   });
 });
+
+export const getMe = asyncHandler(async (req, res) => {
+  const user = await userService.getUserById(req.user.id);
+
+  return successResponse({
+    res,
+    message: "User profile retrieved successfully",
+    data: user,
+  });
+});

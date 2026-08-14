@@ -15,3 +15,4 @@ export const createUser = async (userData) => {
 export const findByEmailWithPassword = async (email) => {
   return await User.findOne({ email }).select("+password");
 };
+

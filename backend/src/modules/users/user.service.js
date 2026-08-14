@@ -24,3 +24,17 @@ export const createUser = async (userData) => {
 
   return sanitizeUser(user);
 };
+
+export const getUserById = async (userId) => {
+  const user = await userRepository.findById(userId);
+
+  if (!user) {
+    throw new AppError("User not found", 404);
+  }
+
+  return sanitizeUser(user);
+};
+
+export const findById = async (userId) => {
+  return userRepository.findById(userId);
+};
