@@ -2,6 +2,7 @@ import bcrypt from "bcrypt";
 
 import * as userRepository from "./user.repository.js";
 import AppError from "../../shared/utils/error/AppError.js";
+import { sanitizeUser } from "./user.respone.js";
 
 export const createUser = async (userData) => {
   const { name, email, password, role } = userData;
@@ -18,8 +19,8 @@ export const createUser = async (userData) => {
     name,
     email,
     password: hashedPassword,
-    role,
+    role: "STUDENT"
   });
 
-  return user;
+  return sanitizeUser(user);
 };

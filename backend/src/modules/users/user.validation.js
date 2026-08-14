@@ -6,8 +6,4 @@ export const createUserSchema = Joi.object({
   email: Joi.string().trim().lowercase().email().required(),
 
   password: Joi.string().min(8).max(72).required(),
-
-  role: Joi.string()
-    .valid("ADMIN", "ACCOUNTANT", "PRINCIPAL", "STUDENT")
-    .default("STUDENT"),
-}).unknown(false); 
+}).unknown(false);
