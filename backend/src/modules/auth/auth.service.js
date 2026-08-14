@@ -2,13 +2,12 @@ import bcrypt from "bcrypt";
 
 import * as userRepository from "../users/user.repository.js";
 import AppError from "../../shared/utils/error/AppError.js";
-const payload = {
-  sub: user._id.toString(),
-  role: user.role,
-};
+import { generateAccessToken } from "../../shared/utils/auth/token.js";
+import { generateRefreshToken } from "../../shared/utils/auth/token.js";
+import { sanitizeUser } from "../users/user.respone.js";
 
-const accessToken = generateAccessToken(payload);
-const refreshToken = generateRefreshToken(payload);
+
+
 
 export const loginUser = async (email, password) => {
   const user = await userRepository.findByEmailWithPassword(email);
@@ -27,5 +26,18 @@ export const loginUser = async (email, password) => {
     throw new AppError("Invalid email or password", 401);
   }
 
-  return user;
+  const payload = {
+    sub: user._id.toString(),
+    role: user.role,
+  };
+
+  const accessToken = generateAccessToken(payload);
+  const refreshToken = generateRefreshToken(payload);
+
+    return {
+      user: sanitizeUser(user),
+      accessToken,
+      refreshToken,
+    };
+
 };
