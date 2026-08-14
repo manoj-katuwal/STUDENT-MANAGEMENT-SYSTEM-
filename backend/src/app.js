@@ -8,6 +8,7 @@ import requestId from "./middleware/requestId.js";
 import requestLogger from "./middleware/requestLogger.js";
 import authRoutes from "./modules/auth/auth.routes.js";
 
+
 const app = express();
 
 // middleware
@@ -21,6 +22,7 @@ app.use(requestLogger)
 //routes
 app.use("/api/v1", apiRoutes);
 app.use("/api/v1/auth", authRoutes);
+
 
 
 app.use(notFound);

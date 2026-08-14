@@ -14,3 +14,15 @@ export const login = asyncHandler(async (req, res) => {
     data: result,
   });
 });
+
+export const adminTest = asyncHandler(async (req, res) => {
+  return successResponse({
+    res,
+    statusCode: 200,
+    message: "Admin access granted",
+    data: {
+      userId: req.user.sub,
+      role: req.user.role,
+    },
+  });
+});
