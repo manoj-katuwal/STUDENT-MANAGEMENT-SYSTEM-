@@ -1,6 +1,6 @@
 import asyncHandler from "../../shared/utils/asyncHandler.js";
 import { successResponse } from "../../shared/utils/response/apiResponse.js";
-import { register, login } from "./auth.service.js";
+import { register, login, refreshAccessToken } from "./auth.service.js";
 
 export const registerController = asyncHandler(async (req, res) => {
   const user = await register(req.body);
@@ -13,15 +13,15 @@ export const registerController = asyncHandler(async (req, res) => {
   });
 });
 
-export const loginContoller = asyncHandler(async (req, res) => {
+export const loginController = asyncHandler(async (req, res) => {
   const { user, accessToken, refreshToken } = await login(req.body);
 
-   res.cookie("refreshToken", refreshToken, {
-     httpOnly: true,
-     secure: process.env.NODE_ENV === "production",
-     sameSite: "strict",
-     maxAge: 30 * 24 * 60 * 60 * 1000,
-   });
+  res.cookie("refreshToken", refreshToken, {
+    httpOnly: true,
+    secure: process.env.NODE_ENV === "production",
+    sameSite: "strict",
+    maxAge: 30 * 24 * 60 * 60 * 1000,
+  });
 
   return successResponse({
     res,
@@ -31,5 +31,46 @@ export const loginContoller = asyncHandler(async (req, res) => {
       user,
       accessToken,
     },
+  });
+});
+
+export const refreshController = asyncHandler(async (req, res) => {
+  const refreshToken = req.cookies.refreshToken;
+
+  const { accessToken, refreshToken: newRefreshToken } =
+    await refreshAccessToken(refreshToken);
+
+  res.cookie("refreshToken", newRefreshToken, {
+    httpOnly: true,
+    secure: process.env.NODE_ENV === "production",
+    sameSite: "strict",
+    maxAge: 30 * 24 * 60 * 60 * 1000,
+  });
+
+  return successResponse({
+    res,
+    statusCode: 200,
+    message: "Access token refreshed successfully",
+    data: {
+      accessToken,
+    },
+  });
+});
+
+export const logoutController = asyncHandler(async (req, res) => {
+  const refreshToken = req.cookies.refreshToken;
+
+  await logout(refreshToken);
+
+  res.clearCookie("refreshToken", {
+    httpOnly: true,
+    secure: process.env.NODE_ENV === "production",
+    sameSite: "strict",
+  });
+
+  return successResponse({
+    res,
+    statusCode: 200,
+    message: "Logout successful",
   });
 });

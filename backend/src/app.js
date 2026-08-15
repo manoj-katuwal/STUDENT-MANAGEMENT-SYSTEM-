@@ -6,6 +6,7 @@ import notFound from "./middleware/notFound.js";
 import apiRoutes from "./routes/index.js";
 import requestId from "./middleware/requestId.js";
 import requestLogger from "./middleware/requestLogger.js";
+import cookieParser from "cookie-parser";
 
 const app = express();
 
@@ -13,6 +14,7 @@ const app = express();
 app.use(helmet()); // for security to secure http header method from hackers
 app.use(cors()); // For connection between the backend and frontend
 app.use(express.json()); // for the data sent from the UI and extract it using req.body;
+app.use(cookieParser());
 
 app.use(requestId);
 app.use(requestLogger);
