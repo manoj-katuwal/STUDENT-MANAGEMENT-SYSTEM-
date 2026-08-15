@@ -11,3 +11,7 @@ export const findUserByEmail = async (email) => {
 export const findUserById = async (userId) => {
   return await User.findById(userId);
 };
+
+export const findUserByEmailWithPassword = async (email) => {
+  return await User.findOne({ email }).select("+password");
+};
