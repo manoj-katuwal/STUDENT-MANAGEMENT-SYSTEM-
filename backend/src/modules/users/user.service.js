@@ -9,6 +9,7 @@ import {
 import AppError from "../../shared/utils/error/AppError.js";
 
 import * as refreshTokenRepostiory from "../../modules/auth/refreshToken/refreshToken.repository.js";
+import { createEmailVerificationToken } from "../auth/emailVerification/emailVerification.service.js";
 
 export const registerUser = async ({ name, email, password }) => {
   const existingUser = await findUserByEmail(email);
@@ -26,6 +27,26 @@ export const registerUser = async ({ name, email, password }) => {
     role: "STUDENT",
   });
 
+  const verificationToken = await createEmailVerificationToken(user._id);
+
+  const verificationUrl = `${process.env.FRONTEND_URL}/verify-email?token=${verificationToken}`;
+
+  const html = `
+  <h2>Verify your email</h2>
+
+  <p>Please click the link below to verify your email address.</p>
+
+  <a href="${verificationUrl}">
+    Verify Email
+  </a>
+
+  <p>This link will expire in 30 minutes.</p>
+`;
+  await sendEmail({
+    to: user.email,
+    subject: "Verify your email",
+    html,
+  });
   return user;
 };
 
