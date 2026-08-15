@@ -1,5 +1,10 @@
 // import { useId } from "react";
+import bcrypt from "bcryptjs";
+import { hashToken } from "../../shared/utils/auth/token.js";
+import AppError from "../../shared/utils/error/AppError.js";
+import { findPasswordResetByTokenHash, markPasswordResetAsUsed } from "../auth/passwordReset/passwordReset.repository.js";
 import User from "./user.model.js";
+import { revokeAllUserRefreshTokens } from "../auth/refreshToken/refreshToken.repository.js";
 
 export const createUser = async (userData) => {
   return await User.create(userData);
@@ -43,3 +48,5 @@ export const verifyUserEmail = async (userId) => {
     },
   );
 };
+
+

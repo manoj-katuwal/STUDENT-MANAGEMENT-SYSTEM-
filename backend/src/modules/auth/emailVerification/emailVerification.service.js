@@ -10,7 +10,10 @@ import {
   hashToken,
 } from "../../../shared/utils/auth/token.js";
 import { sendEmail } from "../../../shared/services/email/email.service.js";
-import { findUserByEmail } from "../../users/user.repository.js";
+import {
+  findUserByEmail,
+  verifyUserEmail,
+} from "../../users/user.repository.js";
 import AppError from "../../../shared/utils/error/AppError.js";
 
 export const createEmailVerificationToken = async (userId) => {

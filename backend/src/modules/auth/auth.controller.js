@@ -7,7 +7,11 @@ import {
   refreshAccessToken,
   logoutAllSessions,
 } from "./auth.service.js";
-import { resendVerificationEmail, verifyEmail } from "./emailVerification/emailVerification.service.js";
+import {
+  resendVerificationEmail,
+  verifyEmail,
+} from "./emailVerification/emailVerification.service.js";
+import { forgotPassword, resetPassword } from "./passwordReset/passwordReset.service.js";
 
 export const registerController = asyncHandler(async (req, res) => {
   const user = await register(req.body);
@@ -142,3 +146,28 @@ export const resendVerificationEmailController = asyncHandler(
     });
   },
 );
+
+export const forgotPasswordController = asyncHandler(async (req, res) => {
+  const { email } = req.body;
+
+  await forgotPassword(email);
+
+  return successResponse({
+    res,
+    statusCode: 200,
+    message:
+      "If an account with that email exists, a password reset link has been sent",
+  });
+});
+
+export const resetPasswordController = asyncHandler(async (req, res) => {
+  const { token, newPassword } = req.body;
+
+  await resetPassword(token, newPassword);
+
+  return successResponse({
+    res,
+    statusCode: 200,
+    message: "Password has been reset successfully",
+  });
+});
