@@ -9,6 +9,7 @@ import {
 import AppError from "../../shared/utils/error/AppError.js";
 
 import * as refreshTokenRepostiory from "../../modules/auth/refreshToken/refreshToken.repository.js";
+import { sendEmail } from "../../shared/services/email/email.service.js";
 import { createEmailVerificationToken } from "../auth/emailVerification/emailVerification.service.js";
 
 export const registerUser = async ({ name, email, password }) => {

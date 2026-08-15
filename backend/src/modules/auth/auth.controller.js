@@ -1,7 +1,13 @@
 import asyncHandler from "../../shared/utils/asyncHandler.js";
 import { successResponse } from "../../shared/utils/response/apiResponse.js";
 import { changeUserPassword } from "../users/user.service.js";
-import { register, login, refreshAccessToken, logoutAllSessions } from "./auth.service.js";
+import {
+  register,
+  login,
+  refreshAccessToken,
+  logoutAllSessions,
+} from "./auth.service.js";
+import { verifyEmail } from "./emailVerification/emailVerification.service.js";
 
 export const registerController = asyncHandler(async (req, res) => {
   const user = await register(req.body);
@@ -107,5 +113,17 @@ export const logoutAllSessionsController = asyncHandler(async (req, res) => {
     res,
     statusCode: 200,
     message: "Logged out from all sessions successfully",
+  });
+});
+
+export const verifyEmailController = asyncHandler(async (req, res) => {
+  const { token } = req.query;
+
+  await verifyEmail(token);
+
+  return successResponse({
+    res,
+    statusCode: 200,
+    message: "Email verified successfully",
   });
 });

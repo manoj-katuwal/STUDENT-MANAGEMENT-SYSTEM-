@@ -31,3 +31,15 @@ export const updateUserPassword = async (userId, passwordHash) => {
     },
   );
 };
+
+export const verifyUserEmail = async (userId) => {
+  return await User.findByIdAndUpdate(
+    userId,
+    {
+      isEmailVerified: true,
+    },
+    {
+      new: true,
+    },
+  );
+};
