@@ -17,5 +17,6 @@ router.post("/logout", authController.logoutController);
 router.post("/change-password",authenticate , authController.changePasswordController);
 router.post("/logout-all", authenticate,authController.logoutAllSessionsController);
 router.get("/verify-email", authController.verifyEmailController);
+router.post("/resend-verification", authController.resendVerificationEmailController);
 
 export default router;

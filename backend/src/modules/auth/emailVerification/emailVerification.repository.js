@@ -21,3 +21,10 @@ export const markEmailVerificationAsUsed = async (verificationId) => {
     },
   );
 };
+
+export const deleteUnusedVerificationsByUserId = async (userId) => {
+  return await EmailVerification.deleteMany({
+    userId,
+    usedAt: null,
+  });
+};

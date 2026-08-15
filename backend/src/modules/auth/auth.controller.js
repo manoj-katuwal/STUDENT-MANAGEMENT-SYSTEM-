@@ -7,7 +7,7 @@ import {
   refreshAccessToken,
   logoutAllSessions,
 } from "./auth.service.js";
-import { verifyEmail } from "./emailVerification/emailVerification.service.js";
+import { resendVerificationEmail, verifyEmail } from "./emailVerification/emailVerification.service.js";
 
 export const registerController = asyncHandler(async (req, res) => {
   const user = await register(req.body);
@@ -127,3 +127,18 @@ export const verifyEmailController = asyncHandler(async (req, res) => {
     message: "Email verified successfully",
   });
 });
+
+export const resendVerificationEmailController = asyncHandler(
+  async (req, res) => {
+    const { email } = req.body;
+
+    await resendVerificationEmail(email);
+
+    return successResponse({
+      res,
+      statusCode: 200,
+      message:
+        "If an account with that email exists and is not yet verified, a verification email has been sent",
+    });
+  },
+);
