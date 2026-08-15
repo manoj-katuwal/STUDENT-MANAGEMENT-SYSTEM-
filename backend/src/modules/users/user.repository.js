@@ -1,3 +1,4 @@
+// import { useId } from "react";
 import User from "./user.model.js";
 
 export const createUser = async (userData) => {
@@ -14,4 +15,19 @@ export const findUserById = async (userId) => {
 
 export const findUserByEmailWithPassword = async (email) => {
   return await User.findOne({ email }).select("+password");
+};
+export const findUserByIdWithPassword = async (userId) => {
+  return await User.findById(userId).select("+password");
+};
+
+export const updateUserPassword = async (userId, passwordHash) => {
+  return await User.findByIdAndUpdate(
+    userId,
+    {
+      password: passwordHash,
+    },
+    {
+      new: true,
+    },
+  );
 };

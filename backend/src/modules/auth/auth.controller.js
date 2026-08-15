@@ -1,5 +1,6 @@
 import asyncHandler from "../../shared/utils/asyncHandler.js";
 import { successResponse } from "../../shared/utils/response/apiResponse.js";
+import { changeUserPassword } from "../users/user.service.js";
 import { register, login, refreshAccessToken } from "./auth.service.js";
 
 export const registerController = asyncHandler(async (req, res) => {
@@ -72,5 +73,23 @@ export const logoutController = asyncHandler(async (req, res) => {
     res,
     statusCode: 200,
     message: "Logout successful",
+  });
+});
+
+export const changePasswordController = asyncHandler(async (req, res) => {
+  const { currentPassword, newPassword } = req.body;
+
+  await changeUserPassword(req.user.id, currentPassword, newPassword);
+
+  res.clearCookie("refreshToken", {
+    httpOnly: true,
+    secure: process.env.NODE_ENV === "production",
+    sameSite: "strict",
+  });
+
+  return successResponse({
+    res,
+    statusCode: 200,
+    message: "Password changed successfully",
   });
 });

@@ -21,3 +21,15 @@ export const revokeRefreshToken = async (tokenId) => {
 export const createRefreshToken = async (data) => {
   return RefreshToken.create(data);
 };
+
+export const revokeAllUserRefreshTokens = async (userId) => {
+  return RefreshToken.updateMany(
+    {
+      userId,
+      revokedAt: null,
+    },
+    {
+      revokedAt: new Date(),
+    },
+  );
+};
