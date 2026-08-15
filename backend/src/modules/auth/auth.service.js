@@ -2,6 +2,7 @@ import AppError from "../../shared/utils/error/AppError.js";
 import { findUserByEmailWithPassword } from "../users/user.repository.js";
 import { registerUser } from "../users/user.service.js";
 import bcrypt from "bcryptjs";
+import { generateAccessToken } from "../../config/jwt.js";
 
 export const register = async (userData) => {
   const user = await registerUser(userData);
@@ -21,5 +22,10 @@ export const login = async ({ email, password }) => {
   if (!isPasswordValid) {
     throw new AppError("Invalid email and Password", 400);
   }
-  return user;
+
+  const accessToken = await generateAccessToken(user);
+  return {
+    user, 
+    accessToken
+  };
 };

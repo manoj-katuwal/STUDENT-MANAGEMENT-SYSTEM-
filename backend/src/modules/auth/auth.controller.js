@@ -14,12 +14,15 @@ export const registerController = asyncHandler(async (req, res) => {
 });
 
 export const loginContoller = asyncHandler(async (req, res) => {
-  const user = await login(req.body);
+  const { user, accessToken } = await login(req.body);
 
   return successResponse({
     res,
     statusCode: 200,
     message: "Login SuccessFully",
-    data: user,
+    data: {
+      user,
+      accessToken,
+    },
   });
 });
