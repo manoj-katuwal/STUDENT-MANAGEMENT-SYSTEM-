@@ -14,7 +14,14 @@ export const registerController = asyncHandler(async (req, res) => {
 });
 
 export const loginContoller = asyncHandler(async (req, res) => {
-  const { user, accessToken } = await login(req.body);
+  const { user, accessToken, refreshToken } = await login(req.body);
+
+   res.cookie("refreshToken", refreshToken, {
+     httpOnly: true,
+     secure: process.env.NODE_ENV === "production",
+     sameSite: "strict",
+     maxAge: 30 * 24 * 60 * 60 * 1000,
+   });
 
   return successResponse({
     res,
