@@ -1,7 +1,7 @@
 import asyncHandler from "../../shared/utils/asyncHandler.js";
 import { successResponse } from "../../shared/utils/response/apiResponse.js";
 import { changeUserPassword } from "../users/user.service.js";
-import { register, login, refreshAccessToken } from "./auth.service.js";
+import { register, login, refreshAccessToken, logoutAllSessions } from "./auth.service.js";
 
 export const registerController = asyncHandler(async (req, res) => {
   const user = await register(req.body);
@@ -91,5 +91,21 @@ export const changePasswordController = asyncHandler(async (req, res) => {
     res,
     statusCode: 200,
     message: "Password changed successfully",
+  });
+});
+
+export const logoutAllSessionsController = asyncHandler(async (req, res) => {
+  await logoutAllSessions(req.user.id);
+
+  res.clearCookie("refreshToken", {
+    httpOnly: true,
+    secure: process.env.NODE_ENV === "production",
+    sameSite: "strict",
+  });
+
+  return successResponse({
+    res,
+    statusCode: 200,
+    message: "Logged out from all sessions successfully",
   });
 });

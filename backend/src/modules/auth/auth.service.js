@@ -3,6 +3,12 @@ import {
   findUserByEmailWithPassword,
   findUserById,
 } from "../users/user.repository.js";
+import {
+  findActiveRefreshToken,
+  revokeRefreshToken,
+  createRefreshToken,
+  revokeAllUserRefreshTokens,
+} from "./refreshToken/refreshToken.repository.js";
 import { registerUser } from "../users/user.service.js";
 import bcrypt from "bcryptjs";
 import { generateAccessToken } from "../../config/jwt.js";
@@ -11,11 +17,6 @@ import {
   hashToken,
 } from "../../shared/utils/auth/token.js";
 import RefreshToken from "./refreshToken/refreshToken.model.js";
-import {
-  findActiveRefreshToken,
-  revokeRefreshToken,
-  createRefreshToken,
-} from "./refreshToken/refreshToken.repository.js";
 
 export const register = async (userData) => {
   const user = await registerUser(userData);
@@ -112,4 +113,8 @@ export const logout = async (rawRefreshToken) => {
   }
 
   await revokeRefreshToken(storedToken._id);
+};
+
+export const logoutAllSessions = async (userId) => {
+  await revokeAllUserRefreshTokens(userId);
 };
