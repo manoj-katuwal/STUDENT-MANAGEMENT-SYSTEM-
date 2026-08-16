@@ -60,3 +60,9 @@ export const updateStudentSchema = Joi.object({
 export const updateStudentStatusSchema = Joi.object({
   status: Joi.string().valid("ACTIVE", "INACTIVE").required(),
 });
+
+export const listStudentsQuerySchema = Joi.object({
+  page: Joi.number().integer().min(1).default(1),
+
+  limit: Joi.number().integer().min(1).max(100).default(10),
+});

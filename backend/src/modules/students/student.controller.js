@@ -20,13 +20,18 @@ export const createStudentController = asyncHandler(async (req, res) => {
 });
 
 export const getStudentsController = asyncHandler(async (req, res) => {
-  const students = await getStudentsService();
+  const page = Number(req.query.page) || 1;
+  const limit = Number(req.query.limit) || 10;
+  const search = req.query.search || "";
+
+  const result = await getStudentsService(page, limit, search);
 
   return successResponse({
     res,
     statusCode: 200,
     message: "Students fetched successfully",
-    data: students,
+    data: result.students,
+    meta: result.pagination,
   });
 });
 

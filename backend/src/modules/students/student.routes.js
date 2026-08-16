@@ -12,9 +12,11 @@ import authorize from "../../middleware/authorize.js";
 import validate from "../../middleware/validate.js";
 import {
   createStudentSchema,
+  listStudentsQuerySchema,
   updateStudentSchema,
   updateStudentStatusSchema,
 } from "./student.validation.js";
+import validateQuery from "../../middleware/validateQuery.js";
 
 const router = express.Router();
 
@@ -26,11 +28,17 @@ router.post(
   createStudentController,
 );
 router.get("/", authenticate, authorize("ADMIN"), getStudentsController);
-router.get("/:id", authenticate, authorize("ADMIN"), getStudentByIdController);
-router.patch(
+router.get(
   "/:id",
   authenticate,
   authorize("ADMIN"),
+  validateQuery(listStudentsQuerySchema),
+  getStudentByIdController,
+);
+router.patch(
+  "/:id",
+  authenticate,
+  authorize("ADMIN"), 
   validate(updateStudentSchema),
   updateStudentController,
 );

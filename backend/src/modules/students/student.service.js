@@ -1,5 +1,6 @@
 import AppError from "../../shared/utils/error/AppError.js";
 import {
+    countStudents,
   createStudent,
   findStudentByAdmissionNumber,
   findStudentById,
@@ -28,11 +29,7 @@ export const createStudentService = async (studentData) => {
   return student;
 };
 
-export const getStudentsService = async () => {
-  const students = await findStudents();
 
-  return students;
-};
 
 export const getStudentByIdService = async (studentId) => {
   const student = await findStudentById(studentId);
@@ -85,3 +82,48 @@ export const updateStudentStatusService = async (studentId, status) => {
 
   return updatedStudent;
 };
+
+export const getStudentsService = async (page = 1, limit = 10, search = "") => {
+  const skip = (page - 1) * limit;
+
+  const filter = {};
+
+  if (search) {
+    filter.$or = [
+      {
+        name: {
+          $regex: search,
+          $options: "i",
+        },
+      },
+      {
+        admissionNumber: {
+          $regex: search,
+          $options: "i",
+        },
+      },
+    ];
+  }
+
+  const [students, total] = await Promise.all([
+    findStudents({
+      filter,
+      skip,
+      limit,
+    }),
+    countStudents(filter),
+  ]);
+
+  const totalPages = Math.ceil(total / limit);
+
+  return {
+    students,
+    pagination: {
+      page,
+      limit,
+      total,
+      totalPages,
+    },
+  };
+};
+
