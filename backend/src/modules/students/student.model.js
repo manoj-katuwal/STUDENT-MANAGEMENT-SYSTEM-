@@ -70,6 +70,16 @@ const studentSchema = new mongoose.Schema(
       enum: ["ACTIVE", "INACTIVE"],
       default: "ACTIVE",
     },
+    classId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Class",
+      required: true,
+    },
+    sectionId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Section",
+      required: true,
+    },
   },
   {
     timestamps: true,

@@ -16,6 +16,10 @@ export const createStudentSchema = Joi.object({
 
   address: Joi.string().trim().max(255).allow(null),
 
+  classId: Joi.string().hex().length(24).required(),
+
+  sectionId: Joi.string().hex().length(24).required(),
+
   guardian: Joi.object({
     name: Joi.string().trim().max(100).allow(null),
 
@@ -44,6 +48,10 @@ export const updateStudentSchema = Joi.object({
 
   address: Joi.string().trim().max(255).allow(null),
 
+  classId: Joi.string().hex().length(24),
+
+  sectionId: Joi.string().hex().length(24),
+
   guardian: Joi.object({
     name: Joi.string().trim().max(100).allow(null),
 
@@ -55,7 +63,6 @@ export const updateStudentSchema = Joi.object({
       .allow(null),
   }).allow(null),
 }).min(1);
-
 
 export const updateStudentStatusSchema = Joi.object({
   status: Joi.string().valid("ACTIVE", "INACTIVE").required(),
