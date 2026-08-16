@@ -4,6 +4,7 @@ import {
   findStudentByAdmissionNumber,
   findStudentById,
   findStudents,
+  updateStudent,
 } from "./student.repository.js";
 
 export const createStudentService = async (studentData) => {
@@ -41,4 +42,32 @@ export const getStudentByIdService = async (studentId) => {
   }
 
   return student;
+};
+
+export const updateStudentService = async (studentId, updateData) => {
+  const student = await findStudentById(studentId);
+
+  if (!student) {
+    throw new AppError("Student not found", 404);
+  }
+
+  if (
+    updateData.admissionNumber &&
+    updateData.admissionNumber !== student.admissionNumber
+  ) {
+    const existingStudent = await findStudentByAdmissionNumber(
+      updateData.admissionNumber,
+    );
+
+    if (existingStudent) {
+      throw new AppError(
+        "Student with this admission number already exists",
+        400,
+      );
+    }
+  }
+
+  const updatedStudent = await updateStudent(studentId, updateData);
+
+  return updatedStudent;
 };

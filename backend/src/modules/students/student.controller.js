@@ -1,6 +1,11 @@
 import asyncHandler from "../../shared/utils/asyncHandler.js";
 import { successResponse } from "../../shared/utils/response/apiResponse.js";
-import { createStudentService, getStudentByIdService, getStudentsService } from "./student.service.js";
+import {
+  createStudentService,
+  getStudentByIdService,
+  getStudentsService,
+  updateStudentService,
+} from "./student.service.js";
 
 export const createStudentController = asyncHandler(async (req, res) => {
   const student = await createStudentService(req.body);
@@ -31,6 +36,17 @@ export const getStudentByIdController = asyncHandler(async (req, res) => {
     res,
     statusCode: 200,
     message: "Student fetched successfully",
+    data: student,
+  });
+});
+
+export const updateStudentController = asyncHandler(async (req, res) => {
+  const student = await updateStudentService(req.params.id, req.body);
+
+  return successResponse({
+    res,
+    statusCode: 200,
+    message: "Student updated successfully",
     data: student,
   });
 });

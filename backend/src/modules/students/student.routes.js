@@ -4,6 +4,7 @@ import {
   createStudentController,
   getStudentByIdController,
   getStudentsController,
+  updateStudentController,
 } from "./student.controller.js";
 import authenticate from "../../middleware/authenticate.js";
 import authorize from "../../middleware/authorize.js";
@@ -21,5 +22,6 @@ router.post(
 );
 router.get("/", authenticate, authorize("ADMIN"), getStudentsController);
 router.get("/:id", authenticate, authorize("ADMIN"), getStudentByIdController);
+router.patch("/:id", authenticate, authorize("ADMIN"), updateStudentController);
 
 export default router;
