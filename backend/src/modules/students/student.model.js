@@ -6,7 +6,6 @@ const studentSchema = new mongoose.Schema(
       type: mongoose.Schema.Types.ObjectId,
       ref: "User",
       default: null,
-      unique: true,
       sparse: true,
     },
 

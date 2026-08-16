@@ -1,4 +1,3 @@
-
 import AppError from "../../shared/utils/error/AppError.js";
 import {
   createStudent,
@@ -7,6 +6,10 @@ import {
 } from "./student.repository.js";
 
 export const createStudentService = async (studentData) => {
+  if (!studentData || !studentData.admissionNumber) {
+    throw new AppError("Admission number is required", 400);
+  }
+
   const existingStudent = await findStudentByAdmissionNumber(
     studentData.admissionNumber,
   );
