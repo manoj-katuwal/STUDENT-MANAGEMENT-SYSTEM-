@@ -10,6 +10,12 @@ const studentSchema = new mongoose.Schema(
       sparse: true,
     },
 
+    name: {
+      type: String,
+      required: true,
+      trim: true,
+    },
+
     admissionNumber: {
       type: String,
       required: true,

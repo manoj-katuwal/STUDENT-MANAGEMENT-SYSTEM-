@@ -3,6 +3,7 @@ import AppError from "../../shared/utils/error/AppError.js";
 import {
   createStudent,
   findStudentByAdmissionNumber,
+  findStudents,
 } from "./student.repository.js";
 
 export const createStudentService = async (studentData) => {
@@ -20,4 +21,10 @@ export const createStudentService = async (studentData) => {
   const student = await createStudent(studentData);
 
   return student;
+};
+
+export const getStudentsService = async () => {
+  const students = await findStudents();
+
+  return students;
 };
