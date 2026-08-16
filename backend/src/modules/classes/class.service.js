@@ -5,6 +5,7 @@ import {
   findClassByCode,
   findClasses,
   findClassById,
+  updateClass,
 } from "./class.repository.js";
 
 export const createClassService = async (classData) => {
@@ -39,4 +40,32 @@ export const getClassByIdService = async (classId) => {
   }
 
   return classRecord;
+};
+
+export const updateClassService = async (classId, updateData) => {
+  const classRecord = await findClassById(classId);
+
+  if (!classRecord) {
+    throw new AppError("Class not found", 404);
+  }
+
+  if (updateData.name && updateData.name !== classRecord.name) {
+    const existingClass = await findClassByName(updateData.name);
+
+    if (existingClass) {
+      throw new AppError("Class with this name already exists", 400);
+    }
+  }
+
+  if (updateData.code && updateData.code !== classRecord.code) {
+    const existingClass = await findClassByCode(updateData.code);
+
+    if (existingClass) {
+      throw new AppError("Class with this code already exists", 400);
+    }
+  }
+
+  const updatedClass = await updateClass(classId, updateData);
+
+  return updatedClass;
 };
