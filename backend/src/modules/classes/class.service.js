@@ -6,6 +6,7 @@ import {
   findClasses,
   findClassById,
   updateClass,
+  updateClassStatus,
 } from "./class.repository.js";
 
 export const createClassService = async (classData) => {
@@ -68,4 +69,18 @@ export const updateClassService = async (classId, updateData) => {
   const updatedClass = await updateClass(classId, updateData);
 
   return updatedClass;
+};
+
+export const updateClassStatusService = async (classId, status) => {
+  const classRecord = await findClassById(classId);
+
+  if (!classRecord) {
+    throw new AppError("Class not found", 404);
+  }
+
+  if (classRecord.status === status) {
+    throw new AppError(`Class is already ${status.toLowerCase()}`, 400);
+  }
+
+  return await updateClassStatus(classId, status);
 };

@@ -2,12 +2,13 @@ import express from "express";
 import authenticate from "../../middleware/authenticate.js";
 import authorize from "../../middleware/authorize.js";
 import validate from "../../middleware/validate.js";
-import { createClassSchema, updateClassSchema } from "./class.validation.js";
+import { createClassSchema, updateClassSchema, updateClassStatusSchema } from "./class.validation.js";
 import {
   createClassController,
   getClassByIdController,
   getClassesController,
   updateClassController,
+  updateClassStatusController,
 } from "./class.controller.js";
 
 const router = express.Router();
@@ -27,6 +28,14 @@ router.patch(
   authorize("ADMIN"),
   validate(updateClassSchema),
   updateClassController,
+);
+
+router.patch(
+  "/:id/status",
+  authenticate,
+  authorize("ADMIN"),
+  validate(updateClassStatusSchema),
+  updateClassStatusController,
 );
 
 export default router;

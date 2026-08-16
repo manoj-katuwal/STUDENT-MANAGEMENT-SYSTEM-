@@ -12,3 +12,7 @@ export const updateClassSchema = Joi.object({
 
   code: Joi.string().trim().min(2).max(20).uppercase(),
 }).min(1);
+
+export const updateClassStatusSchema = Joi.object({
+  status: Joi.string().valid("ACTIVE", "INACTIVE").required(),
+});

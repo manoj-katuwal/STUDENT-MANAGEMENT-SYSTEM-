@@ -26,3 +26,14 @@ export const updateClass = async (classId, updateData) => {
     runValidators: true,
   });
 };
+
+export const updateClassStatus = async (classId, status) => {
+  return await Class.findByIdAndUpdate(
+    classId,
+    { status },
+    {
+      new: true,
+      runValidators: true,
+    },
+  );
+};

@@ -1,6 +1,6 @@
 import asyncHandler from "../../shared/utils/asyncHandler.js";
 import { successResponse } from "../../shared/utils/response/apiResponse.js";
-import { createClassService, getClassByIdService, getClassesService, updateClassService } from "./class.service.js";
+import { createClassService, getClassByIdService, getClassesService, updateClassService, updateClassStatusService } from "./class.service.js";
 
 export const createClassController = asyncHandler(async (req, res) => {
   const classRecord = await createClassService(req.body);
@@ -42,6 +42,22 @@ export const updateClassController = asyncHandler(async (req, res) => {
     res,
     statusCode: 200,
     message: "Class updated successfully",
+    data: classRecord,
+  });
+});
+
+export const updateClassStatusController = asyncHandler(async (req, res) => {
+  const classRecord = await updateClassStatusService(
+    req.params.id,
+    req.body.status,
+  );
+
+  return successResponse({
+    res,
+    statusCode: 200,
+    message: `Class ${
+      classRecord.status === "ACTIVE" ? "activated" : "deactivated"
+    } successfully`,
     data: classRecord,
   });
 });
