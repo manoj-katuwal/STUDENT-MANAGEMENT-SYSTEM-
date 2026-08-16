@@ -1,10 +1,9 @@
-// import AppError from "../../shared/utils/error/AppError.js";
-
 import AppError from "../../shared/utils/error/AppError.js";
 import {
   createClass,
   findClassByName,
   findClassByCode,
+  findClasses,
 } from "./class.repository.js";
 
 export const createClassService = async (classData) => {
@@ -23,4 +22,10 @@ export const createClassService = async (classData) => {
   const classRecord = await createClass(classData);
 
   return classRecord;
+};
+
+export const getClassesService = async () => {
+  const classes = await findClasses();
+
+  return classes;
 };
