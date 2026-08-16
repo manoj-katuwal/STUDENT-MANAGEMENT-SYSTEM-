@@ -9,7 +9,10 @@ import {
 import authenticate from "../../middleware/authenticate.js";
 import authorize from "../../middleware/authorize.js";
 import validate from "../../middleware/validate.js";
-import { createStudentSchema } from "./student.validation.js";
+import {
+  createStudentSchema,
+  updateStudentSchema,
+} from "./student.validation.js";
 
 const router = express.Router();
 
@@ -22,6 +25,12 @@ router.post(
 );
 router.get("/", authenticate, authorize("ADMIN"), getStudentsController);
 router.get("/:id", authenticate, authorize("ADMIN"), getStudentByIdController);
-router.patch("/:id", authenticate, authorize("ADMIN"), updateStudentController);
+router.patch(
+  "/:id",
+  authenticate,
+  authorize("ADMIN"),
+  validate(updateStudentSchema),
+  updateStudentController,
+);
 
 export default router;
