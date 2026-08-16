@@ -5,11 +5,13 @@ import {
   getSectionByIdController,
   getSectionsController,
   updateSectionController,
+  updateSectionStatusController,
 } from "./section.controller.js";
 
 import {
   createSectionSchema,
   updateSectionSchema,
+  updateSectionStatusSchema,
 } from "./section.validation.js";
 import authenticate from "../../middleware/authenticate.js";
 import validate from "../../middleware/validate.js";
@@ -32,5 +34,12 @@ router.patch(
   authorize("ADMIN"),
   validate(updateSectionSchema),
   updateSectionController,
+);
+router.patch(
+  "/:id/status",
+  authenticate,
+  authorize("ADMIN"),
+  validate(updateSectionStatusSchema),
+  updateSectionStatusController,
 );
 export default router;

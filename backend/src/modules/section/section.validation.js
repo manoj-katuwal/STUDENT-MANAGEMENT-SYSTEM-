@@ -11,3 +11,7 @@ export const updateSectionSchema = Joi.object({
 
   classId: Joi.string().hex().length(24),
 }).min(1);
+
+export const updateSectionStatusSchema = Joi.object({
+  status: Joi.string().valid("ACTIVE", "INACTIVE").required(),
+});

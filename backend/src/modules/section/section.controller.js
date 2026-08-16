@@ -6,6 +6,7 @@ import {
   getSectionByIdService,
   getSectionsService,
   updateSectionService,
+  updateSectionStatusService,
 } from "./section.service.js";
 
 export const createSectionController = asyncHandler(async (req, res) => {
@@ -53,6 +54,22 @@ export const updateSectionController = asyncHandler(async (req, res) => {
     res,
     statusCode: 200,
     message: "Section updated successfully",
+    data: section,
+  });
+});
+
+export const updateSectionStatusController = asyncHandler(async (req, res) => {
+  const section = await updateSectionStatusService(
+    req.params.id,
+    req.body.status,
+  );
+
+  return successResponse({
+    res,
+    statusCode: 200,
+    message: `Section ${
+      section.status === "ACTIVE" ? "activated" : "deactivated"
+    } successfully`,
     data: section,
   });
 });

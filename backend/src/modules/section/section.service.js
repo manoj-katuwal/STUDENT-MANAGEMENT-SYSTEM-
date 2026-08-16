@@ -5,6 +5,7 @@ import {
   findSectionByNameAndClass,
   findSections,
   updateSection,
+  updateSectionStatus,
 } from "./section.repository.js";
 
 import { findClassById } from "../classes/class.repository.js";
@@ -114,4 +115,19 @@ export const updateSectionService = async (sectionId, updateData) => {
   }
 
   return await updateSection(sectionId, updateData);
+};
+
+
+export const updateSectionStatusService = async (sectionId, status) => {
+  const section = await findSectionById(sectionId);
+
+  if (!section) {
+    throw new AppError("Section not found", 404);
+  }
+
+  if (section.status === status) {
+    throw new AppError(`Section is already ${status.toLowerCase()}`, 400);
+  }
+
+  return await updateSectionStatus(sectionId, status);
 };
