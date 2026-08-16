@@ -4,6 +4,7 @@ import userRoutes from "../modules/users/user.routes.js";
 import authRoutes from "../modules/auth/auth.routes.js";
 import authenticate from "../middleware/authenticate.js";
 import authorize from "../middleware/authorize.js";
+import studentRoutes from "../modules/students/student.routes.js";
 
 const router = express.Router();
 
@@ -24,9 +25,8 @@ router.get("/admin-test", authenticate, authorize("ADMIN"), (req, res) => {
     },
   });
 });
-router.use('/users', userRoutes);
+router.use("/users", userRoutes);
 router.use("/auth", authRoutes);
-
-
+router.use("/students", studentRoutes);
 
 export default router;
