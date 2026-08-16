@@ -4,6 +4,7 @@ import {
   findSectionById,
   findSectionByNameAndClass,
   findSections,
+  updateSection,
 } from "./section.repository.js";
 
 import { findClassById } from "../classes/class.repository.js";
@@ -81,4 +82,36 @@ export const getSectionByIdService = async (sectionId) => {
   }
 
   return section;
+};
+
+export const updateSectionService = async (sectionId, updateData) => {
+  const section = await findSectionById(sectionId);
+
+  if (!section) {
+    throw new AppError("Section not found", 404);
+  }
+
+  const newClassId = updateData.classId || section.classId;
+  const newName = updateData.name || section.name;
+
+  const classRecord = await findClassById(newClassId);
+
+  if (!classRecord) {
+    throw new AppError("Class not found", 404);
+  }
+
+  if (classRecord.status === "INACTIVE") {
+    throw new AppError("Cannot assign section to an inactive class", 400);
+  }
+
+  const existingSection = await findSectionByNameAndClass(newName, newClassId);
+
+  if (existingSection && existingSection._id.toString() !== sectionId) {
+    throw new AppError(
+      "Section with this name already exists in this class",
+      400,
+    );
+  }
+
+  return await updateSection(sectionId, updateData);
 };

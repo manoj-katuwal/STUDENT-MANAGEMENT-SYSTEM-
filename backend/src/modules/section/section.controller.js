@@ -5,6 +5,7 @@ import {
   createSectionService,
   getSectionByIdService,
   getSectionsService,
+  updateSectionService,
 } from "./section.service.js";
 
 export const createSectionController = asyncHandler(async (req, res) => {
@@ -41,6 +42,17 @@ export const getSectionByIdController = asyncHandler(async (req, res) => {
     res,
     statusCode: 200,
     message: "Section fetched successfully",
+    data: section,
+  });
+});
+
+export const updateSectionController = asyncHandler(async (req, res) => {
+  const section = await updateSectionService(req.params.id, req.body);
+
+  return successResponse({
+    res,
+    statusCode: 200,
+    message: "Section updated successfully",
     data: section,
   });
 });

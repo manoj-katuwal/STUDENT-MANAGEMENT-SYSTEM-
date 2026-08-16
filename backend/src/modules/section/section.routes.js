@@ -4,9 +4,13 @@ import {
   createSectionController,
   getSectionByIdController,
   getSectionsController,
+  updateSectionController,
 } from "./section.controller.js";
 
-import { createSectionSchema } from "./section.validation.js";
+import {
+  createSectionSchema,
+  updateSectionSchema,
+} from "./section.validation.js";
 import authenticate from "../../middleware/authenticate.js";
 import validate from "../../middleware/validate.js";
 import authorize from "../../middleware/authorize.js";
@@ -22,4 +26,11 @@ router.post(
 );
 router.get("/", authenticate, authorize("ADMIN"), getSectionsController);
 router.get("/:id", authenticate, authorize("ADMIN"), getSectionByIdController);
+router.patch(
+  "/:id",
+  authenticate,
+  authorize("ADMIN"),
+  validate(updateSectionSchema),
+  updateSectionController,
+);
 export default router;
