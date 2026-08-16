@@ -16,8 +16,17 @@ export const findClassByCode = async (code) => {
   return await Class.findOne({ code });
 };
 
-export const findClasses = async (filter = {}) => {
-  return await Class.find(filter).sort({ createdAt: -1 });
+
+
+export const findClasses = async (filter = {}, skip = 0, limit = 10) => {
+  return await Class.find(filter)
+    .sort({ createdAt: -1 })
+    .skip(skip)
+    .limit(limit);
+};
+
+export const countClasses = async (filter = {}) => {
+  return await Class.countDocuments(filter);
 };
 
 export const updateClass = async (classId, updateData) => {

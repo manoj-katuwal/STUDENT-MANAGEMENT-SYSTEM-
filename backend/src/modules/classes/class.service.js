@@ -7,6 +7,7 @@ import {
   findClassById,
   updateClass,
   updateClassStatus,
+  countClasses,
 } from "./class.repository.js";
 
 export const createClassService = async (classData) => {
@@ -27,10 +28,42 @@ export const createClassService = async (classData) => {
   return classRecord;
 };
 
-export const getClassesService = async () => {
-  const classes = await findClasses();
+export const getClassesService = async (page = 1, limit = 10, search = "") => {
+  const skip = (page - 1) * limit;
 
-  return classes;
+  const filter = {};
+
+  if (search) {
+    filter.$or = [
+      {
+        name: {
+          $regex: search,
+          $options: "i",
+        },
+      },
+      {
+        code: {
+          $regex: search,
+          $options: "i",
+        },
+      },
+    ];
+  }
+
+  const [classes, total] = await Promise.all([
+    findClasses(filter, skip, limit),
+    countClasses(filter),
+  ]);
+
+  return {
+    classes,
+    pagination: {
+      page,
+      limit,
+      total,
+      totalPages: Math.ceil(total / limit),
+    },
+  };
 };
 
 export const getClassByIdService = async (classId) => {
