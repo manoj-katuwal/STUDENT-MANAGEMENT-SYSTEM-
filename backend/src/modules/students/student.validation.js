@@ -55,3 +55,8 @@ export const updateStudentSchema = Joi.object({
       .allow(null),
   }).allow(null),
 }).min(1);
+
+
+export const updateStudentStatusSchema = Joi.object({
+  status: Joi.string().valid("ACTIVE", "INACTIVE").required(),
+});

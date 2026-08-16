@@ -71,3 +71,17 @@ export const updateStudentService = async (studentId, updateData) => {
 
   return updatedStudent;
 };
+
+export const updateStudentStatusService = async (studentId, status) => {
+  const student = await findStudentById(studentId);
+
+  if (!student) {
+    throw new AppError("Student not found", 404);
+  }
+
+  const updatedStudent = await updateStudent(studentId, {
+    status,
+  });
+
+  return updatedStudent;
+};

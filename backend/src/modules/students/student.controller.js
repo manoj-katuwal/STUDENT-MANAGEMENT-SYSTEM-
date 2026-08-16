@@ -5,6 +5,7 @@ import {
   getStudentByIdService,
   getStudentsService,
   updateStudentService,
+  updateStudentStatusService,
 } from "./student.service.js";
 
 export const createStudentController = asyncHandler(async (req, res) => {
@@ -47,6 +48,20 @@ export const updateStudentController = asyncHandler(async (req, res) => {
     res,
     statusCode: 200,
     message: "Student updated successfully",
+    data: student,
+  });
+});
+
+export const updateStudentStatusController = asyncHandler(async (req, res) => {
+  const student = await updateStudentStatusService(
+    req.params.id,
+    req.body.status,
+  );
+
+  return successResponse({
+    res,
+    statusCode: 200,
+    message: "Student status updated successfully",
     data: student,
   });
 });

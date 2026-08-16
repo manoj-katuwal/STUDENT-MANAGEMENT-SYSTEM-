@@ -5,6 +5,7 @@ import {
   getStudentByIdController,
   getStudentsController,
   updateStudentController,
+  updateStudentStatusController,
 } from "./student.controller.js";
 import authenticate from "../../middleware/authenticate.js";
 import authorize from "../../middleware/authorize.js";
@@ -12,6 +13,7 @@ import validate from "../../middleware/validate.js";
 import {
   createStudentSchema,
   updateStudentSchema,
+  updateStudentStatusSchema,
 } from "./student.validation.js";
 
 const router = express.Router();
@@ -31,6 +33,13 @@ router.patch(
   authorize("ADMIN"),
   validate(updateStudentSchema),
   updateStudentController,
+);
+router.patch(
+  "/:id/status",
+  authenticate,
+  authorize("ADMIN"),
+  validate(updateStudentStatusSchema),
+  updateStudentStatusController,
 );
 
 export default router;
