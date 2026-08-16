@@ -2,6 +2,7 @@ import express from "express";
 
 import {
   createStudentController,
+  getStudentByIdController,
   getStudentsController,
 } from "./student.controller.js";
 import authenticate from "../../middleware/authenticate.js";
@@ -19,5 +20,6 @@ router.post(
   createStudentController,
 );
 router.get("/", authenticate, authorize("ADMIN"), getStudentsController);
+router.get("/:id", authenticate, authorize("ADMIN"), getStudentByIdController);
 
 export default router;

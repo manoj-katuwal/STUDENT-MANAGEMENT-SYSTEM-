@@ -2,6 +2,7 @@ import AppError from "../../shared/utils/error/AppError.js";
 import {
   createStudent,
   findStudentByAdmissionNumber,
+  findStudentById,
   findStudents,
 } from "./student.repository.js";
 
@@ -30,4 +31,14 @@ export const getStudentsService = async () => {
   const students = await findStudents();
 
   return students;
+};
+
+export const getStudentByIdService = async (studentId) => {
+  const student = await findStudentById(studentId);
+
+  if (!student) {
+    throw new AppError("Student not found", 404);
+  }
+
+  return student;
 };
