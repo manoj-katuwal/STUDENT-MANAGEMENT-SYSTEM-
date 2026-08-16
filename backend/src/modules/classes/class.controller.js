@@ -1,6 +1,6 @@
 import asyncHandler from "../../shared/utils/asyncHandler.js";
 import { successResponse } from "../../shared/utils/response/apiResponse.js";
-import { createClassService, getClassesService } from "./class.service.js";
+import { createClassService, getClassByIdService, getClassesService } from "./class.service.js";
 
 export const createClassController = asyncHandler(async (req, res) => {
   const classRecord = await createClassService(req.body);
@@ -21,5 +21,16 @@ export const getClassesController = asyncHandler(async (req, res) => {
     statusCode: 200,
     message: "Classes fetched successfully",
     data: classes,
+  });
+});
+
+export const getClassByIdController = asyncHandler(async (req, res) => {
+  const classRecord = await getClassByIdService(req.params.id);
+
+  return successResponse({
+    res,
+    statusCode: 200,
+    message: "Class fetched successfully",
+    data: classRecord,
   });
 });

@@ -4,6 +4,7 @@ import {
   findClassByName,
   findClassByCode,
   findClasses,
+  findClassById,
 } from "./class.repository.js";
 
 export const createClassService = async (classData) => {
@@ -28,4 +29,14 @@ export const getClassesService = async () => {
   const classes = await findClasses();
 
   return classes;
+};
+
+export const getClassByIdService = async (classId) => {
+  const classRecord = await findClassById(classId);
+
+  if (!classRecord) {
+    throw new AppError("Class not found", 404);
+  }
+
+  return classRecord;
 };
