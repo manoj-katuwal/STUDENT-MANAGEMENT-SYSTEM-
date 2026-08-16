@@ -1,6 +1,8 @@
 import {
+  countSections,
   createSection,
   findSectionByNameAndClass,
+  findSections,
 } from "./section.repository.js";
 
 import { findClassById } from "../classes/class.repository.js";
@@ -31,4 +33,41 @@ export const createSectionService = async (sectionData) => {
   const section = await createSection(sectionData);
 
   return section;
+};
+
+export const getSectionsService = async (
+  page = 1,
+  limit = 10,
+  search = "",
+  classId = "",
+) => {
+  const skip = (page - 1) * limit;
+
+  const filter = {};
+
+  if (search) {
+    filter.name = {
+      $regex: search,
+      $options: "i",
+    };
+  }
+
+  if (classId) {
+    filter.classId = classId;
+  }
+
+  const [sections, total] = await Promise.all([
+    findSections(filter, skip, limit),
+    countSections(filter),
+  ]);
+
+  return {
+    sections,
+    pagination: {
+      page,
+      limit,
+      total,
+      totalPages: Math.ceil(total / limit),
+    },
+  };
 };

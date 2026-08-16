@@ -1,6 +1,9 @@
 import express from "express";
 
-import { createSectionController } from "./section.controller.js";
+import {
+  createSectionController,
+  getSectionsController,
+} from "./section.controller.js";
 
 import { createSectionSchema } from "./section.validation.js";
 import authenticate from "../../middleware/authenticate.js";
@@ -16,5 +19,5 @@ router.post(
   validate(createSectionSchema),
   createSectionController,
 );
-
+router.get("/", authenticate, authorize("ADMIN"), getSectionsController);
 export default router;
