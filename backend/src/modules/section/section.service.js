@@ -1,6 +1,7 @@
 import {
   countSections,
   createSection,
+  findSectionById,
   findSectionByNameAndClass,
   findSections,
 } from "./section.repository.js";
@@ -70,4 +71,14 @@ export const getSectionsService = async (
       totalPages: Math.ceil(total / limit),
     },
   };
+};
+
+export const getSectionByIdService = async (sectionId) => {
+  const section = await findSectionById(sectionId);
+
+  if (!section) {
+    throw new AppError("Section not found", 404);
+  }
+
+  return section;
 };

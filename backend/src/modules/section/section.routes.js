@@ -2,6 +2,7 @@ import express from "express";
 
 import {
   createSectionController,
+  getSectionByIdController,
   getSectionsController,
 } from "./section.controller.js";
 
@@ -20,4 +21,5 @@ router.post(
   createSectionController,
 );
 router.get("/", authenticate, authorize("ADMIN"), getSectionsController);
+router.get("/:id", authenticate, authorize("ADMIN"), getSectionByIdController);
 export default router;

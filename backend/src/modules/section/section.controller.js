@@ -1,7 +1,11 @@
 import asyncHandler from "../../shared/utils/asyncHandler.js";
 import { successResponse } from "../../shared/utils/response/apiResponse.js";
 
-import { createSectionService, getSectionsService } from "./section.service.js";
+import {
+  createSectionService,
+  getSectionByIdService,
+  getSectionsService,
+} from "./section.service.js";
 
 export const createSectionController = asyncHandler(async (req, res) => {
   const section = await createSectionService(req.body);
@@ -27,5 +31,16 @@ export const getSectionsController = asyncHandler(async (req, res) => {
     statusCode: 200,
     message: "Sections fetched successfully",
     data: result,
+  });
+});
+
+export const getSectionByIdController = asyncHandler(async (req, res) => {
+  const section = await getSectionByIdService(req.params.id);
+
+  return successResponse({
+    res,
+    statusCode: 200,
+    message: "Section fetched successfully",
+    data: section,
   });
 });
