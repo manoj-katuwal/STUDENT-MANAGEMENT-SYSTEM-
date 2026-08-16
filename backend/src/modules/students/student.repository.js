@@ -5,7 +5,9 @@ export const createStudent = async (studentData) => {
 };
 
 export const findStudentById = async (studentId) => {
-  return await Student.findById(studentId);
+  return await Student.findById(studentId)
+    .populate("classId", "name code")
+    .populate("sectionId", "name");
 };
 
 export const findStudentByAdmissionNumber = async (admissionNumber) => {
@@ -29,6 +31,8 @@ export const findStudents = async ({
   limit = 10,
 } = {}) => {
   return await Student.find(filter)
+    .populate("classId", "name code")
+    .populate("sectionId", "name")
     .skip(skip)
     .limit(limit)
     .sort({ createdAt: -1 });
@@ -37,4 +41,3 @@ export const findStudents = async ({
 export const countStudents = async (filter = {}) => {
   return await Student.countDocuments(filter);
 };
-

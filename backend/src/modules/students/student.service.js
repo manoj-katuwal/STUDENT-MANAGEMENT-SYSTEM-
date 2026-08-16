@@ -86,6 +86,7 @@ export const updateStudentService = async (studentId, updateData) => {
     throw new AppError("Student not found", 404);
   }
 
+  // Admission number duplicate check
   if (
     updateData.admissionNumber &&
     updateData.admissionNumber !== student.admissionNumber
@@ -103,9 +104,13 @@ export const updateStudentService = async (studentId, updateData) => {
   }
 
   if (updateData.classId || updateData.sectionId) {
-    const classId = updateData.classId || student.classId;
+    const existingClassId = student.classId?._id || student.classId;
 
-    const sectionId = updateData.sectionId || student.sectionId;
+    const existingSectionId = student.sectionId?._id || student.sectionId;
+
+    const classId = updateData.classId || existingClassId;
+
+    const sectionId = updateData.sectionId || existingSectionId;
 
     await validateAcademicAssignment(classId, sectionId);
   }
