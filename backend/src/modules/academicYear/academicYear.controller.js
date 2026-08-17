@@ -1,7 +1,7 @@
 import asyncHandler from "../../shared/utils/asyncHandler.js";
 import { successResponse } from "../../shared/utils/response/apiResponse.js";
 import {
-    activateAcademicYearService,
+  activateAcademicYearService,
   createAcademicYearService,
   deactivateAcademicYearService,
   getAcademicYearByIdService,

@@ -2,12 +2,14 @@ import express from "express";
 
 import {
   createFeeStructureController,
+  deactivateFeeStructureController,
   getFeeStructureByIdController,
   getFeeStructuresController,
 } from "./feeStructure.controller.js";
 
 import authenticate from "../../middleware/authenticate.js";
 import authorize from "../../middleware/authorize.js";
+
 
 const router = express.Router();
 
@@ -24,6 +26,12 @@ router.get(
   authenticate,
   authorize("ADMIN"),
   getFeeStructureByIdController,
+);
+router.patch(
+  "/:feeStructureId/deactivate",
+  authenticate,
+  authorize("ADMIN"),
+  deactivateFeeStructureController,
 );
 
 export default router;

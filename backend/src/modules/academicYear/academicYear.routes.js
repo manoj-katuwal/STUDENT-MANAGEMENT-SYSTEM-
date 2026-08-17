@@ -1,7 +1,7 @@
 import express from "express";
 import authenticate from "../../middleware/authenticate.js";
 import {
-    activateAcademicYearController,
+  activateAcademicYearController,
   createAcademicYearController,
   deactivateAcademicYearController,
   getAcademicYearByIdController,
