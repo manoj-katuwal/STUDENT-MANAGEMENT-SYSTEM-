@@ -1,5 +1,7 @@
+import mongoose from "mongoose";
 import AppError from "../../shared/utils/error/AppError.js";
 import {
+  clearCurrentAcademicYear,
   countAcademicYears,
   createAcademicYear,
   findAcademicYearById,
@@ -8,6 +10,31 @@ import {
   findCurrentAcademicYear,
   updateAcademicYear,
 } from "./academicYear.repository.js";
+
+const switchCurrentAcademicYear = async (academicYearId, updateData = {}) => {
+  const session = await mongoose.startSession();
+
+  try {
+    session.startTransaction();
+
+    await clearCurrentAcademicYear(session);
+
+    const updatedAcademicYear = await updateAcademicYear(
+      academicYearId,
+      { ...updateData, isCurrent: true, status: "ACTIVE" },
+      session,
+    );
+
+    await session.commitTransaction();
+
+    return updatedAcademicYear;
+  } catch (error) {
+    await session.abortTransaction();
+    throw error;
+  } finally {
+    await session.endSession();
+  }
+};
 
 export const createAcademicYearService = async (academicYearData) => {
   const { name, startDate, endDate, isCurrent } = academicYearData;
@@ -30,14 +57,34 @@ export const createAcademicYearService = async (academicYearData) => {
     throw new AppError("Academic year with this name already exists", 400);
   }
 
-  if (isCurrent) {
-    const currentAcademicYear = await findCurrentAcademicYear();
+  if (isCurrent === true) {
+    const session = await mongoose.startSession();
 
-    if (currentAcademicYear) {
-      throw new AppError(
-        "Another academic year is already marked as current",
-        400,
+    try {
+      session.startTransaction();
+
+      const currentAcademicYear = await findCurrentAcademicYear(session);
+
+      if (currentAcademicYear) {
+        throw new AppError(
+          "Another academic year is already marked as current",
+          400,
+        );
+      }
+
+      const createdAcademicYear = await createAcademicYear(
+        academicYearData,
+        session,
       );
+
+      await session.commitTransaction();
+
+      return createdAcademicYear;
+    } catch (error) {
+      await session.abortTransaction();
+      throw error;
+    } finally {
+      await session.endSession();
     }
   }
 
@@ -100,7 +147,6 @@ export const updateAcademicYearService = async (academicYearId, updateData) => {
   }
 
   const startDate = updateData.startDate || academicYear.startDate;
-
   const endDate = updateData.endDate || academicYear.endDate;
 
   if (new Date(startDate) >= new Date(endDate)) {
@@ -108,31 +154,7 @@ export const updateAcademicYearService = async (academicYearId, updateData) => {
   }
 
   if (updateData.isCurrent === true) {
-    const currentAcademicYear = await findCurrentAcademicYear();
-
-    if (
-      currentAcademicYear &&
-      currentAcademicYear._id.toString() !== academicYearId.toString()
-    ) {
-      throw new AppError(
-        "Another academic year is already marked as current",
-        400,
-      );
-    }
-  }
-
-  if (updateData.isCurrent === true) {
-    const currentAcademicYear = await findCurrentAcademicYear();
-
-    if (
-      currentAcademicYear &&
-      currentAcademicYear._id.toString() !== academicYearId.toString()
-    ) {
-      throw new AppError(
-        "Another academic year is already marked as current",
-        400,
-      );
-    }
+    return await switchCurrentAcademicYear(academicYearId, updateData);
   }
 
   return await updateAcademicYear(academicYearId, updateData);
@@ -167,11 +189,11 @@ export const activateAcademicYearService = async (academicYearId) => {
     throw new AppError("Academic year not found", 404);
   }
 
-  if (academicYear.status === "ACTIVE") {
-    throw new AppError("Academic year is already active", 400);
+  if (academicYear.status === "ACTIVE" && academicYear.isCurrent) {
+    throw new AppError("Academic year is already active and current", 400);
   }
 
-  const updatedAcademicYear = await updateAcademicYear(academicYearId, {
+  const updatedAcademicYear = await switchCurrentAcademicYear(academicYearId, {
     status: "ACTIVE",
   });
 

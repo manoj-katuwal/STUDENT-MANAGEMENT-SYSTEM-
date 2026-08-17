@@ -1,21 +1,36 @@
 import AcademicYear from "./academicYear.model.js";
 
-export const createAcademicYear = async (academicYearData) => {
-  return await AcademicYear.create(academicYearData);
+export const createAcademicYear = async (academicYearData, session = null) => {
+  const academicYear = new AcademicYear(academicYearData);
+
+  if (session) {
+    await academicYear.save({ session });
+    return academicYear;
+  }
+
+  return await academicYear.save();
 };
 
-export const findAcademicYearById = async (academicYearId) => {
-  return await AcademicYear.findById(academicYearId);
+export const findAcademicYearById = async (academicYearId, session = null) => {
+  return await AcademicYear.findById(
+    academicYearId,
+    null,
+    session ? { session } : {},
+  );
 };
 
 export const findAcademicYearByName = async (name) => {
   return await AcademicYear.findOne({ name });
 };
 
-export const findCurrentAcademicYear = async () => {
-  return await AcademicYear.findOne({
-    isCurrent: true,
-  });
+export const findCurrentAcademicYear = async (session = null) => {
+  return await AcademicYear.findOne(
+    {
+      isCurrent: true,
+    },
+    null,
+    session ? { session } : {},
+  );
 };
 
 export const findAcademicYears = async ({
@@ -33,16 +48,22 @@ export const countAcademicYears = async (filter = {}) => {
   return await AcademicYear.countDocuments(filter);
 };
 
-export const updateAcademicYear = async (academicYearId, updateData) => {
+export const updateAcademicYear = async (
+  academicYearId,
+  updateData,
+  session = null,
+) => {
   return await AcademicYear.findByIdAndUpdate(academicYearId, updateData, {
     new: true,
     runValidators: true,
+    ...(session && { session }),
   });
 };
 
-export const clearCurrentAcademicYear = async () => {
+export const clearCurrentAcademicYear = async (session) => {
   return await AcademicYear.updateMany(
     { isCurrent: true },
     { $set: { isCurrent: false } },
+    { session },
   );
 };
