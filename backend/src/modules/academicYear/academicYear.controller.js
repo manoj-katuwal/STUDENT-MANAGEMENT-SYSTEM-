@@ -1,6 +1,7 @@
 import asyncHandler from "../../shared/utils/asyncHandler.js";
 import { successResponse } from "../../shared/utils/response/apiResponse.js";
 import {
+    activateAcademicYearService,
   createAcademicYearService,
   deactivateAcademicYearService,
   getAcademicYearByIdService,
@@ -75,3 +76,16 @@ export const deactivateAcademicYearController = asyncHandler(
     });
   },
 );
+
+export const activateAcademicYearController = asyncHandler(async (req, res) => {
+  const academicYear = await activateAcademicYearService(
+    req.params.academicYearId,
+  );
+
+  return successResponse({
+    res,
+    statusCode: 200,
+    message: "Academic year activated successfully",
+    data: academicYear,
+  });
+});

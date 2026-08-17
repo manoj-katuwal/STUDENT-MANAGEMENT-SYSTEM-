@@ -159,3 +159,21 @@ export const deactivateAcademicYearService = async (academicYearId) => {
 
   return updatedAcademicYear;
 };
+
+export const activateAcademicYearService = async (academicYearId) => {
+  const academicYear = await findAcademicYearById(academicYearId);
+
+  if (!academicYear) {
+    throw new AppError("Academic year not found", 404);
+  }
+
+  if (academicYear.status === "ACTIVE") {
+    throw new AppError("Academic year is already active", 400);
+  }
+
+  const updatedAcademicYear = await updateAcademicYear(academicYearId, {
+    status: "ACTIVE",
+  });
+
+  return updatedAcademicYear;
+};
