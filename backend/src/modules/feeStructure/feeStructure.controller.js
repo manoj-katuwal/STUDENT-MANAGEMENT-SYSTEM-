@@ -1,6 +1,10 @@
 import asyncHandler from "../../shared/utils/asyncHandler.js";
 import { successResponse } from "../../shared/utils/response/apiResponse.js";
-import { createFeeStructureService, getFeeStructuresService } from "./feeStructure.service.js";
+import {
+  createFeeStructureService,
+  getFeeStructureByIdService,
+  getFeeStructuresService,
+} from "./feeStructure.service.js";
 
 export const createFeeStructureController = asyncHandler(async (req, res) => {
   const feeStructure = await createFeeStructureService(req.body);
@@ -40,5 +44,18 @@ export const getFeeStructuresController = asyncHandler(async (req, res) => {
     message: "Fee structures fetched successfully",
     data: result.feeStructures,
     meta: result.pagination,
+  });
+});
+
+export const getFeeStructureByIdController = asyncHandler(async (req, res) => {
+  const feeStructure = await getFeeStructureByIdService(
+    req.params.feeStructureId,
+  );
+
+  return successResponse({
+    res,
+    statusCode: 200,
+    message: "Fee structure fetched successfully",
+    data: feeStructure,
   });
 });

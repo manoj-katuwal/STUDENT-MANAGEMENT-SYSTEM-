@@ -1,7 +1,7 @@
 import AppError from "../../shared/utils/error/AppError.js";
 import { findAcademicYearById } from "../academicYear/academicYear.repository.js";
 import { findClassById } from "../classes/class.repository.js";
-import { countFeeStructures, createFeeStructure, findFeeStructureByCombination, findFeeStructures } from "./feeStructure.repository.js";
+import { countFeeStructures, createFeeStructure, findFeeStructureByCombination, findFeeStructureById, findFeeStructures } from "./feeStructure.repository.js";
 
 export const createFeeStructureService = async (feeStructureData) => {
   const { academicYearId, classId, feeType, amount } = feeStructureData;
@@ -116,4 +116,14 @@ export const getFeeStructuresService = async (
       totalPages,
     },
   };
+};
+
+export const getFeeStructureByIdService = async (feeStructureId) => {
+  const feeStructure = await findFeeStructureById(feeStructureId);
+
+  if (!feeStructure) {
+    throw new AppError("Fee structure not found", 404);
+  }
+
+  return feeStructure;
 };
