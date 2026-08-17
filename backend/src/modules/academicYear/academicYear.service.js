@@ -1,8 +1,10 @@
 import AppError from "../../shared/utils/error/AppError.js";
 import {
+    countAcademicYears,
   createAcademicYear,
   findAcademicYearById,
   findAcademicYearByName,
+  findAcademicYears,
   findCurrentAcademicYear,
 } from "./academicYear.repository.js";
 
@@ -49,4 +51,31 @@ export const getAcademicYearByIdService = async (academicYearId) => {
   }
 
   return academicYear;
+};
+
+export const getAcademicYearsService = async (page = 1, limit = 10) => {
+  const skip = (page - 1) * limit;
+
+  const filter = {};
+
+  const [academicYears, total] = await Promise.all([
+    findAcademicYears({
+      filter,
+      skip,
+      limit,
+    }),
+    countAcademicYears(filter),
+  ]);
+
+  const totalPages = Math.ceil(total / limit);
+
+  return {
+    academicYears,
+    pagination: {
+      page,
+      limit,
+      total,
+      totalPages,
+    },
+  };
 };

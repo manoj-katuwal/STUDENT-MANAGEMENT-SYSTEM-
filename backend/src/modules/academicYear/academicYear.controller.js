@@ -1,6 +1,6 @@
 import asyncHandler from "../../shared/utils/asyncHandler.js";
 import { successResponse } from "../../shared/utils/response/apiResponse.js";
-import { createAcademicYearService, getAcademicYearByIdService } from "./academicYear.service.js";
+import { createAcademicYearService, getAcademicYearByIdService, getAcademicYearsService } from "./academicYear.service.js";
 
 export const createAcademicYearController = asyncHandler(async (req, res) => {
   const academicYear = await createAcademicYearService(req.body);
@@ -23,5 +23,20 @@ export const getAcademicYearByIdController = asyncHandler(async (req, res) => {
     statusCode: 200,
     message: "Academic year fetched successfully",
     data: academicYear,
+  });
+});
+
+export const getAcademicYearsController = asyncHandler(async (req, res) => {
+  const page = Number(req.query.page) || 1;
+  const limit = Number(req.query.limit) || 10;
+
+  const result = await getAcademicYearsService(page, limit);
+
+  return successResponse({
+    res,
+    statusCode: 200,
+    message: "Academic years fetched successfully",
+    data: result.academicYears,
+    meta: result.pagination,
   });
 });
