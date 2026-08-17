@@ -7,6 +7,7 @@ import authorize from "../middleware/authorize.js";
 import studentRoutes from "../modules/students/student.routes.js";
 import classRoutes from "../modules/classes/class.route.js";
 import sectionRoutes from "../modules/section/section.routes.js";
+import academicYearRoutes from "../modules/academicYear/academicYear.routes.js";
 
 const router = express.Router();
 
@@ -32,5 +33,6 @@ router.use("/auth", authRoutes);
 router.use("/students", studentRoutes);
 router.use("/classes", classRoutes);
 router.use("/sections", sectionRoutes);
+router.use("/academic-years", academicYearRoutes);
 
 export default router;
