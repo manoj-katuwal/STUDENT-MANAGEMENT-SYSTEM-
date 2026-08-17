@@ -1,7 +1,7 @@
 import AppError from "../../shared/utils/error/AppError.js";
 import { findAcademicYearById } from "../academicYear/academicYear.repository.js";
 import { findClassById } from "../classes/class.repository.js";
-import { createFeeStructure, findFeeStructureByCombination } from "./feeStructure.repository.js";
+import { countFeeStructures, createFeeStructure, findFeeStructureByCombination, findFeeStructures } from "./feeStructure.repository.js";
 
 export const createFeeStructureService = async (feeStructureData) => {
   const { academicYearId, classId, feeType, amount } = feeStructureData;
@@ -66,4 +66,54 @@ export const createFeeStructureService = async (feeStructureData) => {
   }
 
   return await createFeeStructure(feeStructureData);
+};
+
+export const getFeeStructuresService = async (
+  page = 1,
+  limit = 10,
+  academicYearId = "",
+  classId = "",
+  feeType = "",
+  status = "",
+) => {
+  const skip = (page - 1) * limit;
+
+  const filter = {};
+
+  if (academicYearId) {
+    filter.academicYearId = academicYearId;
+  }
+
+  if (classId) {
+    filter.classId = classId;
+  }
+
+  if (feeType) {
+    filter.feeType = feeType;
+  }
+
+  if (status) {
+    filter.status = status;
+  }
+
+  const [feeStructures, total] = await Promise.all([
+    findFeeStructures({
+      filter,
+      skip,
+      limit,
+    }),
+    countFeeStructures(filter),
+  ]);
+
+  const totalPages = Math.ceil(total / limit);
+
+  return {
+    feeStructures,
+    pagination: {
+      page,
+      limit,
+      total,
+      totalPages,
+    },
+  };
 };

@@ -1,6 +1,9 @@
 import express from "express";
 
-import { createFeeStructureController } from "./feeStructure.controller.js";
+import {
+  createFeeStructureController,
+  getFeeStructuresController,
+} from "./feeStructure.controller.js";
 
 import authenticate from "../../middleware/authenticate.js";
 import authorize from "../../middleware/authorize.js";
@@ -13,5 +16,7 @@ router.post(
   authorize("ADMIN"),
   createFeeStructureController,
 );
+
+router.get("/", authenticate, authorize("ADMIN"), getFeeStructuresController);
 
 export default router;
