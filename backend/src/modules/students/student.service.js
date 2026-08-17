@@ -85,8 +85,6 @@ export const updateStudentService = async (studentId, updateData) => {
   if (!student) {
     throw new AppError("Student not found", 404);
   }
-
-  // Admission number duplicate check
   if (
     updateData.admissionNumber &&
     updateData.admissionNumber !== student.admissionNumber
@@ -138,7 +136,24 @@ export const updateStudentStatusService = async (studentId, status) => {
   return updatedStudent;
 };
 
-export const getStudentsService = async (page = 1, limit = 10, search = "") => {
+export const getStudentsService = async (
+  page = 1,
+  limit = 10,
+  search = "",
+  classId = "",
+  sectionId = "",
+) => {
+  if (sectionId) {
+    const section = await findSectionById(sectionId);
+
+    if (!section) {
+      throw new AppError("Section not found", 404);
+    }
+
+    if (classId && section.classId.toString() !== classId.toString()) {
+      throw new AppError("Section does not belong to the selected class", 400);
+    }
+  }
   const skip = (page - 1) * limit;
 
   const filter = {};
@@ -158,6 +173,14 @@ export const getStudentsService = async (page = 1, limit = 10, search = "") => {
         },
       },
     ];
+  }
+
+  if (classId) {
+    filter.classId = classId;
+  }
+
+  if (sectionId) {
+    filter.sectionId = sectionId;
   }
 
   const [students, total] = await Promise.all([

@@ -23,8 +23,10 @@ export const getStudentsController = asyncHandler(async (req, res) => {
   const page = Number(req.query.page) || 1;
   const limit = Number(req.query.limit) || 10;
   const search = req.query.search || "";
+  const classId = req.query.classId?.trim() || "";
+  const sectionId = req.query.sectionId?.trim() || "";
 
-  const result = await getStudentsService(page, limit, search);
+  const result = await getStudentsService(page, limit, search, classId, sectionId);
 
   return successResponse({
     res,
