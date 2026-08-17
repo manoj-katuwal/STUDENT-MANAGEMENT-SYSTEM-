@@ -4,6 +4,7 @@ import {
   createAcademicYearController,
   getAcademicYearByIdController,
   getAcademicYearsController,
+  updateAcademicYearController,
 } from "./academicYear.controller.js";
 import authorize from "../../middleware/authorize.js";
 
@@ -24,5 +25,12 @@ router.get(
 );
 
 router.get("/", authenticate, authorize("ADMIN"), getAcademicYearsController);
+
+router.patch(
+  "/:academicYearId",
+  authenticate,
+  authorize("ADMIN"),
+  updateAcademicYearController,
+);
 
 export default router;
