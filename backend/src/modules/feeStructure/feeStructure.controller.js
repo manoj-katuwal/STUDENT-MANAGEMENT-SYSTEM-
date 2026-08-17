@@ -1,6 +1,7 @@
 import asyncHandler from "../../shared/utils/asyncHandler.js";
 import { successResponse } from "../../shared/utils/response/apiResponse.js";
 import {
+    activateFeeStructureService,
   createFeeStructureService,
   deactivateFeeStructureService,
   getFeeStructureByIdService,
@@ -74,3 +75,16 @@ export const deactivateFeeStructureController = asyncHandler(
     });
   },
 );
+
+export const activateFeeStructureController = asyncHandler(async (req, res) => {
+  const feeStructure = await activateFeeStructureService(
+    req.params.feeStructureId,
+  );
+
+  return successResponse({
+    res,
+    statusCode: 200,
+    message: "Fee structure activated successfully",
+    data: feeStructure,
+  });
+});

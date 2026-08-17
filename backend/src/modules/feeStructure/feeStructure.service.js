@@ -215,3 +215,19 @@ export const deactivateFeeStructureService = async (feeStructureId) => {
   });
 };
 
+export const activateFeeStructureService = async (feeStructureId) => {
+  const feeStructure = await findFeeStructureById(feeStructureId);
+
+  if (!feeStructure) {
+    throw new AppError("Fee structure not found", 404);
+  }
+
+  if (feeStructure.status === "ACTIVE") {
+    throw new AppError("Fee structure is already active", 400);
+  }
+
+  return await updateFeeStructure(feeStructureId, {
+    status: "ACTIVE",
+  });
+};
+

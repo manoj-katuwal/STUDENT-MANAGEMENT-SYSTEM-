@@ -1,6 +1,7 @@
 import express from "express";
 
 import {
+    activateFeeStructureController,
   createFeeStructureController,
   deactivateFeeStructureController,
   getFeeStructureByIdController,
@@ -32,6 +33,13 @@ router.patch(
   authenticate,
   authorize("ADMIN"),
   deactivateFeeStructureController,
+);
+
+router.patch(
+  "/:feeStructureId/activate",
+  authenticate,
+  authorize("ADMIN"),
+  activateFeeStructureController,
 );
 
 export default router;
