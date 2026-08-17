@@ -8,6 +8,7 @@ import studentRoutes from "../modules/students/student.routes.js";
 import classRoutes from "../modules/classes/class.route.js";
 import sectionRoutes from "../modules/section/section.routes.js";
 import academicYearRoutes from "../modules/academicYear/academicYear.routes.js";
+import feeStructureRoutes from "../modules/feeStructure/feeStructure.routes.js";
 
 const router = express.Router();
 
@@ -34,5 +35,6 @@ router.use("/students", studentRoutes);
 router.use("/classes", classRoutes);
 router.use("/sections", sectionRoutes);
 router.use("/academic-years", academicYearRoutes);
+router.use("/fee-structures", feeStructureRoutes);
 
 export default router;
