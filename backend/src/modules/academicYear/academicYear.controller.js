@@ -1,6 +1,12 @@
 import asyncHandler from "../../shared/utils/asyncHandler.js";
 import { successResponse } from "../../shared/utils/response/apiResponse.js";
-import { createAcademicYearService, getAcademicYearByIdService, getAcademicYearsService, updateAcademicYearService } from "./academicYear.service.js";
+import {
+  createAcademicYearService,
+  deactivateAcademicYearService,
+  getAcademicYearByIdService,
+  getAcademicYearsService,
+  updateAcademicYearService,
+} from "./academicYear.service.js";
 
 export const createAcademicYearController = asyncHandler(async (req, res) => {
   const academicYear = await createAcademicYearService(req.body);
@@ -54,3 +60,18 @@ export const updateAcademicYearController = asyncHandler(async (req, res) => {
     data: academicYear,
   });
 });
+
+export const deactivateAcademicYearController = asyncHandler(
+  async (req, res) => {
+    const academicYear = await deactivateAcademicYearService(
+      req.params.academicYearId,
+    );
+
+    return successResponse({
+      res,
+      statusCode: 200,
+      message: "Academic year deactivated successfully",
+      data: academicYear,
+    });
+  },
+);

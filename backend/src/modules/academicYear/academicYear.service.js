@@ -121,5 +121,41 @@ export const updateAcademicYearService = async (academicYearId, updateData) => {
     }
   }
 
+  if (updateData.isCurrent === true) {
+    const currentAcademicYear = await findCurrentAcademicYear();
+
+    if (
+      currentAcademicYear &&
+      currentAcademicYear._id.toString() !== academicYearId.toString()
+    ) {
+      throw new AppError(
+        "Another academic year is already marked as current",
+        400,
+      );
+    }
+  }
+
   return await updateAcademicYear(academicYearId, updateData);
+};
+
+export const deactivateAcademicYearService = async (academicYearId) => {
+  const academicYear = await findAcademicYearById(academicYearId);
+
+  if (!academicYear) {
+    throw new AppError("Academic year not found", 404);
+  }
+
+  if (academicYear.status === "INACTIVE") {
+    throw new AppError("Academic year is already inactive", 400);
+  }
+
+  if (academicYear.isCurrent) {
+    throw new AppError("Cannot deactivate the current academic year", 400);
+  }
+
+  const updatedAcademicYear = await updateAcademicYear(academicYearId, {
+    status: "INACTIVE",
+  });
+
+  return updatedAcademicYear;
 };

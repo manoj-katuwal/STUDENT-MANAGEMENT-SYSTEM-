@@ -39,3 +39,10 @@ export const updateAcademicYear = async (academicYearId, updateData) => {
     runValidators: true,
   });
 };
+
+export const clearCurrentAcademicYear = async () => {
+  return await AcademicYear.updateMany(
+    { isCurrent: true },
+    { $set: { isCurrent: false } },
+  );
+};

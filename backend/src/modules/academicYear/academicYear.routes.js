@@ -2,6 +2,7 @@ import express from "express";
 import authenticate from "../../middleware/authenticate.js";
 import {
   createAcademicYearController,
+  deactivateAcademicYearController,
   getAcademicYearByIdController,
   getAcademicYearsController,
   updateAcademicYearController,
@@ -31,6 +32,13 @@ router.patch(
   authenticate,
   authorize("ADMIN"),
   updateAcademicYearController,
+);
+
+router.patch(
+  "/:academicYearId/deactivate",
+  authenticate,
+  authorize("ADMIN"),
+  deactivateAcademicYearController,
 );
 
 export default router;
