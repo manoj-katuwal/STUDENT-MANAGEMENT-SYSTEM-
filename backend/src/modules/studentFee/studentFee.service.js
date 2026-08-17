@@ -1,4 +1,4 @@
-import { countStudentFees, createStudentFee, findStudentFee, findStudentFeeById, findStudentFees } from "./studentFee.repository.js";
+import { countStudentFees, createStudentFee, findStudentFee, findStudentFeeById, findStudentFees, updateStudentFee } from "./studentFee.repository.js";
 import { findStudentById } from "../students/student.repository.js";
 import { findAcademicYearById } from "../academicYear/academicYear.repository.js";
 import { findFeeStructureById } from "../feeStructure/feeStructure.repository.js";
@@ -167,4 +167,62 @@ export const getStudentFeesService = async ({
       hasPreviousPage: pageNumber > 1,
     },
   };
+};
+
+export const updateStudentFeeService = async (studentFeeId, updateData) => {
+  const studentFee = await findStudentFeeById(studentFeeId);
+
+  if (!studentFee) {
+    throw new AppError("Student fee not found", 404);
+  }
+
+  // Only discount can be modified here
+  const { discountAmount } = updateData;
+
+  if (discountAmount === undefined) {
+    throw new AppError("Only discount amount can be updated", 400);
+  }
+
+  if (discountAmount < 0) {
+    throw new AppError("Discount amount cannot be negative", 400);
+  }
+
+  if (discountAmount > studentFee.totalAmount) {
+    throw new AppError(
+      "Discount cannot be greater than the total fee amount",
+      400,
+    );
+  }
+
+  // Recalculate financial values
+  const netAmount = studentFee.totalAmount - discountAmount;
+
+  const paidAmount = studentFee.paidAmount;
+
+  const dueAmount = netAmount - paidAmount;
+
+  // Prevent discount from making due negative
+  if (dueAmount < 0) {
+    throw new AppError(
+      "Discount cannot reduce the fee below the amount already paid",
+      400,
+    );
+  }
+
+  let status = "PENDING";
+
+  if (dueAmount === 0) {
+    status = "PAID";
+  } else if (paidAmount > 0) {
+    status = "PARTIAL";
+  }
+
+  const updatedStudentFee = await updateStudentFee(studentFeeId, {
+    discountAmount,
+    netAmount,
+    dueAmount,
+    status,
+  });
+
+  return updatedStudentFee;
 };

@@ -3,6 +3,7 @@ import {
   createStudentFeeController,
   getStudentFeeByIdController,
   getStudentFeesController,
+  updateStudentFeeController,
 } from "./studentFee.controller.js";
 import authenticate from "../../middleware/authenticate.js";
 import authorize from "../../middleware/authorize.js";
@@ -17,5 +18,11 @@ router.get(
   getStudentFeeByIdController,
 );
 router.get("/", authenticate, authorize("ADMIN"), getStudentFeesController);
+router.patch(
+  "/:studentFeeId",
+  authenticate,
+  authorize("ADMIN"),
+  updateStudentFeeController,
+);
 
 export default router;
