@@ -1,5 +1,10 @@
 import AppError from "../../shared/utils/error/AppError.js";
-import { createAcademicYear, findAcademicYearByName, findCurrentAcademicYear } from "./academicYear.repository.js";
+import {
+  createAcademicYear,
+  findAcademicYearById,
+  findAcademicYearByName,
+  findCurrentAcademicYear,
+} from "./academicYear.repository.js";
 
 export const createAcademicYearService = async (academicYearData) => {
   const { name, startDate, endDate, isCurrent } = academicYearData;
@@ -34,4 +39,14 @@ export const createAcademicYearService = async (academicYearData) => {
   }
 
   return await createAcademicYear(academicYearData);
+};
+
+export const getAcademicYearByIdService = async (academicYearId) => {
+  const academicYear = await findAcademicYearById(academicYearId);
+
+  if (!academicYear) {
+    throw new AppError("Academic year not found", 404);
+  }
+
+  return academicYear;
 };
