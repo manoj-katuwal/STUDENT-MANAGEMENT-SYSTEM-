@@ -12,6 +12,7 @@ export const findStudentFee = async (filter = {}) => {
   return await StudentFee.findOne(filter);
 };
 
+
 export const findStudentFees = async ({
   filter = {},
   skip = 0,
@@ -20,7 +21,7 @@ export const findStudentFees = async ({
   return await StudentFee.find(filter)
     .populate("studentId", "name admissionNumber")
     .populate("academicYearId", "name")
-    .populate("feeStructureId")
+    .populate("feeStructureId", "feeType amount")
     .sort({ createdAt: -1 })
     .skip(skip)
     .limit(limit);

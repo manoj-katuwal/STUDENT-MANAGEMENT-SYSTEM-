@@ -1,9 +1,11 @@
 import express from "express";
-import { createStudentFeeController, getStudentFeeByIdController } from "./studentFee.controller.js";
+import {
+  createStudentFeeController,
+  getStudentFeeByIdController,
+  getStudentFeesController,
+} from "./studentFee.controller.js";
 import authenticate from "../../middleware/authenticate.js";
 import authorize from "../../middleware/authorize.js";
-
-
 
 const router = express.Router();
 
@@ -14,5 +16,6 @@ router.get(
   authorize("ADMIN"),
   getStudentFeeByIdController,
 );
+router.get("/", authenticate, authorize("ADMIN"), getStudentFeesController);
 
 export default router;

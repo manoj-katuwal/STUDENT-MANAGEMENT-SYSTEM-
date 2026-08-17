@@ -1,4 +1,4 @@
-import { createStudentFee, findStudentFee, findStudentFeeById } from "./studentFee.repository.js";
+import { countStudentFees, createStudentFee, findStudentFee, findStudentFeeById, findStudentFees } from "./studentFee.repository.js";
 import { findStudentById } from "../students/student.repository.js";
 import { findAcademicYearById } from "../academicYear/academicYear.repository.js";
 import { findFeeStructureById } from "../feeStructure/feeStructure.repository.js";
@@ -111,4 +111,60 @@ export const getStudentFeeByIdService = async (studentFeeId) => {
   }
 
   return studentFee;
+};
+
+export const getStudentFeesService = async ({
+  page = 1,
+  limit = 10,
+  studentId,
+  academicYearId,
+  feeStructureId,
+  status,
+}) => {
+  const filter = {};
+
+  if (studentId) {
+    filter.studentId = studentId;
+  }
+
+  if (academicYearId) {
+    filter.academicYearId = academicYearId;
+  }
+
+  if (feeStructureId) {
+    filter.feeStructureId = feeStructureId;
+  }
+
+  if (status) {
+    filter.status = status;
+  }
+
+  const pageNumber = Number(page);
+  const limitNumber = Number(limit);
+
+  const skip = (pageNumber - 1) * limitNumber;
+
+  const [studentFees, total] = await Promise.all([
+    findStudentFees({
+      filter,
+      skip,
+      limit: limitNumber,
+    }),
+
+    countStudentFees(filter),
+  ]);
+
+  const totalPages = Math.ceil(total / limitNumber);
+
+  return {
+    studentFees,
+    pagination: {
+      total,
+      page: pageNumber,
+      limit: limitNumber,
+      totalPages,
+      hasNextPage: pageNumber < totalPages,
+      hasPreviousPage: pageNumber > 1,
+    },
+  };
 };
