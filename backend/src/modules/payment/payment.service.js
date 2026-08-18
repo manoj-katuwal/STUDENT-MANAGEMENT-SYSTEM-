@@ -69,11 +69,24 @@ export const createOfflinePayment = async ({
   };
 };
 
-export const getPaymentHistory = async (studentFeeId) => {
-  const studentFee = await studentFeeRepository.findStudentFeeById(studentFeeId);
+export const getPaymentHistoryService = async (
+  studentFeeId,
+  requestingUser,
+) => {
+  const studentFee = await studentFeeRepository.findById(studentFeeId);
 
   if (!studentFee) {
     throw new AppError("StudentFee not found", 404);
+  }
+
+  if (
+    requestingUser.role === "STUDENT" &&
+    studentFee.studentId.toString() !== requestingUser.studentId.toString()
+  ) {
+    throw new AppError(
+      "You are not authorized to view this payment history",
+      403,
+    );
   }
 
   const payments = await paymentRepository.findByStudentFeeId(studentFeeId);
@@ -84,7 +97,7 @@ export const getPaymentHistory = async (studentFeeId) => {
   };
 };
 
-export const getReceipt = async (paymentId) => {
+export const getReceiptService = async (paymentId, requestingUser) => {
   const payment = await paymentRepository.findById(paymentId);
 
   if (!payment) {
@@ -98,7 +111,14 @@ export const getReceipt = async (paymentId) => {
     );
   }
 
-  const studentFee = await studentFeeRepository.findStudentFeeById(payment.studentFeeId);
+  const studentFee = await studentFeeRepository.findById(payment.studentFeeId);
+
+  if (
+    requestingUser.role === "STUDENT" &&
+    studentFee.studentId.toString() !== requestingUser.studentId.toString()
+  ) {
+    throw new AppError("You are not authorized to view this receipt", 403);
+  }
 
   return {
     receiptNo: `RCPT-${payment._id.toString().slice(-8).toUpperCase()}`,

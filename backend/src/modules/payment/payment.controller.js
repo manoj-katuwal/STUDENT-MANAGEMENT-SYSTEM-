@@ -28,10 +28,13 @@ export const createOfflinePayment = asyncHandler(async (req, res) => {
   });
 });
 
-export const getPaymentHistory = asyncHandler(async (req, res) => {
+export const getPaymentHistoryController = asyncHandler(async (req, res) => {
   const { studentFeeId } = req.params;
 
-  const result = await paymentService.getPaymentHistory(studentFeeId);
+  const result = await getPaymentHistoryService(
+    studentFeeId,
+    req.user, 
+  );
 
   return successResponse({
     res,
@@ -41,10 +44,10 @@ export const getPaymentHistory = asyncHandler(async (req, res) => {
   });
 });
 
-export const getReceipt = asyncHandler(async (req, res) => {
+export const getReceiptController = asyncHandler(async (req, res) => {
   const { paymentId } = req.params;
 
-  const receipt = await paymentService.getReceipt(paymentId);
+  const receipt = await getReceiptService(paymentId, req.user);
 
   return successResponse({
     res,

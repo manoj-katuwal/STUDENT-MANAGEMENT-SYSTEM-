@@ -1,5 +1,5 @@
 import express from "express";
-import { createOfflinePayment, getPaymentHistory, getReceipt } from "./payment.controller.js";
+import { createOfflinePayment, getPaymentHistoryController, getReceiptController, } from "./payment.controller.js";
 import authenticate from "../../middleware/authenticate.js";
 import authorize from "../../middleware/authorize.js";
 
@@ -15,14 +15,14 @@ router.get(
   "/student-fee/:studentFeeId",
   authenticate,
   authorize("ADMIN", "ACCOUNTANT", "STUDENT"),
-  getPaymentHistory,
+  getPaymentHistoryController,
 );
 
 router.get(
   "/:paymentId/receipt",
   authenticate,
   authorize("ADMIN", "ACCOUNTANT", "STUDENT"),
-  getReceipt,
+  getReceiptController,
 );
 
 export default router;
