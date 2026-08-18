@@ -95,3 +95,11 @@ export const getStudentFeeSummary = async (studentId) => {
     }
   );
 };
+
+export const updatePaymentStatus = async (id, { paidAmount, dueAmount, status }) => {
+  return await StudentFee.findByIdAndUpdate(
+    id,
+    { paidAmount, dueAmount, status },
+    { new: true },
+  );
+};

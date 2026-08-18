@@ -10,6 +10,7 @@ import sectionRoutes from "../modules/section/section.routes.js";
 import academicYearRoutes from "../modules/academicYear/academicYear.routes.js";
 import feeStructureRoutes from "../modules/feeStructure/feeStructure.routes.js";
 import studentFeeRoutes from "../modules/studentFee/studentFee.routes.js";
+import paymentRoutes from '../modules/payment/payment.routes.js'
 
 const router = express.Router();
 
@@ -38,5 +39,6 @@ router.use("/sections", sectionRoutes);
 router.use("/academic-years", academicYearRoutes);
 router.use("/fee-structures", feeStructureRoutes);
 router.use("/student-fees", studentFeeRoutes);
+router.use("/offline", paymentRoutes);
 
 export default router;
