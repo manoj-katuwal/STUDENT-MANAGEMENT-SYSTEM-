@@ -1,4 +1,5 @@
 import StudentFee from "./studentFee.model.js";
+import mongoose from "mongoose";
 
 export const createStudentFee = async (studentFeeData) => {
   return await StudentFee.create(studentFeeData);
@@ -11,7 +12,6 @@ export const findStudentFeeById = async (studentFeeId) => {
 export const findStudentFee = async (filter = {}) => {
   return await StudentFee.findOne(filter);
 };
-
 
 export const findStudentFees = async ({
   filter = {},
@@ -36,4 +36,62 @@ export const updateStudentFee = async (studentFeeId, updateData) => {
     new: true,
     runValidators: true,
   });
+};
+
+export const getStudentFeeSummary = async (studentId) => {
+  const result = await StudentFee.aggregate([
+    {
+      $match: {
+        studentId: new mongoose.Types.ObjectId(studentId),
+        status: {
+          $ne: "CANCELLED",
+        },
+      },
+    },
+    {
+      $group: {
+        _id: null,
+
+        totalAmount: {
+          $sum: "$totalAmount",
+        },
+
+        discountAmount: {
+          $sum: "$discountAmount",
+        },
+
+        netAmount: {
+          $sum: "$netAmount",
+        },
+
+        paidAmount: {
+          $sum: "$paidAmount",
+        },
+
+        dueAmount: {
+          $sum: "$dueAmount",
+        },
+      },
+    },
+    {
+      $project: {
+        _id: 0,
+        totalAmount: 1,
+        discountAmount: 1,
+        netAmount: 1,
+        paidAmount: 1,
+        dueAmount: 1,
+      },
+    },
+  ]);
+
+  return (
+    result[0] || {
+      totalAmount: 0,
+      discountAmount: 0,
+      netAmount: 0,
+      paidAmount: 0,
+      dueAmount: 0,
+    }
+  );
 };

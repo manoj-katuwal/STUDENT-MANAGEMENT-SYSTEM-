@@ -1,6 +1,6 @@
 import asyncHandler from "../../shared/utils/asyncHandler.js";
 import { successResponse } from "../../shared/utils/response/apiResponse.js";
-import { cancelStudentFeeService, createStudentFeeService, getStudentFeeByIdService, getStudentFeesService, updateStudentFeeService } from "./studentFee.service.js";
+import { cancelStudentFeeService, createStudentFeeService, getStudentFeeByIdService, getStudentFeesService, getStudentFeeSummaryService, updateStudentFeeService } from "./studentFee.service.js";
 
 
 export const createStudentFeeController = asyncHandler(async (req, res) => {
@@ -65,5 +65,16 @@ export const cancelStudentFeeController = asyncHandler(async (req, res) => {
     statusCode: 200,
     message: "Student fee cancelled successfully",
     data: studentFee,
+  });
+});
+
+export const getStudentFeeSummaryController = asyncHandler(async (req, res) => {
+  const summary = await getStudentFeeSummaryService(req.params.studentId);
+
+  return successResponse({
+    res,
+    statusCode: 200,
+    message: "Student fee summary fetched successfully",
+    data: summary,
   });
 });

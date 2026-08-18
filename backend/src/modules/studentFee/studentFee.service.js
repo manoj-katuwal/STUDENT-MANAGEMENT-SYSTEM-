@@ -1,4 +1,4 @@
-import { countStudentFees, createStudentFee, findStudentFee, findStudentFeeById, findStudentFees, updateStudentFee } from "./studentFee.repository.js";
+import { countStudentFees, createStudentFee, findStudentFee, findStudentFeeById, findStudentFees, getStudentFeeSummary, updateStudentFee } from "./studentFee.repository.js";
 import { findStudentById } from "../students/student.repository.js";
 import { findAcademicYearById } from "../academicYear/academicYear.repository.js";
 import { findFeeStructureById } from "../feeStructure/feeStructure.repository.js";
@@ -252,4 +252,20 @@ export const cancelStudentFeeService = async (studentFeeId) => {
   });
 
   return cancelledStudentFee;
+};
+
+export const getStudentFeeSummaryService = async (studentId) => {
+  if (!studentId) {
+    throw new AppError("Student ID is required", 400);
+  }
+
+  const student = await findStudentById(studentId);
+
+  if (!student) {
+    throw new AppError("Student not found", 404);
+  }
+
+  const summary = await getStudentFeeSummary(studentId);
+
+  return summary;
 };
