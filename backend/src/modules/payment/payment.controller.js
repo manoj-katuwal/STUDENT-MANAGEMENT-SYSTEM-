@@ -1,58 +1,52 @@
 import asyncHandler from "../../shared/utils/asyncHandler.js";
-import AppError from "../../shared/utils/error/AppError.js";
 import { successResponse } from "../../shared/utils/response/apiResponse.js";
-import * as paymentService from "./payment.service.js";
+import { createOfflinePaymentService, getPaymentsListService, getStudentFeePaymentHistoryService } from "./payment.service.js";
 
-export const createOfflinePayment = asyncHandler(async (req, res) => {
-  const { studentFeeId, amount, paymentMethod, remarks } = req.body;
 
-  if (!studentFeeId || !amount || !paymentMethod) {
-    throw new AppError(
-      "studentFeeId, amount, and paymentMethod are required",
-      400,
-    );
-  }
-
-  const result = await paymentService.createOfflinePayment({
-    studentFeeId,
-    amount,
-    paymentMethod,
-    remarks,
-  });
+export const createOfflinePaymentController = asyncHandler(async (req, res) => {
+  const payment = await createOfflinePaymentService(req.body);
 
   return successResponse({
     res,
     statusCode: 201,
-    message: "Payment recorded successfully",
-    data: result,
+    message: "Payment created successfully",
+    data: payment,
   });
 });
 
-export const getPaymentHistoryController = asyncHandler(async (req, res) => {
-  const { studentFeeId } = req.params;
-
-  const result = await getPaymentHistoryService(
-    studentFeeId,
-    req.user, 
-  );
+export const getPaymentByIdController = asyncHandler(async (req, res) => {
+  const payment = await getPaymentByIdService(req.params.paymentId);
 
   return successResponse({
     res,
     statusCode: 200,
-    message: "Payment history fetched successfully",
-    data: result,
+    message: "Payment fetched successfully",
+    data: payment,
   });
 });
 
-export const getReceiptController = asyncHandler(async (req, res) => {
-  const { paymentId } = req.params;
+export const getStudentFeePaymentHistoryController = asyncHandler(
+  async (req, res) => {
+    const payments = await getStudentFeePaymentHistoryService(
+      req.params.studentFeeId,
+    );
 
-  const receipt = await getReceiptService(paymentId, req.user);
+    return successResponse({
+      res,
+      statusCode: 200,
+      message: "Payment history fetched successfully",
+      data: payments,
+    });
+  },
+);
+
+export const getPaymentsListController = asyncHandler(async (req, res) => {
+  const result = await getPaymentsListService(req.query);
 
   return successResponse({
     res,
     statusCode: 200,
-    message: "Receipt fetched successfully",
-    data: receipt,
+    message: "Payments fetched successfully",
+    data: result,
   });
 });

@@ -1,28 +1,41 @@
 import express from "express";
-import { createOfflinePayment, getPaymentHistoryController, getReceiptController, } from "./payment.controller.js";
 import authenticate from "../../middleware/authenticate.js";
 import authorize from "../../middleware/authorize.js";
+import {
+  createOfflinePaymentController,
+  getPaymentByIdController,
+  getStudentFeePaymentHistoryController,
+  getPaymentsListController,
+} from "./payment.controller.js";
 
 const router = express.Router();
+
+router.get(
+  "/",
+  authenticate,
+  authorize("ADMIN", "ACCOUNTANT"),
+  getPaymentsListController,
+);
+
 router.post(
   "/offline",
   authenticate,
   authorize("ADMIN", "ACCOUNTANT"),
-  createOfflinePayment,
+  createOfflinePaymentController,
 );
 
 router.get(
   "/student-fee/:studentFeeId",
   authenticate,
-  authorize("ADMIN", "ACCOUNTANT", "STUDENT"),
-  getPaymentHistoryController,
+  authorize("ADMIN", "ACCOUNTANT"),
+  getStudentFeePaymentHistoryController,
 );
 
 router.get(
-  "/:paymentId/receipt",
+  "/:paymentId",
   authenticate,
-  authorize("ADMIN", "ACCOUNTANT", "STUDENT"),
-  getReceiptController,
+  authorize("ADMIN", "ACCOUNTANT"),
+  getPaymentByIdController,
 );
 
 export default router;

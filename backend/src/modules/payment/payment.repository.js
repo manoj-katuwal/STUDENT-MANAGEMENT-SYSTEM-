@@ -1,47 +1,45 @@
 import Payment from "./payment.model.js";
-import mongoose from "mongoose";
 
-export const create = async (data) => {
-  return await Payment.create(data);
+export const createPayment = async (paymentData) => {
+  return await Payment.create(paymentData);
 };
 
-export const findById = async (id) => {
-  return await Payment.findById(id);
+export const findPaymentById = async (paymentId) => {
+  return await Payment.findById(paymentId);
 };
 
-export const findByTransactionId = async (transactionId) => {
+export const findPaymentByTransactionId = async (transactionId) => {
   return await Payment.findOne({ transactionId });
 };
 
-export const findByStudentFeeId = async (studentFeeId) => {
-  return await Payment.find({ studentFeeId }).sort({
-    createdAt: -1,
-  });
+export const findPaymentsByStudentFeeId = async (studentFeeId) => {
+  return await Payment.find({ studentFeeId }).sort({ createdAt: -1 });
 };
 
-export const getTotalPaidAmount = async (studentFeeId) => {
-  const result = await Payment.aggregate([
-    {
-      $match: {
-        studentFeeId: new mongoose.Types.ObjectId(studentFeeId),
-        paymentStatus: "SUCCESS",
-      },
-    },
-    {
-      $group: {
-        _id: "$studentFeeId",
-        totalPaid: { $sum: "$amount" },
-      },
-    },
-  ]);
-
-  return result.length > 0 ? result[0].totalPaid : 0;
+export const findPayments = async ({ filter = {}, skip = 0, limit = 10 }) => {
+  return await Payment.find(filter)
+    .populate({
+      path: "studentFeeId",
+      populate: [
+        {
+          path: "studentId",
+          select: "name admissionNumber",
+        },
+        {
+          path: "academicYearId",
+          select: "name",
+        },
+        {
+          path: "feeStructureId",
+          select: "feeType amount",
+        },
+      ],
+    })
+    .sort({ createdAt: -1 })
+    .skip(skip)
+    .limit(limit);
 };
 
-export const updateStatus = async (id, status) => {
-  return await Payment.findByIdAndUpdate(
-    id,
-    { paymentStatus: status },
-    { new: true },
-  );
+export const countPayments = async (filter = {}) => {
+  return await Payment.countDocuments(filter);
 };

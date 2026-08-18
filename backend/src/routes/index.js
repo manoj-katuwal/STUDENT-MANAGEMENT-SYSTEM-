@@ -11,6 +11,7 @@ import academicYearRoutes from "../modules/academicYear/academicYear.routes.js";
 import feeStructureRoutes from "../modules/feeStructure/feeStructure.routes.js";
 import studentFeeRoutes from "../modules/studentFee/studentFee.routes.js";
 import paymentRoutes from '../modules/payment/payment.routes.js'
+import esewaRoutes from "../modules/payment/gateways/esewa.routes.js";
 
 const router = express.Router();
 
@@ -40,5 +41,6 @@ router.use("/academic-years", academicYearRoutes);
 router.use("/fee-structures", feeStructureRoutes);
 router.use("/student-fees", studentFeeRoutes);
 router.use("/payments", paymentRoutes);
+router.use("/payments/online",esewaRoutes);
 
 export default router;

@@ -1,137 +1,161 @@
-import * as paymentRepository from "./payment.repository.js";
-import * as studentFeeRepository from "../studentFee/studentFee.repository.js";
-import { updateStudentFee } from "../studentFee/studentFee.repository.js";
 import AppError from "../../shared/utils/error/AppError.js";
+import { findStudentFeeById, updateStudentFee } from "../studentFee/studentFee.repository.js";
+import { countPayments, createPayment, findPaymentByTransactionId, findPayments, findPaymentsByStudentFeeId } from "./payment.repository.js";
 
-const OFFLINE_METHODS = ["CASH", "BANK_TRANSFER", "CHEQUE"];
+export const createOfflinePaymentService = async (paymentData) => {
+  const { studentFeeId, amount, paymentMethod, transactionId, remarks } =
+    paymentData;
 
-export const createOfflinePayment = async ({
-  studentFeeId,
-  amount,
-  paymentMethod,
-  remarks,
-}) => {
-  if (!OFFLINE_METHODS.includes(paymentMethod)) {
+  // 1. Required fields
+  if (!studentFeeId) {
+    throw new AppError("Student fee is required", 400);
+  }
+
+  if (!amount) {
+    throw new AppError("Payment amount is required", 400);
+  }
+
+  if (!paymentMethod) {
+    throw new AppError("Payment method is required", 400);
+  }
+
+  // 2. Validate offline payment method
+  const offlineMethods = ["CASH", "BANK_TRANSFER", "CHEQUE"];
+
+  if (!offlineMethods.includes(paymentMethod)) {
     throw new AppError("Invalid offline payment method", 400);
   }
 
-  if (amount <= 0) {
-    throw new AppError("Amount must be greater than 0", 400);
-  }
-
-  const studentFee =
-    await studentFeeRepository.findStudentFeeById(studentFeeId);
+  // 3. Find StudentFee
+  const studentFee = await findStudentFeeById(studentFeeId);
 
   if (!studentFee) {
-    throw new AppError("StudentFee not found", 404);
+    throw new AppError("Student fee not found", 404);
   }
 
+  // 4. Cannot pay cancelled fee
   if (studentFee.status === "CANCELLED") {
-    throw new AppError("Cannot accept payment for a cancelled fee", 400);
+    throw new AppError("Cannot make payment for a cancelled student fee", 400);
   }
 
-  const currentPaid = await paymentRepository.getTotalPaidAmount(studentFeeId);
-
-  const currentDue = studentFee.netAmount - currentPaid;
-
-  if (amount > currentDue) {
-    throw new AppError(`Payment exceeds due amount. Due: ${currentDue}`, 400);
+  // 5. Validate amount
+  if (amount <= 0) {
+    throw new AppError("Payment amount must be greater than zero", 400);
   }
 
-  const payment = await paymentRepository.create({
+  // 6. Prevent overpayment
+  if (amount > studentFee.dueAmount) {
+    throw new AppError(
+      "Payment amount cannot be greater than the due amount",
+      400,
+    );
+  }
+
+  // 7. Transaction ID validation
+  if (transactionId) {
+    const existingPayment = await findPaymentByTransactionId(transactionId);
+
+    if (existingPayment) {
+      throw new AppError("Transaction ID already exists", 409);
+    }
+  }
+
+  // 8. Calculate new financial values
+  const newPaidAmount = studentFee.paidAmount + amount;
+
+  const newDueAmount = studentFee.netAmount - newPaidAmount;
+
+  let newStatus = "PARTIAL";
+
+  if (newDueAmount === 0) {
+    newStatus = "PAID";
+  }
+
+  // 9. Create payment
+  const payment = await createPayment({
     studentFeeId,
     amount,
     paymentMethod,
     paymentType: "OFFLINE",
     paymentStatus: "SUCCESS",
-    remarks,
+    transactionId: transactionId || null,
+    gateway: null,
+    paidAt: new Date(),
+    remarks: remarks || null,
   });
 
-  const newPaidAmount = currentPaid + amount;
-  const newDueAmount = studentFee.netAmount - newPaidAmount;
-
-  let newStatus = "PARTIAL";
-  if (newDueAmount === 0) {
-    newStatus = "PAID";
-  } else if (newPaidAmount === 0) {
-    newStatus = "PENDING";
-  }
-
-  const updatedStudentFee = await updateStudentFee(studentFeeId, {
+  // 10. Update StudentFee
+  await updateStudentFee(studentFeeId, {
     paidAmount: newPaidAmount,
     dueAmount: newDueAmount,
     status: newStatus,
   });
 
-  return {
-    payment,
-    studentFee: updatedStudentFee,
-  };
+  return payment;
 };
 
-export const getPaymentHistoryService = async (
-  studentFeeId,
-  requestingUser,
-) => {
-  const studentFee = await studentFeeRepository.findById(studentFeeId);
+
+export const getStudentFeePaymentHistoryService = async (studentFeeId) => {
+  const studentFee = await findStudentFeeById(studentFeeId);
 
   if (!studentFee) {
-    throw new AppError("StudentFee not found", 404);
+    throw new AppError("Student fee not found", 404);
   }
 
-  if (
-    requestingUser.role === "STUDENT" &&
-    studentFee.studentId.toString() !== requestingUser.studentId.toString()
-  ) {
-    throw new AppError(
-      "You are not authorized to view this payment history",
-      403,
-    );
-  }
+  const payments = await findPaymentsByStudentFeeId(studentFeeId);
 
-  const payments = await paymentRepository.findByStudentFeeId(studentFeeId);
-
-  return {
-    studentFee,
-    payments,
-  };
+  return payments;
 };
 
-export const getReceiptService = async (paymentId, requestingUser) => {
-  const payment = await paymentRepository.findById(paymentId);
 
-  if (!payment) {
-    throw new AppError("Payment not found", 404);
+export const getPaymentsListService = async (queryParams) => {
+  const {
+    page = 1,
+    limit = 10,
+    method,
+    studentFeeId,
+    fromDate,
+    toDate,
+  } = queryParams;
+
+  const filter = {};
+
+  if (method) {
+    filter.method = method;
   }
 
-  if (payment.paymentStatus !== "SUCCESS") {
-    throw new AppError(
-      "Receipt is only available for successful payments",
-      400,
-    );
+  if (studentFeeId) {
+    filter.studentFeeId = studentFeeId;
   }
 
-  const studentFee = await studentFeeRepository.findById(payment.studentFeeId);
+  if (fromDate || toDate) {
+    filter.createdAt = {};
 
-  if (
-    requestingUser.role === "STUDENT" &&
-    studentFee.studentId.toString() !== requestingUser.studentId.toString()
-  ) {
-    throw new AppError("You are not authorized to view this receipt", 403);
+    if (fromDate) {
+      filter.createdAt.$gte = new Date(fromDate);
+    }
+
+    if (toDate) {
+      filter.createdAt.$lte = new Date(toDate);
+    }
   }
+
+  const pageNumber = Number(page);
+  const limitNumber = Number(limit);
+  const skip = (pageNumber - 1) * limitNumber;
+
+  const [payments, total] = await Promise.all([
+    findPayments({ filter, skip, limit: limitNumber }),
+    countPayments(filter),
+  ]);
 
   return {
-    receiptNo: `RCPT-${payment._id.toString().slice(-8).toUpperCase()}`,
-    paymentId: payment._id,
-    amount: payment.amount,
-    paymentMethod: payment.paymentMethod,
-    paidAt: payment.paidAt,
-    remarks: payment.remarks,
-    studentFee: {
-      netAmount: studentFee.netAmount,
-      paidAmount: studentFee.paidAmount,
-      dueAmount: studentFee.dueAmount,
-      status: studentFee.status,
+    payments,
+    pagination: {
+      total,
+      page: pageNumber,
+      limit: limitNumber,
+      totalPages: Math.ceil(total / limitNumber),
     },
   };
 };
