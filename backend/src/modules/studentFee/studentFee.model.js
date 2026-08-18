@@ -55,7 +55,7 @@ const studentFeeSchema = new mongoose.Schema(
 
     status: {
       type: String,
-      enum: ["PENDING", "PARTIAL", "PAID"],
+      enum: ["PENDING", "PARTIAL", "PAID", "CANCELLED"],
       default: "PENDING",
     },
   },

@@ -1,5 +1,6 @@
 import express from "express";
 import {
+  cancelStudentFeeController,
   createStudentFeeController,
   getStudentFeeByIdController,
   getStudentFeesController,
@@ -23,6 +24,12 @@ router.patch(
   authenticate,
   authorize("ADMIN"),
   updateStudentFeeController,
+);
+router.patch(
+  "/:studentFeeId/cancel",
+  authenticate,
+  authorize("ADMIN"),
+  cancelStudentFeeController,
 );
 
 export default router;

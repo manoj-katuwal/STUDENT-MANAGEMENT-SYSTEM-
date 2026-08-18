@@ -226,3 +226,30 @@ export const updateStudentFeeService = async (studentFeeId, updateData) => {
 
   return updatedStudentFee;
 };
+
+export const cancelStudentFeeService = async (studentFeeId) => {
+  const studentFee = await findStudentFeeById(studentFeeId);
+
+  if (!studentFee) {
+    throw new AppError("Student fee not found", 404);
+  }
+
+  // Already cancelled
+  if (studentFee.status === "CANCELLED") {
+    throw new AppError("Student fee is already cancelled", 400);
+  }
+
+  // Cannot cancel if payment already exists
+  if (studentFee.paidAmount > 0) {
+    throw new AppError(
+      "Cannot cancel a student fee with existing payment",
+      400,
+    );
+  }
+
+  const cancelledStudentFee = await updateStudentFee(studentFeeId, {
+    status: "CANCELLED",
+  });
+
+  return cancelledStudentFee;
+};
