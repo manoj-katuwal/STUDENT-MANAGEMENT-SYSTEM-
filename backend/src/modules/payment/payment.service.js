@@ -68,3 +68,50 @@ export const createOfflinePayment = async ({
     studentFee: updatedStudentFee,
   };
 };
+
+export const getPaymentHistory = async (studentFeeId) => {
+  const studentFee = await studentFeeRepository.findStudentFeeById(studentFeeId);
+
+  if (!studentFee) {
+    throw new AppError("StudentFee not found", 404);
+  }
+
+  const payments = await paymentRepository.findByStudentFeeId(studentFeeId);
+
+  return {
+    studentFee,
+    payments,
+  };
+};
+
+export const getReceipt = async (paymentId) => {
+  const payment = await paymentRepository.findById(paymentId);
+
+  if (!payment) {
+    throw new AppError("Payment not found", 404);
+  }
+
+  if (payment.paymentStatus !== "SUCCESS") {
+    throw new AppError(
+      "Receipt is only available for successful payments",
+      400,
+    );
+  }
+
+  const studentFee = await studentFeeRepository.findStudentFeeById(payment.studentFeeId);
+
+  return {
+    receiptNo: `RCPT-${payment._id.toString().slice(-8).toUpperCase()}`,
+    paymentId: payment._id,
+    amount: payment.amount,
+    paymentMethod: payment.paymentMethod,
+    paidAt: payment.paidAt,
+    remarks: payment.remarks,
+    studentFee: {
+      netAmount: studentFee.netAmount,
+      paidAmount: studentFee.paidAmount,
+      dueAmount: studentFee.dueAmount,
+      status: studentFee.status,
+    },
+  };
+};

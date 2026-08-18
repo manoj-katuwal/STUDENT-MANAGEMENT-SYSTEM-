@@ -1,5 +1,5 @@
 import express from "express";
-import { createOfflinePayment } from "./payment.controller.js";
+import { createOfflinePayment, getPaymentHistory, getReceipt } from "./payment.controller.js";
 import authenticate from "../../middleware/authenticate.js";
 import authorize from "../../middleware/authorize.js";
 
@@ -9,6 +9,20 @@ router.post(
   authenticate,
   authorize("ADMIN", "ACCOUNTANT"),
   createOfflinePayment,
+);
+
+router.get(
+  "/student-fee/:studentFeeId",
+  authenticate,
+  authorize("ADMIN", "ACCOUNTANT", "STUDENT"),
+  getPaymentHistory,
+);
+
+router.get(
+  "/:paymentId/receipt",
+  authenticate,
+  authorize("ADMIN", "ACCOUNTANT", "STUDENT"),
+  getReceipt,
 );
 
 export default router;

@@ -27,3 +27,29 @@ export const createOfflinePayment = asyncHandler(async (req, res) => {
     data: result,
   });
 });
+
+export const getPaymentHistory = asyncHandler(async (req, res) => {
+  const { studentFeeId } = req.params;
+
+  const result = await paymentService.getPaymentHistory(studentFeeId);
+
+  return successResponse({
+    res,
+    statusCode: 200,
+    message: "Payment history fetched successfully",
+    data: result,
+  });
+});
+
+export const getReceipt = asyncHandler(async (req, res) => {
+  const { paymentId } = req.params;
+
+  const receipt = await paymentService.getReceipt(paymentId);
+
+  return successResponse({
+    res,
+    statusCode: 200,
+    message: "Receipt fetched successfully",
+    data: receipt,
+  });
+});
