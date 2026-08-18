@@ -39,6 +39,6 @@ router.use("/sections", sectionRoutes);
 router.use("/academic-years", academicYearRoutes);
 router.use("/fee-structures", feeStructureRoutes);
 router.use("/student-fees", studentFeeRoutes);
-router.use("/offline", paymentRoutes);
+router.use("/payments", paymentRoutes);
 
 export default router;
