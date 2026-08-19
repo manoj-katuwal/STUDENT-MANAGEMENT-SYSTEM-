@@ -3,7 +3,7 @@ import { successResponse } from "../../shared/utils/response/apiResponse.js";
 import { getReceiptByIdService, getReceiptByPaymentIdService, getReceiptByReceiptNumberService } from "./receipt.service.js";
 
 export const getReceiptByIdController = asyncHandler(async (req, res) => {
-  const receipt = await getReceiptByIdService(req.params.id);
+  const receipt = await getReceiptByIdService(req.params.id, req.user);
 
   return successResponse({
     res,
@@ -15,7 +15,10 @@ export const getReceiptByIdController = asyncHandler(async (req, res) => {
 
 export const getReceiptByPaymentIdController = asyncHandler(
   async (req, res) => {
-    const receipt = await getReceiptByPaymentIdService(req.params.paymentId);
+    const receipt = await getReceiptByPaymentIdService(
+      req.params.paymentId,
+      req.user,
+    );
 
     return successResponse({
       res,
@@ -30,6 +33,7 @@ export const getReceiptByReceiptNumberController = asyncHandler(
   async (req, res) => {
     const receipt = await getReceiptByReceiptNumberService(
       req.params.receiptNumber,
+      req.user,
     );
 
     return successResponse({

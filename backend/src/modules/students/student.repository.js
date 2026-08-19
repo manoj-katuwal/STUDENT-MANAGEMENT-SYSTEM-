@@ -14,6 +14,10 @@ export const findStudentByAdmissionNumber = async (admissionNumber) => {
   return await Student.findOne({ admissionNumber });
 };
 
+export const findStudentByUserId = async (userId) => {
+  return await Student.findOne({ userId });
+};
+
 // export const findStudents = async (filter = {}) => {
 //   return await Student.find(filter);
 // };
