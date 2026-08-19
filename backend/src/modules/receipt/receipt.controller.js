@@ -1,6 +1,6 @@
 import asyncHandler from "../../shared/utils/asyncHandler.js";
 import { successResponse } from "../../shared/utils/response/apiResponse.js";
-import { getReceiptByIdService, getReceiptByPaymentIdService, getReceiptByReceiptNumberService } from "./receipt.service.js";
+import { generateReceiptPdfService, getReceiptByIdService, getReceiptByPaymentIdService, getReceiptByReceiptNumberService } from "./receipt.service.js";
 
 export const getReceiptByIdController = asyncHandler(async (req, res) => {
   const receipt = await getReceiptByIdService(req.params.id, req.user);
@@ -44,3 +44,15 @@ export const getReceiptByReceiptNumberController = asyncHandler(
     });
   },
 );
+
+export const getReceiptPdfController = asyncHandler(async (req, res) => {
+  const pdf = await generateReceiptPdfService(req.params.id);
+
+  res.setHeader("Content-Type", "application/pdf");
+  res.setHeader(
+    "Content-Disposition",
+    `inline; filename="receipt-${req.params.id}.pdf"`,
+  );
+
+  pdf.pipe(res);
+});

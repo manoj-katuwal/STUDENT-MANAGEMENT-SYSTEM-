@@ -3,6 +3,7 @@ import {
   getReceiptByIdController,
   getReceiptByPaymentIdController,
   getReceiptByReceiptNumberController,
+  getReceiptPdfController,
 } from "./receipt.controller.js";
 import authenticate from "../../middleware/authenticate.js";
 import authorize from "../../middleware/authorize.js";
@@ -27,6 +28,12 @@ router.get(
   authenticate,
   authorize("ADMIN", "ACCOUNTANT", "PRINCIPAL", "STUDENT"),
   getReceiptByIdController,
+);
+router.get(
+  "/:id/pdf",
+  authenticate,
+  authorize("ADMIN", "ACCOUNTANT", "PRINCIPAL", "STUDENT"),
+  getReceiptPdfController,
 );
 
 export default router;
