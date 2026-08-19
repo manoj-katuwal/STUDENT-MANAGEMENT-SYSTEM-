@@ -7,6 +7,7 @@ import {
   getStudentFeePaymentHistoryController,
   getPaymentsController,
 } from "./payment.controller.js";
+import { initiateEsewaPaymentController } from "./gateways/esewa/esewa.controller.js";
 
 const router = express.Router();
 
@@ -38,4 +39,10 @@ router.get(
   getPaymentsController,
 );
 
+router.post(
+  "/online/esewa/initiate",
+  authenticate,
+  authorize("STUDENT"),
+  initiateEsewaPaymentController,
+);
 export default router;
