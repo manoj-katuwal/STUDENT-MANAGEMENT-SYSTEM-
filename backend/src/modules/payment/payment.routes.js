@@ -24,6 +24,12 @@ router.get(
   getStudentFeePaymentHistoryController,
 );
 
+router.get(
+  "/:paymentId",
+  authenticate,
+  authorize("ADMIN", "ACCOUNTANT"),
+  getPaymentByIdController,
+);
 
 router.get(
   "/",

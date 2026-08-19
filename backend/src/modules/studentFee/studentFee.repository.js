@@ -100,10 +100,46 @@ export const getStudentFeeSummary = async (studentId) => {
   );
 };
 
-export const updatePaymentStatus = async (id, { paidAmount, dueAmount, status } = {}) => {
-  return await StudentFee.findByIdAndUpdate(
-    id,
-    { paidAmount, dueAmount, status },
-    { new: true },
+export const updatePaymentStatus = async (id, paymentAmount, options = {}) => {
+  return await StudentFee.findOneAndUpdate(
+    {
+      _id: id,
+      dueAmount: { $gte: paymentAmount },
+    },
+    {
+      $inc: {
+        paidAmount: paymentAmount,
+        dueAmount: -paymentAmount,
+      },
+    },
+    {
+      new: true,
+      runValidators: true,
+      ...options,
+    },
+  );
+};
+
+export const updateStudentFeeWithPayment = async (
+  studentFeeId,
+  paymentAmount,
+  options = {},
+) => {
+  return await StudentFee.findOneAndUpdate(
+    {
+      _id: studentFeeId,
+      dueAmount: { $gte: paymentAmount },
+    },
+    {
+      $inc: {
+        paidAmount: paymentAmount,
+        dueAmount: -paymentAmount,
+      },
+    },
+    {
+      new: true,
+      runValidators: true,
+      ...options,
+    },
   );
 };

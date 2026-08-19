@@ -2,7 +2,7 @@ import AppError from "../../shared/utils/error/AppError.js";
 import mongoose from "mongoose";
 import {
   findStudentFeeById,
-  updateStudentFee,
+  updatePaymentStatus,
 } from "../studentFee/studentFee.repository.js";
 import {
   countPayments,
@@ -16,13 +16,14 @@ import {
 export const createOfflinePaymentService = async (paymentData) => {
   const { studentFeeId, amount, paymentMethod, transactionId, remarks } =
     paymentData;
+  const paymentAmount = Number(amount);
 
   // 1. Required fields
   if (!studentFeeId) {
     throw new AppError("Student fee is required", 400);
   }
 
-  if (!amount) {
+  if (!Number.isFinite(paymentAmount) || paymentAmount <= 0) {
     throw new AppError("Payment amount is required", 400);
   }
 
@@ -58,40 +59,25 @@ export const createOfflinePaymentService = async (paymentData) => {
         );
       }
 
-      // 5. Validate amount
-      if (amount <= 0) {
-        throw new AppError("Payment amount must be greater than zero", 400);
-      }
-
-      // 6. Prevent overpayment
-      if (amount > studentFee.dueAmount) {
-        throw new AppError(
-          "Payment amount cannot be greater than the due amount",
-          400,
-        );
-      }
-
-      // 7. Transaction ID validation
+      // 5. Transaction ID validation
       if (transactionId) {
-        const existingPayment = await findPaymentByTransactionId(transactionId, {
-          session,
-        });
+        const existingPayment = await findPaymentByTransactionId(
+          transactionId,
+          {
+            session,
+          },
+        );
 
         if (existingPayment) {
           throw new AppError("Transaction ID already exists", 409);
         }
       }
 
-      // 8. Calculate new financial values
-      const newPaidAmount = studentFee.paidAmount + amount;
-      const newDueAmount = studentFee.netAmount - newPaidAmount;
-      const newStatus = newDueAmount === 0 ? "PAID" : "PARTIAL";
-
-      // 9. Create payment
+      // 6. Create payment
       payment = await createPayment(
         {
           studentFeeId,
-          amount,
+          amount: paymentAmount,
           paymentMethod,
           paymentType: "OFFLINE",
           paymentStatus: "SUCCESS",
@@ -103,16 +89,23 @@ export const createOfflinePaymentService = async (paymentData) => {
         { session },
       );
 
-      // 10. Update StudentFee
-      await updateStudentFee(
+      // 7. Atomically update the fee only when enough amount is still due.
+      const updatedStudentFee = await updatePaymentStatus(
         studentFeeId,
-        {
-          paidAmount: newPaidAmount,
-          dueAmount: newDueAmount,
-          status: newStatus,
-        },
+        paymentAmount,
         { session },
       );
+
+      if (!updatedStudentFee) {
+        throw new AppError(
+          "Payment could not be processed because the due amount has changed",
+          409,
+        );
+      }
+
+      updatedStudentFee.status =
+        updatedStudentFee.dueAmount === 0 ? "PAID" : "PARTIAL";
+      await updatedStudentFee.save({ session });
     });
 
     return payment;

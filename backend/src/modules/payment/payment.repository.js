@@ -6,8 +6,8 @@ export const createPayment = async (paymentData, options = {}) => {
   );
 };
 
-export const findPaymentById = async (paymentId) => {
-  return await Payment.findById(paymentId);
+export const findPaymentById = async (paymentId, options = {}) => {
+  return await Payment.findById(paymentId, null, options);
 };
 
 export const findPaymentByTransactionId = async (
