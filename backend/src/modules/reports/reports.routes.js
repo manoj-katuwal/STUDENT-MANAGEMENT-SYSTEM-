@@ -1,5 +1,5 @@
 import express from "express";
-import { getTodayCollection } from "./reports.controller.js";
+import { getMonthlyCollection, getTodayCollection } from "./reports.controller.js";
 import authenticate from "../../middleware/authenticate.js";
 import authorize from "../../middleware/authorize.js";
 
@@ -10,6 +10,13 @@ router.get(
   authenticate,
   authorize("ADMIN", "ACCOUNTANT", "PRINCIPAL"),
   getTodayCollection,
+);
+
+router.get(
+  "/monthly-collection",
+  authenticate,
+  authorize("ADMIN", "ACCOUNTANT", "PRINCIPAL"),
+  getMonthlyCollection,
 );
 
 export default router;
