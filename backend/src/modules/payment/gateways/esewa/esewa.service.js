@@ -10,6 +10,8 @@ import {
   createPayment,
   findPaymentByTransactionId,
 } from "../../payment.repository.js";
+import { generateReceiptNumber } from "../../../receipt/receiptCounter.service.js";
+import Receipt from "../../../receipt/receipt.model.js";
 
 export const generateEsewaSignature = ({ totalAmount, transactionUuid }) => {
   const message = `total_amount=${totalAmount},transaction_uuid=${transactionUuid},product_code=${esewaConfig.productCode}`;
@@ -153,6 +155,7 @@ export const handleEsewaSuccessService = async (encodedData) => {
 
   const {
     status,
+    transaction_code: transactionCode,
     total_amount: totalAmount,
     transaction_uuid: transactionUuid,
   } = response;
@@ -221,8 +224,25 @@ export const handleEsewaSuccessService = async (encodedData) => {
       // 10. Mark payment SUCCESS
       payment.paymentStatus = "SUCCESS";
       payment.paidAt = new Date();
+      payment.gatewayTransactionId = transactionCode;
 
       await payment.save({ session });
+      const receiptNumber = await generateReceiptNumber({ session });
+
+      await Receipt.create(
+        [
+          {
+            paymentId: payment._id,
+            studentFeeId: payment.studentFeeId,
+            receiptNumber,
+            amount: payment.amount,
+            paymentMethod: payment.paymentMethod,
+            paymentType: payment.paymentType,
+            paidAt: payment.paidAt,
+          },
+        ],
+        { session },
+      );
     });
 
     return payment;
@@ -230,7 +250,6 @@ export const handleEsewaSuccessService = async (encodedData) => {
     await session.endSession();
   }
 };
-
 
 export const verifyEsewaTransaction = async ({
   transactionUuid,
@@ -257,7 +276,6 @@ export const verifyEsewaTransaction = async ({
 
   return result;
 };
-
 
 export const handleEsewaFailureService = async (query) => {
   const { transaction_uuid: transactionUuid } = query;
@@ -302,4 +320,3 @@ export const handleEsewaFailureService = async (query) => {
     await session.endSession();
   }
 };
-

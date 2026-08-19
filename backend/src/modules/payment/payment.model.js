@@ -38,6 +38,12 @@ const paymentSchema = new mongoose.Schema(
       trim: true,
     },
 
+    gatewayTransactionId: {
+      type: String,
+      default: null,
+      trim: true,
+    },
+
     gateway: {
       type: String,
       enum: ["ESEWA", "KHALTI", null],
@@ -53,6 +59,12 @@ const paymentSchema = new mongoose.Schema(
       type: String,
       trim: true,
       default: null,
+    },
+
+    gatewayTransactionId: {
+      type: String,
+      default: null,
+      trim: true,
     },
   },
   {
