@@ -1,6 +1,11 @@
 import asyncHandler from "../../shared/utils/asyncHandler.js";
 import { successResponse } from "../../shared/utils/response/apiResponse.js";
-import { createOfflinePaymentService, getPaymentsListService, getStudentFeePaymentHistoryService } from "./payment.service.js";
+import {
+  createOfflinePaymentService,
+  getPaymentByIdService,
+  getPaymentsService,
+  getStudentFeePaymentHistoryService,
+} from "./payment.service.js";
 
 
 export const createOfflinePaymentController = asyncHandler(async (req, res) => {
@@ -40,13 +45,32 @@ export const getStudentFeePaymentHistoryController = asyncHandler(
   },
 );
 
-export const getPaymentsListController = asyncHandler(async (req, res) => {
-  const result = await getPaymentsListService(req.query);
+export const getPaymentsController = asyncHandler(async (req, res) => {
+  const {
+    studentFeeId,
+    paymentMethod,
+    paymentType,
+    paymentStatus,
+    gateway,
+    page = 1,
+    limit = 10,
+  } = req.query;
+
+  const result = await getPaymentsService({
+    studentFeeId,
+    paymentMethod,
+    paymentType,
+    paymentStatus,
+    gateway,
+    page: Number(page),
+    limit: Number(limit),
+  });
 
   return successResponse({
     res,
     statusCode: 200,
     message: "Payments fetched successfully",
-    data: result,
+    data: result.payments,
+    meta: result.meta,
   });
 });

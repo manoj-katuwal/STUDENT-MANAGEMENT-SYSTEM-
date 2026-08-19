@@ -5,17 +5,10 @@ import {
   createOfflinePaymentController,
   getPaymentByIdController,
   getStudentFeePaymentHistoryController,
-  getPaymentsListController,
+  getPaymentsController,
 } from "./payment.controller.js";
 
 const router = express.Router();
-
-router.get(
-  "/",
-  authenticate,
-  authorize("ADMIN", "ACCOUNTANT"),
-  getPaymentsListController,
-);
 
 router.post(
   "/offline",
@@ -31,11 +24,12 @@ router.get(
   getStudentFeePaymentHistoryController,
 );
 
+
 router.get(
-  "/:paymentId",
+  "/",
   authenticate,
   authorize("ADMIN", "ACCOUNTANT"),
-  getPaymentByIdController,
+  getPaymentsController,
 );
 
 export default router;

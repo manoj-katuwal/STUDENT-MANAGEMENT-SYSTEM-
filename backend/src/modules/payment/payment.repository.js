@@ -1,15 +1,20 @@
 import Payment from "./payment.model.js";
 
-export const createPayment = async (paymentData) => {
-  return await Payment.create(paymentData);
+export const createPayment = async (paymentData, options = {}) => {
+  return await Payment.create([paymentData], options).then(
+    (result) => result[0],
+  );
 };
 
 export const findPaymentById = async (paymentId) => {
   return await Payment.findById(paymentId);
 };
 
-export const findPaymentByTransactionId = async (transactionId) => {
-  return await Payment.findOne({ transactionId });
+export const findPaymentByTransactionId = async (
+  transactionId,
+  options = {},
+) => {
+  return await Payment.findOne({ transactionId }, null, options);
 };
 
 export const findPaymentsByStudentFeeId = async (studentFeeId) => {
