@@ -61,11 +61,6 @@ const paymentSchema = new mongoose.Schema(
       default: null,
     },
 
-    gatewayTransactionId: {
-      type: String,
-      default: null,
-      trim: true,
-    },
   },
   {
     timestamps: true,

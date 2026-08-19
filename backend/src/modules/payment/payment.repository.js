@@ -17,6 +17,17 @@ export const findPaymentByTransactionId = async (
   return await Payment.findOne({ transactionId }, null, options);
 };
 
+export const findPendingPaymentByStudentFeeId = async (
+  studentFeeId,
+  gateway,
+) => {
+  return await Payment.findOne({
+    studentFeeId,
+    gateway,
+    paymentStatus: "PENDING",
+  }).sort({ createdAt: -1 });
+};
+
 export const findPaymentsByStudentFeeId = async (studentFeeId) => {
   return await Payment.find({ studentFeeId }).sort({ createdAt: -1 });
 };

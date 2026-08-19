@@ -9,9 +9,10 @@ import {
 import {
   createPayment,
   findPaymentByTransactionId,
+  findPendingPaymentByStudentFeeId,
 } from "../../payment.repository.js";
 import { generateReceiptNumber } from "../../../receipt/receiptCounter.service.js";
-import Receipt from "../../../receipt/receipt.model.js";
+import { createReceiptService } from "../../../receipt/receipt.service.js";
 
 export const generateEsewaSignature = ({ totalAmount, transactionUuid }) => {
   const message = `total_amount=${totalAmount},transaction_uuid=${transactionUuid},product_code=${esewaConfig.productCode}`;
@@ -56,11 +57,13 @@ export const generateTransactionUuid = () => {
 };
 
 export const initiateEsewaPaymentService = async ({ studentFeeId, amount }) => {
+  const paymentAmount = Number(amount);
+
   if (!studentFeeId) {
     throw new AppError("Student fee is required", 400);
   }
 
-  if (!amount || amount <= 0) {
+  if (!Number.isFinite(paymentAmount) || paymentAmount <= 0) {
     throw new AppError("Valid payment amount is required", 400);
   }
 
@@ -74,10 +77,22 @@ export const initiateEsewaPaymentService = async ({ studentFeeId, amount }) => {
     throw new AppError("Cannot make payment for a cancelled student fee", 400);
   }
 
-  if (amount > studentFee.dueAmount) {
+  if (paymentAmount > studentFee.dueAmount) {
     throw new AppError(
       "Payment amount cannot be greater than the due amount",
       400,
+    );
+  }
+
+  const pendingPayment = await findPendingPaymentByStudentFeeId(
+    studentFeeId,
+    "ESEWA",
+  );
+
+  if (pendingPayment) {
+    throw new AppError(
+      "An eSewa payment is already pending for this student fee",
+      409,
     );
   }
 
@@ -85,7 +100,7 @@ export const initiateEsewaPaymentService = async ({ studentFeeId, amount }) => {
 
   const payment = await createPayment({
     studentFeeId,
-    amount,
+    amount: paymentAmount,
     paymentMethod: "ESEWA",
     paymentType: "ONLINE",
     paymentStatus: "PENDING",
@@ -95,7 +110,7 @@ export const initiateEsewaPaymentService = async ({ studentFeeId, amount }) => {
   });
 
   const paymentData = createEsewaPaymentData({
-    amount,
+    amount: paymentAmount,
     transactionUuid,
   });
 
@@ -229,18 +244,16 @@ export const handleEsewaSuccessService = async (encodedData) => {
       await payment.save({ session });
       const receiptNumber = await generateReceiptNumber({ session });
 
-      await Receipt.create(
-        [
-          {
-            paymentId: payment._id,
-            studentFeeId: payment.studentFeeId,
-            receiptNumber,
-            amount: payment.amount,
-            paymentMethod: payment.paymentMethod,
-            paymentType: payment.paymentType,
-            paidAt: payment.paidAt,
-          },
-        ],
+      await createReceiptService(
+        {
+          paymentId: payment._id,
+          studentFeeId: payment.studentFeeId,
+          receiptNumber,
+          amount: payment.amount,
+          paymentMethod: payment.paymentMethod,
+          paymentType: payment.paymentType,
+          paidAt: payment.paidAt,
+        },
         { session },
       );
     });

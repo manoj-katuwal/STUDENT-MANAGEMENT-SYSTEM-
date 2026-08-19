@@ -1,5 +1,5 @@
 import AppError from "../../shared/utils/error/AppError.js";
-import { createReceipt, findReceiptByPaymentId } from "./receipt.repository.js";
+import { createReceipt, findReceiptById, findReceiptByPaymentId, findReceiptByReceiptNumber } from "./receipt.repository.js";
 
 export const createReceiptService = async (
   {
@@ -60,4 +60,34 @@ export const createReceiptService = async (
     },
     options,
   );
+};
+
+export const getReceiptByIdService = async (receiptId) => {
+  const receipt = await findReceiptById(receiptId);
+
+  if (!receipt) {
+    throw new AppError("Receipt not found", 404);
+  }
+
+  return receipt;
+};
+
+export const getReceiptByPaymentIdService = async (paymentId) => {
+  const receipt = await findReceiptByPaymentId(paymentId);
+
+  if (!receipt) {
+    throw new AppError("Receipt not found for this payment", 404);
+  }
+
+  return receipt;
+};
+
+export const getReceiptByReceiptNumberService = async (receiptNumber) => {
+  const receipt = await findReceiptByReceiptNumber(receiptNumber);
+
+  if (!receipt) {
+    throw new AppError("Receipt not found", 404);
+  }
+
+  return receipt;
 };

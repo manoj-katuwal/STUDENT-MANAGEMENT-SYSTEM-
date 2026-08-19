@@ -12,6 +12,8 @@ import {
   findPayments,
   findPaymentsByStudentFeeId,
 } from "./payment.repository.js";
+import { generateReceiptNumber } from "../receipt/receiptCounter.service.js";
+import { createReceiptService } from "../receipt/receipt.service.js";
 
 export const createOfflinePaymentService = async (paymentData) => {
   const { studentFeeId, amount, paymentMethod, transactionId, remarks } =
@@ -106,6 +108,20 @@ export const createOfflinePaymentService = async (paymentData) => {
       updatedStudentFee.status =
         updatedStudentFee.dueAmount === 0 ? "PAID" : "PARTIAL";
       await updatedStudentFee.save({ session });
+
+      const receiptNumber = await generateReceiptNumber({ session });
+      await createReceiptService(
+        {
+          paymentId: payment._id,
+          studentFeeId: payment.studentFeeId,
+          receiptNumber,
+          amount: payment.amount,
+          paymentMethod: payment.paymentMethod,
+          paymentType: payment.paymentType,
+          paidAt: payment.paidAt,
+        },
+        { session },
+      );
     });
 
     return payment;
