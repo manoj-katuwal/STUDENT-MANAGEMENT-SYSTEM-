@@ -10,8 +10,11 @@ export const findReceiptByPaymentId = async (paymentId, options = {}) => {
   return await Receipt.findOne({ paymentId }, null, options);
 };
 
-export const findReceiptByReceiptNumber = async (receiptNumber) => {
-  return await Receipt.findOne({ receiptNumber });
+export const findReceiptByReceiptNumber = async (
+  receiptNumber,
+  options = {},
+) => {
+  return await Receipt.findOne({ receiptNumber }, null, options);
 };
 
 export const findReceiptById = async (receiptId) => {

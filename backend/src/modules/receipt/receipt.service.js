@@ -1,5 +1,10 @@
 import AppError from "../../shared/utils/error/AppError.js";
-import { createReceipt, findReceiptById, findReceiptByPaymentId, findReceiptByReceiptNumber } from "./receipt.repository.js";
+import {
+  createReceipt,
+  findReceiptById,
+  findReceiptByPaymentId,
+  findReceiptByReceiptNumber,
+} from "./receipt.repository.js";
 
 export const createReceiptService = async (
   {
@@ -91,3 +96,4 @@ export const getReceiptByReceiptNumberService = async (receiptNumber) => {
 
   return receipt;
 };
+
