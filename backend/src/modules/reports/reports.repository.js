@@ -85,3 +85,30 @@ export const getPendingFeeTotal = async () => {
 
   return result[0]?.totalPending || 0;
 };
+
+export const getOverdueFeeTotal = async () => {
+  const today = new Date();
+
+  const result = await StudentFee.aggregate([
+    {
+      $match: {
+        dueAmount: {
+          $gt: 0,
+        },
+        dueDate: {
+          $lt: today,
+        },
+      },
+    },
+    {
+      $group: {
+        _id: null,
+        totalOverdue: {
+          $sum: "$dueAmount",
+        },
+      },
+    },
+  ]);
+
+  return result[0]?.totalOverdue || 0;
+};

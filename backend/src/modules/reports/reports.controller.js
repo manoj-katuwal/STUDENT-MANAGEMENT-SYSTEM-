@@ -2,6 +2,7 @@ import asyncHandler from "../../shared/utils/asyncHandler.js";
 import { successResponse } from "../../shared/utils/response/apiResponse.js";
 import {
   getMonthlyCollectionService,
+  getOverdueFeeTotalService,
   getPendingFeeTotalService,
   getTodayCollectionService,
 } from "./reports.service.js";
@@ -35,6 +36,17 @@ export const getPendingFeeTotal = asyncHandler(async (req, res) => {
     res,
     statusCode: 200,
     message: "Pending fee total fetched successfully",
+    data,
+  });
+});
+
+export const getOverdueFeeTotal = asyncHandler(async (req, res) => {
+  const data = await getOverdueFeeTotalService();
+
+  return successResponse({
+    res,
+    statusCode: 200,
+    message: "Overdue fee total fetched successfully",
     data,
   });
 });
