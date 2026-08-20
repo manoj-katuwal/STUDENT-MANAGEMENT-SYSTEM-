@@ -1,8 +1,14 @@
 import express from "express";
-import { getMonthlyCollection, getOverdueFeeTotal, getStudentDueList, getTodayCollection } from "./reports.controller.js";
+import {
+  getMonthlyCollection,
+  getOverdueFeeTotal,
+  getStudentDueList,
+  getTodayCollection,
+} from "./reports.controller.js";
 import authenticate from "../../middleware/authenticate.js";
 import authorize from "../../middleware/authorize.js";
 import { getPendingFeeTotal } from "./reports.controller.js";
+import { getPaymentMethodCollection } from "./reports.repository.js";
 
 const router = express.Router();
 
@@ -38,5 +44,12 @@ router.get(
   authenticate,
   authorize("ADMIN", "ACCOUNTANT", "PRINCIPAL"),
   getStudentDueList,
+);
+
+router.get(
+  "/payment-method-collection",
+  authenticate,
+  authorize("ADMIN", "ACCOUNTANT", "PRINCIPAL"),
+  getPaymentMethodCollection,
 );
 export default router;

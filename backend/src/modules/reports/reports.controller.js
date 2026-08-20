@@ -3,6 +3,7 @@ import { successResponse } from "../../shared/utils/response/apiResponse.js";
 import {
   getMonthlyCollectionService,
   getOverdueFeeTotalService,
+  getPaymentMethodCollectionService,
   getPendingFeeTotalService,
   getStudentDueListService,
   getTodayCollectionService,
@@ -64,6 +65,17 @@ export const getStudentDueList = asyncHandler(async (req, res) => {
     res,
     statusCode: 200,
     message: "Student due list fetched successfully",
+    data,
+  });
+});
+
+export const getPaymentMethodCollection = asyncHandler(async (req, res) => {
+  const data = await getPaymentMethodCollectionService();
+
+  return successResponse({
+    res,
+    statusCode: 200,
+    message: "Payment method collection fetched successfully",
     data,
   });
 });

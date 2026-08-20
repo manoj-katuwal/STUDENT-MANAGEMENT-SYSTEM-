@@ -169,3 +169,28 @@ export const getStudentDueList = async ({ page = 1, limit = 10 }) => {
 
   return result;
 };
+
+export const getPaymentMethodCollection = async () => {
+  return await Payment.aggregate([
+    {
+      $match: {
+        paymentStatus: "SUCCESS",
+      },
+    },
+    {
+      $group: {
+        _id: "$paymentMethod",
+        totalCollection: {
+          $sum: "$amount",
+        },
+      },
+    },
+    {
+      $project: {
+        _id: 0,
+        paymentMethod: "$_id",
+        totalCollection: 1,
+      },
+    },
+  ]);
+};

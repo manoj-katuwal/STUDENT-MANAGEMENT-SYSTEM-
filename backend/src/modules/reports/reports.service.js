@@ -1,4 +1,4 @@
-import { getMonthlyCollection, getOverdueFeeTotal, getPendingFeeTotal, getStudentDueList, getTodayCollection } from "./reports.repository.js";
+import { getMonthlyCollection, getOverdueFeeTotal, getPaymentMethodCollection, getPendingFeeTotal, getStudentDueList, getTodayCollection } from "./reports.repository.js";
 
 export const getTodayCollectionService = async () => {
   const totalCollection = await getTodayCollection();
@@ -37,6 +37,15 @@ export const getStudentDueListService = async ({ page = 1, limit = 10 }) => {
     page: Number(page),
     limit: Number(limit),
   });
+
+  return data;
+};
+
+export const getPaymentMethodCollectionService = async () => {
+  const data = await getPaymentMethodCollection();
+
+  console.log("2. Service completed:", data);
+
 
   return data;
 };
