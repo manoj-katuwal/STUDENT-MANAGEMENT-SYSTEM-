@@ -2,6 +2,7 @@ import asyncHandler from "../../shared/utils/asyncHandler.js";
 import { successResponse } from "../../shared/utils/response/apiResponse.js";
 import {
   getAcademicYearCollectionSummaryService,
+  getDashboardSummaryService,
   getMonthlyCollectionService,
   getOverdueFeeTotalService,
   getPaymentMethodCollectionService,
@@ -107,3 +108,14 @@ export const getAcademicYearCollectionSummary = asyncHandler(
     });
   },
 );
+
+export const getDashboardSummary = asyncHandler(async (req, res) => {
+  const data = await getDashboardSummaryService();
+
+  return successResponse({
+    res,
+    statusCode: 200,
+    message: "Dashboard summary fetched successfully",
+    data,
+  });
+});

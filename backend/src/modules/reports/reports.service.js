@@ -1,4 +1,13 @@
-import { getAcademicYearCollectionSummary, getMonthlyCollection, getOverdueFeeTotal, getPaymentMethodCollection, getPendingFeeTotal, getRecentPayments, getStudentDueList, getTodayCollection } from "./reports.repository.js";
+import {
+  getAcademicYearCollectionSummary,
+  getMonthlyCollection,
+  getOverdueFeeTotal,
+  getPaymentMethodCollection,
+  getPendingFeeTotal,
+  getRecentPayments,
+  getStudentDueList,
+  getTodayCollection,
+} from "./reports.repository.js";
 
 export const getTodayCollectionService = async () => {
   const totalCollection = await getTodayCollection();
@@ -46,7 +55,6 @@ export const getPaymentMethodCollectionService = async () => {
 
   console.log("2. Service completed:", data);
 
-
   return data;
 };
 
@@ -60,4 +68,34 @@ export const getAcademicYearCollectionSummaryService = async () => {
   const data = await getAcademicYearCollectionSummary();
 
   return data;
+};
+
+export const getDashboardSummaryService = async () => {
+  const [
+    todayCollection,
+    monthlyCollection,
+    pendingFee,
+    overdueFee,
+    paymentMethods,
+    recentPayments,
+    academicYearSummary,
+  ] = await Promise.all([
+    getTodayCollectionService(),
+    getMonthlyCollectionService(),
+    getPendingFeeTotalService(),
+    getOverdueFeeTotalService(),
+    getPaymentMethodCollectionService(),
+    getRecentPaymentsService(),
+    getAcademicYearCollectionSummaryService(),
+  ]);
+
+  return {
+    todayCollection,
+    monthlyCollection,
+    pendingFee,
+    overdueFee,
+    paymentMethods,
+    recentPayments,
+    academicYearSummary,
+  };
 };

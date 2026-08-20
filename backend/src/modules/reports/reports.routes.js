@@ -1,6 +1,7 @@
 import express from "express";
 import {
   getAcademicYearCollectionSummary,
+  getDashboardSummary,
   getMonthlyCollection,
   getOverdueFeeTotal,
   getRecentPayments,
@@ -67,5 +68,12 @@ router.get(
   authenticate,
   authorize("ADMIN", "ACCOUNTANT", "PRINCIPAL"),
   getAcademicYearCollectionSummary,
+);
+
+router.get(
+  "/dashboard",
+  authenticate,
+  authorize("ADMIN", "ACCOUNTANT", "PRINCIPAL"),
+  getDashboardSummary,
 );
 export default router;
