@@ -2,6 +2,7 @@ import express from "express";
 import {
   getMonthlyCollection,
   getOverdueFeeTotal,
+  getRecentPayments,
   getStudentDueList,
   getTodayCollection,
 } from "./reports.controller.js";
@@ -51,5 +52,12 @@ router.get(
   authenticate,
   authorize("ADMIN", "ACCOUNTANT", "PRINCIPAL"),
   getPaymentMethodCollection,
+);
+
+router.get(
+  "/recent-payments",
+  authenticate,
+  authorize("ADMIN", "ACCOUNTANT", "PRINCIPAL"),
+  getRecentPayments,
 );
 export default router;

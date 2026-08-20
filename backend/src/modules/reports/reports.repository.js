@@ -194,3 +194,13 @@ export const getPaymentMethodCollection = async () => {
     },
   ]);
 };
+
+export const getRecentPayments = async (limit = 5) => {
+  return await Payment.find({
+    paymentStatus: "SUCCESS",
+  })
+    .sort({ paidAt: -1 })
+    .limit(limit)
+    .populate("studentFeeId", "studentId")
+    .lean();
+};

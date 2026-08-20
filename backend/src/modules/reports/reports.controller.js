@@ -5,6 +5,7 @@ import {
   getOverdueFeeTotalService,
   getPaymentMethodCollectionService,
   getPendingFeeTotalService,
+  getRecentPaymentsService,
   getStudentDueListService,
   getTodayCollectionService,
 } from "./reports.service.js";
@@ -78,4 +79,17 @@ export const getPaymentMethodCollection = asyncHandler(async (req, res) => {
     message: "Payment method collection fetched successfully",
     data,
   });
+});
+
+export const getRecentPayments = asyncHandler(async (req, res) => {
+  const limit = req.query.limit || 5;
+
+  const data = await getRecentPaymentsService(limit);
+
+  return successResponse({
+    res,
+    statusCode: 200,
+    message : "Recent payments fetched successfully",
+    data,
+});
 });
