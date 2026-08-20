@@ -112,3 +112,60 @@ export const getOverdueFeeTotal = async () => {
 
   return result[0]?.totalOverdue || 0;
 };
+
+export const getStudentDueList = async ({ page = 1, limit = 10 }) => {
+  const skip = (page - 1) * limit;
+
+  const result = await StudentFee.aggregate([
+    {
+      $match: {
+        dueAmount: {
+          $gt: 0,
+        },
+      },
+    },
+
+    {
+      $lookup: {
+        from: "students",
+        localField: "studentId",
+        foreignField: "_id",
+        as: "student",
+      },
+    },
+
+    {
+      $unwind: "$student",
+    },
+
+    {
+      $project: {
+        _id: 1,
+        dueAmount: 1,
+        dueDate: 1,
+        status: 1,
+        student: {
+          _id: "$student._id",
+          name: "$student.name",
+          admissionNumber: "$student.admissionNumber",
+        },
+      },
+    },
+
+    {
+      $sort: {
+        dueDate: 1,
+      },
+    },
+
+    {
+      $skip: skip,
+    },
+
+    {
+      $limit: limit,
+    },
+  ]);
+
+  return result;
+};

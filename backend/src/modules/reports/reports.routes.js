@@ -1,5 +1,5 @@
 import express from "express";
-import { getMonthlyCollection, getOverdueFeeTotal, getTodayCollection } from "./reports.controller.js";
+import { getMonthlyCollection, getOverdueFeeTotal, getStudentDueList, getTodayCollection } from "./reports.controller.js";
 import authenticate from "../../middleware/authenticate.js";
 import authorize from "../../middleware/authorize.js";
 import { getPendingFeeTotal } from "./reports.controller.js";
@@ -31,5 +31,12 @@ router.get(
   authenticate,
   authorize("ADMIN", "ACCOUNTANT", "PRINCIPAL"),
   getOverdueFeeTotal,
+);
+
+router.get(
+  "/student-dues",
+  authenticate,
+  authorize("ADMIN", "ACCOUNTANT", "PRINCIPAL"),
+  getStudentDueList,
 );
 export default router;

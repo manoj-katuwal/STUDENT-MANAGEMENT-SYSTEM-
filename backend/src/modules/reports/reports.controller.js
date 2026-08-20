@@ -4,6 +4,7 @@ import {
   getMonthlyCollectionService,
   getOverdueFeeTotalService,
   getPendingFeeTotalService,
+  getStudentDueListService,
   getTodayCollectionService,
 } from "./reports.service.js";
 
@@ -47,6 +48,22 @@ export const getOverdueFeeTotal = asyncHandler(async (req, res) => {
     res,
     statusCode: 200,
     message: "Overdue fee total fetched successfully",
+    data,
+  });
+});
+
+export const getStudentDueList = asyncHandler(async (req, res) => {
+  const { page, limit } = req.query;
+
+  const data = await getStudentDueListService({
+    page,
+    limit,
+  });
+
+  return successResponse({
+    res,
+    statusCode: 200,
+    message: "Student due list fetched successfully",
     data,
   });
 });
