@@ -1,6 +1,7 @@
 import asyncHandler from "../../shared/utils/asyncHandler.js";
 import { successResponse } from "../../shared/utils/response/apiResponse.js";
 import {
+  getAcademicYearCollectionSummaryService,
   getMonthlyCollectionService,
   getOverdueFeeTotalService,
   getPaymentMethodCollectionService,
@@ -89,7 +90,20 @@ export const getRecentPayments = asyncHandler(async (req, res) => {
   return successResponse({
     res,
     statusCode: 200,
-    message : "Recent payments fetched successfully",
+    message: "Recent payments fetched successfully",
     data,
+  });
 });
-});
+
+export const getAcademicYearCollectionSummary = asyncHandler(
+  async (req, res) => {
+    const data = await getAcademicYearCollectionSummaryService();
+
+    return successResponse({
+      res,
+      statusCode: 200,
+      message: "Academic year collection summary fetched successfully",
+      data,
+    });
+  },
+);

@@ -204,3 +204,63 @@ export const getRecentPayments = async (limit = 5) => {
     .populate("studentFeeId", "studentId")
     .lean();
 };
+
+export const getAcademicYearCollectionSummary = async () => {
+  return await Payment.aggregate([
+    {
+      $match: {
+        paymentStatus: "SUCCESS",
+      },
+    },
+
+    {
+      $lookup: {
+        from: "studentfees",
+        localField: "studentFeeId",
+        foreignField: "_id",
+        as: "studentFee",
+      },
+    },
+
+    {
+      $unwind: "$studentFee",
+    },
+
+    {
+      $group: {
+        _id: "$studentFee.academicYearId",
+        totalCollection: {
+          $sum: "$amount",
+        },
+      },
+    },
+
+    {
+      $lookup: {
+        from: "academicyears",
+        localField: "_id",
+        foreignField: "_id",
+        as: "academicYear",
+      },
+    },
+
+    {
+      $unwind: "$academicYear",
+    },
+
+    {
+      $project: {
+        _id: 0,
+        academicYearId: "$academicYear._id",
+        academicYear: 1,
+        totalCollection: 1,
+      },
+    },
+
+    {
+      $sort: {
+        totalCollection: -1,
+      },
+    },
+  ]);
+};

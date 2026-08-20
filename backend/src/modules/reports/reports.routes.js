@@ -1,5 +1,6 @@
 import express from "express";
 import {
+  getAcademicYearCollectionSummary,
   getMonthlyCollection,
   getOverdueFeeTotal,
   getRecentPayments,
@@ -59,5 +60,12 @@ router.get(
   authenticate,
   authorize("ADMIN", "ACCOUNTANT", "PRINCIPAL"),
   getRecentPayments,
+);
+
+router.get(
+  "/academic-year-collection",
+  authenticate,
+  authorize("ADMIN", "ACCOUNTANT", "PRINCIPAL"),
+  getAcademicYearCollectionSummary,
 );
 export default router;
