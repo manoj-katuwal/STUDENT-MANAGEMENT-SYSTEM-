@@ -2,6 +2,7 @@ import express from "express";
 import { getMonthlyCollection, getTodayCollection } from "./reports.controller.js";
 import authenticate from "../../middleware/authenticate.js";
 import authorize from "../../middleware/authorize.js";
+import { getPendingFeeTotal } from "./reports.controller.js";
 
 const router = express.Router();
 
@@ -17,6 +18,13 @@ router.get(
   authenticate,
   authorize("ADMIN", "ACCOUNTANT", "PRINCIPAL"),
   getMonthlyCollection,
+);
+
+router.get(
+  "/pending-fee-total",
+  authenticate,
+  authorize("ADMIN", "ACCOUNTANT", "PRINCIPAL"),
+  getPendingFeeTotal,
 );
 
 export default router;

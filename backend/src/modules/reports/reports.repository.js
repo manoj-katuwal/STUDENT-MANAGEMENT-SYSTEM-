@@ -1,4 +1,5 @@
 import Payment from "../payment/payment.model.js";
+import StudentFee from "../studentFee/studentFee.model.js";
 
 export const getTodayCollection = async () => {
   const startOfDay = new Date();
@@ -61,4 +62,26 @@ export const getMonthlyCollection = async () => {
   ]);
 
   return result[0]?.totalCollection || 0;
+};
+
+export const getPendingFeeTotal = async () => {
+  const result = await StudentFee.aggregate([
+    {
+      $match: {
+        dueAmount: {
+          $gt: 0,
+        },
+      },
+    },
+    {
+      $group: {
+        _id: null,
+        totalPending: {
+          $sum: "$dueAmount",
+        },
+      },
+    },
+  ]);
+
+  return result[0]?.totalPending || 0;
 };

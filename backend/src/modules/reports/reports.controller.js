@@ -1,6 +1,10 @@
 import asyncHandler from "../../shared/utils/asyncHandler.js";
 import { successResponse } from "../../shared/utils/response/apiResponse.js";
-import { getMonthlyCollectionService, getTodayCollectionService } from "./reports.service.js";
+import {
+  getMonthlyCollectionService,
+  getPendingFeeTotalService,
+  getTodayCollectionService,
+} from "./reports.service.js";
 
 export const getTodayCollection = asyncHandler(async (req, res) => {
   const data = await getTodayCollectionService();
@@ -20,6 +24,17 @@ export const getMonthlyCollection = asyncHandler(async (req, res) => {
     res,
     statusCode: 200,
     message: "Monthly collection fetched successfully",
+    data,
+  });
+});
+
+export const getPendingFeeTotal = asyncHandler(async (req, res) => {
+  const data = await getPendingFeeTotalService();
+
+  return successResponse({
+    res,
+    statusCode: 200,
+    message: "Pending fee total fetched successfully",
     data,
   });
 });

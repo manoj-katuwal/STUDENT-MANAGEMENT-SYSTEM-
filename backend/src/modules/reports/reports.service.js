@@ -1,4 +1,4 @@
-import { getMonthlyCollection, getTodayCollection } from "./reports.repository.js";
+import { getMonthlyCollection, getPendingFeeTotal, getTodayCollection } from "./reports.repository.js";
 
 export const getTodayCollectionService = async () => {
   const totalCollection = await getTodayCollection();
@@ -13,5 +13,13 @@ export const getMonthlyCollectionService = async () => {
 
   return {
     totalCollection,
+  };
+};
+
+export const getPendingFeeTotalService = async () => {
+  const totalPending = await getPendingFeeTotal();
+
+  return {
+    totalPending,
   };
 };
