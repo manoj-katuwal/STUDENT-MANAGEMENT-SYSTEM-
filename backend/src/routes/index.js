@@ -13,6 +13,7 @@ import studentFeeRoutes from "../modules/studentFee/studentFee.routes.js";
 import paymentRoutes from "../modules/payment/payment.routes.js";
 import receiptRoutes from "../modules/receipt/receipt.routes.js";
 import reportsRoutes from "../modules/reports/reports.routes.js";
+import discountRoutes from "../modules/discounts/discount.routes.js";
 
 const router = express.Router();
 
@@ -44,5 +45,6 @@ router.use("/student-fees", studentFeeRoutes);
 router.use("/payments", paymentRoutes);
 router.use("/receipts", receiptRoutes);
 router.use("/reports", reportsRoutes);
+router.use("/discounts", discountRoutes);
 
 export default router;
