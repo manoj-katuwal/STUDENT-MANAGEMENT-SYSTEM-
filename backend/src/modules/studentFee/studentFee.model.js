@@ -58,6 +58,10 @@ const studentFeeSchema = new mongoose.Schema(
       enum: ["PENDING", "PARTIAL", "PAID", "CANCELLED"],
       default: "PENDING",
     },
+    scholarshipAmount: {
+      type: Number,
+      default: 0,
+    },
   },
   {
     timestamps: true,
