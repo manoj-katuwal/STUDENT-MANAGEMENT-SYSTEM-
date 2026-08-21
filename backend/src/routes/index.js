@@ -14,6 +14,7 @@ import paymentRoutes from "../modules/payment/payment.routes.js";
 import receiptRoutes from "../modules/receipt/receipt.routes.js";
 import reportsRoutes from "../modules/reports/reports.routes.js";
 import discountRoutes from "../modules/discounts/discount.routes.js";
+import scholarshipRoutes from "../modules/scholarships/scholarship.routes.js";
 
 const router = express.Router();
 
@@ -46,5 +47,6 @@ router.use("/payments", paymentRoutes);
 router.use("/receipts", receiptRoutes);
 router.use("/reports", reportsRoutes);
 router.use("/discounts", discountRoutes);
+router.use("/scholarships", scholarshipRoutes);
 
 export default router;
