@@ -22,4 +22,6 @@ export const findInstallmentPlanById = async (planId) => {
   return InstallmentPlan.findById(planId);
 };
 
-
+export const deleteInstallmentPlanById = async (planId) => {
+  return InstallmentPlan.findByIdAndDelete(planId);
+};

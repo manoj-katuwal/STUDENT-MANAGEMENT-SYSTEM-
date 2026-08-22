@@ -144,6 +144,14 @@ export const updateStudentFeeWithPayment = async (
   );
 };
 
+export const deleteManyByIds = async (ids = []) => {
+  if (!ids.length) {
+    return { deletedCount: 0 };
+  }
+
+  return await StudentFee.deleteMany({ _id: { $in: ids } });
+};
+
 export const getOverdueStudentFees = async () => {
   return await StudentFee.find({
     dueAmount: { $gt: 0 },

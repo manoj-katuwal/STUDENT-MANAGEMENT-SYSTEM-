@@ -1,6 +1,8 @@
 import mongoose from "mongoose";
 
-const installmentSchema = new mongoose.Schema(
+const { Schema } = mongoose;
+
+const installmentSchema = new Schema(
   {
     installmentNumber: {
       type: Number,
@@ -62,6 +64,13 @@ const installmentPlanSchema = new Schema(
       enum: ["MONTHLY", "QUARTERLY", "CUSTOM_DAYS"],
       required: function () {
         return this.dueDateMode === "AUTO";
+      },
+    },
+    intervalDays: {
+      type: Number,
+      min: 1,
+      required: function () {
+        return this.dueDateMode === "AUTO" && this.frequency === "CUSTOM_DAYS";
       },
     },
     installments: {

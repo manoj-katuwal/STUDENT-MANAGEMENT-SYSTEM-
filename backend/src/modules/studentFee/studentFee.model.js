@@ -53,6 +53,24 @@ const studentFeeSchema = new mongoose.Schema(
       min: 0,
     },
 
+    // Present when this fee was generated from an installment plan.
+    installmentPlanId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "InstallmentPlan",
+      default: null,
+    },
+
+    installmentNumber: {
+      type: Number,
+      min: 1,
+      default: null,
+    },
+
+    dueDate: {
+      type: Date,
+      default: null,
+    },
+
     status: {
       type: String,
       enum: ["PENDING", "PARTIAL", "PAID", "CANCELLED"],
@@ -77,6 +95,8 @@ studentFeeSchema.index(
     studentId: 1,
     academicYearId: 1,
     feeStructureId: 1,
+    installmentPlanId: 1,
+    installmentNumber: 1,
   },
   {
     unique: true,
