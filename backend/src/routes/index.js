@@ -17,6 +17,7 @@ import discountRoutes from "../modules/discounts/discount.routes.js";
 import scholarshipRoutes from "../modules/scholarships/scholarship.routes.js";
 import scholarshipAllocationRoutes from "../modules/scholarships/scholarshipAllocation.routes.js";
 import finePolicyRoutes from "../modules/fines/finePolicy/finePolicy.routes.js";
+import fineRoute from "../modules/fines/fine.routes.js";
 
 const router = express.Router();
 
@@ -52,5 +53,6 @@ router.use("/discounts", discountRoutes);
 router.use("/scholarships", scholarshipRoutes);
 router.use("/scholarship-allocations", scholarshipAllocationRoutes);
 router.use("/fine-policies", finePolicyRoutes);
+router.use("/fines", fineRoute);
 
 export default router;

@@ -143,3 +143,10 @@ export const updateStudentFeeWithPayment = async (
     },
   );
 };
+
+export const getOverdueStudentFees = async () => {
+  return await StudentFee.find({
+    dueAmount: { $gt: 0 },
+    dueDate: { $lt: new Date() },
+  }).populate("feeStructureId");
+};

@@ -62,6 +62,10 @@ const studentFeeSchema = new mongoose.Schema(
       type: Number,
       default: 0,
     },
+    fineAmount: {
+      type: Number,
+      default: 0,
+    },
   },
   {
     timestamps: true,
