@@ -1,12 +1,12 @@
 import Joi from "joi";
+
+const objectId = () => Joi.string().hex().length(24);
+
 export const installmentItemSchema = Joi.object({
   installmentNumber: Joi.number().integer().min(1).required(),
   amount: Joi.number().positive().precision(2).required(),
-  dueDate: Joi.date().iso().when(Joi.ref("$dueDateMode"), {
-    is: "MANUAL",
-    then: Joi.required(),
-    otherwise: Joi.optional(),
-  }),
+  // The service requires and orders these dates when dueDateMode is MANUAL.
+  dueDate: Joi.date().iso().optional(),
 });
 
 export const createInstallmentPlanSchema = Joi.object({
@@ -28,5 +28,10 @@ export const createInstallmentPlanSchema = Joi.object({
     then: Joi.required(),
     otherwise: Joi.forbidden(),
   }),
+  intervalDays: Joi.number().integer().min(1).when("frequency", {
+    is: "CUSTOM_DAYS",
+    then: Joi.required(),
+    otherwise: Joi.forbidden(),
+  }),
   installments: Joi.array().items(installmentItemSchema).min(2).required(),
-}).options({ context: true });
+});
