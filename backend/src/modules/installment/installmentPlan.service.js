@@ -220,8 +220,24 @@ export const createInstallmentPlanService = async (payload, userId) => {
     // Compensating rollback: standalone Mongo, no transaction available
     await studentFeeRepository.deleteManyByIds(createdStudentFeeIds);
     await installmentPlanRepository.deleteInstallmentPlanById(plan._id);
+
+    // Log the real error so we can debug it
+    console.error("[createInstallmentPlanService] StudentFee creation failed:", err);
+
+    // Re-throw meaningful errors instead of swallowing them
+    if (err.code === 11000) {
+      // MongoDB duplicate key — surface the conflicting field
+      const field = Object.keys(err.keyValue || {}).join(", ");
+      throw new AppError(
+        `Duplicate StudentFee record: यो student को लागि पहिल्यै fee record छ (field: ${field})`,
+        409,
+      );
+    }
+
+    if (err instanceof AppError) throw err;
+
     throw new AppError(
-      "Installment plan generate गर्दा समस्या भयो, rollback गरियो",
+      `Installment plan generate गर्दा समस्या भयो, rollback गरियो: ${err.message}`,
       500,
     );
   }
