@@ -156,5 +156,6 @@ export const getOverdueStudentFees = async () => {
   return await StudentFee.find({
     dueAmount: { $gt: 0 },
     dueDate: { $lt: new Date() },
+    status: { $nin: ["PAID", "CANCELLED"] },
   }).populate("feeStructureId");
 };
