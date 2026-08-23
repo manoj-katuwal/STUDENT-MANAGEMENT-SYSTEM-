@@ -83,7 +83,10 @@ export const createInstallmentPlanService = async (payload, userId) => {
   }
 
   if (!Number.isInteger(numberOfInstallments) || numberOfInstallments < 2) {
-    throw new AppError("numberOfInstallments must be an integer of at least 2", 400);
+    throw new AppError(
+      "numberOfInstallments must be an integer of at least 2",
+      400,
+    );
   }
 
   if (!Number.isFinite(totalAmount) || totalAmount <= 0) {
@@ -137,7 +140,10 @@ export const createInstallmentPlanService = async (payload, userId) => {
       frequency === "CUSTOM_DAYS" &&
       (!Number.isInteger(intervalDays) || intervalDays < 1)
     ) {
-      throw new AppError("CUSTOM_DAYS frequency requires intervalDays of at least 1", 400);
+      throw new AppError(
+        "CUSTOM_DAYS frequency requires intervalDays of at least 1",
+        400,
+      );
     }
     const autoDates = generateAutoDueDates(
       startDate,
@@ -222,7 +228,10 @@ export const createInstallmentPlanService = async (payload, userId) => {
     await installmentPlanRepository.deleteInstallmentPlanById(plan._id);
 
     // Log the real error so we can debug it
-    console.error("[createInstallmentPlanService] StudentFee creation failed:", err);
+    console.error(
+      "[createInstallmentPlanService] StudentFee creation failed:",
+      err,
+    );
 
     // Re-throw meaningful errors instead of swallowing them
     if (err.code === 11000) {
@@ -241,4 +250,11 @@ export const createInstallmentPlanService = async (payload, userId) => {
       500,
     );
   }
+};
+
+export const getInstallmentPlanByIdService = async (planId) => {
+  const plan =
+    await installmentPlanRepository.findInstallmentPlanByIdPopulated(planId);
+  if (!plan) throw new AppError("Installment plan फेला परेन", 404);
+  return plan;
 };

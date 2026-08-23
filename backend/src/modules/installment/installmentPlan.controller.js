@@ -1,6 +1,6 @@
 import asyncHandler from "../../shared/utils/asyncHandler.js";
 import { successResponse } from "../../shared/utils/response/apiResponse.js";
-import { createInstallmentPlanService } from "./installmentPlan.service.js";
+import { createInstallmentPlanService, getInstallmentPlanByIdService } from "./installmentPlan.service.js";
 
 export const createInstallmentPlan = asyncHandler(async (req, res) => {
   const plan = await createInstallmentPlanService(req.body, req.user.id);
@@ -12,3 +12,15 @@ export const createInstallmentPlan = asyncHandler(async (req, res) => {
     data: plan,
   });
 });
+
+export const getInstallmentPlanById = asyncHandler(async(req, res) => {
+    const plan = await getInstallmentPlanByIdService(req.params.id);
+
+    return successResponse({
+      res,
+      statusCode: 200,
+      message: "Installment plan retrieved successfully",
+      data: plan
+    });
+
+})
