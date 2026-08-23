@@ -25,3 +25,11 @@ export const findInstallmentPlanById = async (planId) => {
 export const deleteInstallmentPlanById = async (planId) => {
   return InstallmentPlan.findByIdAndDelete(planId);
 };
+
+export const findInstallmentPlanByIdPopulated = async (planId) => {
+  return InstallmentPlan.findById(planId)
+    .populate("studentId", "name admissionNumber classId sectionId")
+    .populate("academicYearId", "name")
+    .populate("feeStructureId", "name totalAmount")
+    .populate("installments.studentFeeId");
+};
