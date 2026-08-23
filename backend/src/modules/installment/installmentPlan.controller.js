@@ -37,11 +37,13 @@ export const listInstallmentPlansByStudent = asyncHandler(async (req, res) => {
     statusCode: 200,
     message: "Student installment plans retrieved successfully",
     data: plans,
-    pagination: {
-      total,
-      page,
-      limit,
-      totalPages: Math.ceil(total / limit),
+    meta: {
+      pagination: {
+        total,
+        page,
+        limit,
+        totalPages: Math.ceil(total / limit),
+      },
     },
   });
 });
