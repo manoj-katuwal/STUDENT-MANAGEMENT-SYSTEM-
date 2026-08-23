@@ -258,3 +258,20 @@ export const getInstallmentPlanByIdService = async (planId) => {
   if (!plan) throw new AppError("Installment plan फेला परेन", 404);
   return plan;
 };
+
+export const listInstallmentPlansByStudentService = async (studentId, query) => {
+  const { status, page = 1, limit = 10 } = query;
+
+  if (!studentId) {
+    throw new AppError('studentId आवश्यक छ', 400);
+  }
+
+  const result = await installmentPlanRepository.findInstallmentPlansByStudent(
+    studentId,
+    { status },
+    Number(page),
+    Number(limit)
+  );
+
+  return result;
+};
