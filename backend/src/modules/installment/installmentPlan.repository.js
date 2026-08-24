@@ -63,6 +63,6 @@ export const cancelUnpaidByIds = async (ids) => {
   if (!ids || ids.length === 0) return { modifiedCount: 0 };
   return StudentFee.updateMany(
     { _id: { $in: ids }, paidAmount: 0 },
-    { $set: { paymentStatus: "CANCELLED" } },
+    { $set: { status: "CANCELLED" } },
   );
 };
