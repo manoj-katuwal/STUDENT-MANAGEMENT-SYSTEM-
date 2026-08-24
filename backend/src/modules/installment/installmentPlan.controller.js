@@ -1,6 +1,7 @@
 import asyncHandler from "../../shared/utils/asyncHandler.js";
 import { successResponse } from "../../shared/utils/response/apiResponse.js";
 import {
+  cancelInstallmentPlanService,
   createInstallmentPlanService,
   getInstallmentPlanByIdService,
   listInstallmentPlansByStudentService,
@@ -47,3 +48,14 @@ export const listInstallmentPlansByStudent = asyncHandler(async (req, res) => {
     },
   });
 });
+
+export const cancelInstallmentPlan = asyncHandler(async(req, res ) => {
+    const plan = await cancelInstallmentPlanService(req.params.id);
+    return successResponse({
+      res,
+      statusCode: 200,
+      message: "Installment plan cancelled successfully",
+      data: plan,
+    }); 
+
+})
