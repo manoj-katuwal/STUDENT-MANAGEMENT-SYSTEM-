@@ -275,3 +275,23 @@ export const listInstallmentPlansByStudentService = async (studentId, query) => 
 
   return result;
 };
+
+export const cancelInstallmentPlanService = async (planId) => {
+  const plan = await installmentPlanRepository.findInstallmentPlanById(planId);
+  if (!plan) throw new AppError('Installment plan फेला परेन', 404);
+
+  if (plan.status !== 'ACTIVE') {
+    throw new AppError(`ACTIVE नभएको plan cancel गर्न मिल्दैन (हाल: ${plan.status})`, 400);
+  }
+
+  const studentFeeIds = plan.installments
+    .map((inst) => inst.studentFeeId)
+    .filter(Boolean);
+
+  await studentFeeRepository.cancelUnpaidByIds(studentFeeIds);
+
+  plan.status = 'CANCELLED';
+  await plan.save();
+
+  return plan;
+};
