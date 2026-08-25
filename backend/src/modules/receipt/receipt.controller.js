@@ -46,7 +46,7 @@ export const getReceiptByReceiptNumberController = asyncHandler(
 );
 
 export const getReceiptPdfController = asyncHandler(async (req, res) => {
-  const pdf = await generateReceiptPdfService(req.params.id);
+  const pdf = await generateReceiptPdfService(req.params.id, req.user);
 
   res.setHeader("Content-Type", "application/pdf");
   res.setHeader(

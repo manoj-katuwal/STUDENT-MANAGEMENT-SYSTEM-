@@ -120,12 +120,14 @@ export const getReceiptByReceiptNumberService = async (receiptNumber, user) => {
   return await ensureReceiptAccess(receipt, user);
 };
 
-export const getReceiptPdfDataService = async (receiptId) => {
+export const getReceiptPdfDataService = async (receiptId, user) => {
   const receipt = await findReceiptById(receiptId);
 
   if (!receipt) {
     throw new AppError("Receipt not found", 404);
   }
+
+  await ensureReceiptAccess(receipt, user);
 
   const studentFee = await findStudentFeeById(receipt.studentFeeId);
 
@@ -146,9 +148,9 @@ export const getReceiptPdfDataService = async (receiptId) => {
   };
 };
 
-export const generateReceiptPdfService = async (receiptId) => {
+export const generateReceiptPdfService = async (receiptId, user) => {
   const { receipt, studentFee, student } =
-    await getReceiptPdfDataService(receiptId);
+    await getReceiptPdfDataService(receiptId, user);
 
   const doc = new PDFDocument({
     size: "A4",
