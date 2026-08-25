@@ -1,5 +1,29 @@
 import AuditLog from "./auditLog.model.js";
+import {
+  findAllLogs as findAllLogsRepository,
+  findLogsByEntity as findLogsByEntityRepository,
+} from "./auditLog.repository.js";
 import logger from "../../config/logger.js";
+
+const toPositiveInteger = (value, fallback) => {
+  const parsedValue = Number(value);
+
+  return Number.isInteger(parsedValue) && parsedValue > 0
+    ? parsedValue
+    : fallback;
+};
+
+const toValidDate = (value, fieldName) => {
+  if (!value) return undefined;
+
+  const date = new Date(value);
+
+  if (Number.isNaN(date.getTime())) {
+    throw new TypeError(`${fieldName} must be a valid date`);
+  }
+
+  return date;
+};
 export const logActivity = async ({
   entityType,
   entityId,
@@ -8,7 +32,7 @@ export const logActivity = async ({
   performedBy,
 }) => {
   try {
-    await AuditLog.create({
+    return await AuditLog.create({
       entityType,
       entityId,
       action,
@@ -23,4 +47,30 @@ export const logActivity = async ({
       err,
     });
   }
+};
+
+export const findLogsByEntity = async (entityType, entityId) => {
+  return findLogsByEntityRepository(entityType, entityId);
+};
+
+export const findAllLogs = async (filters = {}, page = 1, limit = 10) => {
+  const normalizedFilters = {
+    ...filters,
+    startDate: toValidDate(filters.startDate, "startDate"),
+    endDate: toValidDate(filters.endDate, "endDate"),
+  };
+
+  if (
+    normalizedFilters.startDate &&
+    normalizedFilters.endDate &&
+    normalizedFilters.startDate > normalizedFilters.endDate
+  ) {
+    throw new RangeError("startDate cannot be after endDate");
+  }
+
+  return findAllLogsRepository(
+    normalizedFilters,
+    toPositiveInteger(page, 1),
+    toPositiveInteger(limit, 10),
+  );
 };
