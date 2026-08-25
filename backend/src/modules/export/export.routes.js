@@ -1,15 +1,16 @@
-// import express from "express";
-// import authenticate from "../../middleware/authenticate.js";
-// import authorize from "../../middleware/authorize.js";
-// import { exportFeeCollectionCsv } from "./export.controller.js";
+import express from "express"
+import authenticate from "../../middleware/authenticate.js";
+import authorize from "../../middleware/authorize.js";
+import { exportFeeCollection } from "./export.controller.js";
 
-// const router = express.Router();
+const router = express.Router();
 
-// router.get(
-//   "/fee-collection.csv",
-//   authenticate,
-//   authorize("ADMIN", "ACCOUNTANT", "PRINCIPAL"),
-//   exportFeeCollectionCsv,
-// );
+router.get(
+  "/fee-collection",
+  authenticate,
+  authorize("ADMIN", "ACCOUNTANT", "PRINCIPAL"),
+  exportFeeCollection,
+);
 
-// export default router;
+
+export default router;

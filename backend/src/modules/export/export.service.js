@@ -2,6 +2,10 @@ import ExcelJS from "exceljs";
 import { getFeeCollectionCursor } from "./export.repository.js";
 
 export const streamFeeCollectionExcel = async (filters, res) => {
+  // Resolve the query before beginning the response, so invalid filters still
+  // receive the application's regular JSON error response.
+  const cursor = await getFeeCollectionCursor(filters);
+
   res.setHeader(
     "Content-Type",
     "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
@@ -29,13 +33,11 @@ export const streamFeeCollectionExcel = async (filters, res) => {
     { header: "Status", key: "status", width: 12 },
   ];
 
-  const cursor = await getFeeCollectionCursor(filters);
-
   for (let doc = await cursor.next(); doc != null; doc = await cursor.next()) {
     sheet
       .addRow({
         studentName: doc.studentId?.name ?? "N/A",
-        rollNumber: doc.studentId?.rollNumber ?? "N/A",
+        rollNumber: doc.studentId?.admissionNumber ?? "N/A",
         academicYear: doc.academicYearId?.name ?? "N/A",
         totalAmount: doc.totalAmount,
         discountAmount: doc.discountAmount,

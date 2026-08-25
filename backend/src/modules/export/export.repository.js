@@ -1,5 +1,5 @@
 import StudentFee from "../studentFee/studentFee.model.js";
-import Student from "../student/student.model.js";
+import Student from "../students/student.model.js";
 
 export const getFeeCollectionCursor = async (filters) => {
   const query = {};
@@ -16,11 +16,15 @@ export const getFeeCollectionCursor = async (filters) => {
   if (filters.startDate || filters.endDate) {
     query.dueDate = {};
     if (filters.startDate) query.dueDate.$gte = new Date(filters.startDate);
-    if (filters.endDate) query.dueDate.$lte = new Date(filters.endDate);
+    if (filters.endDate) {
+      const endDate = new Date(filters.endDate);
+      endDate.setUTCHours(23, 59, 59, 999);
+      query.dueDate.$lte = endDate;
+    }
   }
 
   return StudentFee.find(query)
-    .populate("studentId", "name rollNumber classId")
+    .populate("studentId", "name admissionNumber classId")
     .populate("academicYearId", "name")
     .cursor();
 };
