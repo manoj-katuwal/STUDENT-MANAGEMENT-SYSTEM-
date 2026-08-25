@@ -4,6 +4,7 @@ import * as academicYearRepository from "../academicYear/academicYear.repository
 import * as feeStructureRepository from "../feeStructure/feeStructure.repository.js";
 import * as installmentPlanRepository from "./installmentPlan.repository.js";
 import * as studentFeeRepository from "../studentFee/studentFee.repository.js";
+import { logActivity } from "../auditLog/auditLog.service.js";
 
 const AMOUNT_TOLERANCE = 0.01;
 
@@ -221,6 +222,15 @@ export const createInstallmentPlanService = async (payload, userId) => {
     }
 
     await plan.save();
+
+    await logActivity({
+      entityType: "InstallmentPlan",
+      entityId: plan._id,
+      action: "CREATED",
+      description: "Installment plan created",
+      performedBy: userId,
+    });
+
     return plan;
   } catch (err) {
     // Compensating rollback: standalone Mongo, no transaction available
@@ -276,7 +286,7 @@ export const listInstallmentPlansByStudentService = async (studentId, query) => 
   return result;
 };
 
-export const cancelInstallmentPlanService = async (planId) => {
+export const cancelInstallmentPlanService = async (planId, performedBy) => {
   const plan = await installmentPlanRepository.findInstallmentPlanById(planId);
   if (!plan) throw new AppError('Installment plan फेला परेन', 404);
 
@@ -292,6 +302,14 @@ export const cancelInstallmentPlanService = async (planId) => {
 
   plan.status = 'CANCELLED';
   await plan.save();
+
+  await logActivity({
+    entityType: "InstallmentPlan",
+    entityId: plan._id,
+    action: "CANCELLED",
+    description: "Installment plan cancelled",
+    performedBy,
+  });
 
   return plan;
 };

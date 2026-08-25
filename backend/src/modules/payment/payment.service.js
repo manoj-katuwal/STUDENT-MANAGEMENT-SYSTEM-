@@ -14,8 +14,9 @@ import {
 } from "./payment.repository.js";
 import { generateReceiptNumber } from "../receipt/receiptCounter.service.js";
 import { createReceiptService } from "../receipt/receipt.service.js";
+import { logActivity } from "../auditLog/auditLog.service.js";
 
-export const createOfflinePaymentService = async (paymentData) => {
+export const createOfflinePaymentService = async (paymentData, performedBy) => {
   const { studentFeeId, amount, paymentMethod, transactionId, remarks } =
     paymentData;
   const paymentAmount = Number(amount);
@@ -122,6 +123,14 @@ export const createOfflinePaymentService = async (paymentData) => {
         },
         { session },
       );
+    });
+
+    await logActivity({
+      entityType: "Payment",
+      entityId: payment._id,
+      action: "CREATED",
+      description: "Offline payment recorded",
+      performedBy,
     });
 
     return payment;

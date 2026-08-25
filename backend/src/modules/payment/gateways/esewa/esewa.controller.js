@@ -7,7 +7,7 @@ import {
 } from "./esewa.service.js";
 
 export const initiateEsewaPaymentController = asyncHandler(async (req, res) => {
-  const result = await initiateEsewaPaymentService(req.body);
+  const result = await initiateEsewaPaymentService(req.body, req.user.id);
 
   return successResponse({
     res,

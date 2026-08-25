@@ -13,6 +13,7 @@ import {
 } from "../../payment.repository.js";
 import { generateReceiptNumber } from "../../../receipt/receiptCounter.service.js";
 import { createReceiptService } from "../../../receipt/receipt.service.js";
+import { logActivity } from "../../../auditLog/auditLog.service.js";
 
 export const generateEsewaSignature = ({ totalAmount, transactionUuid }) => {
   const message = `total_amount=${totalAmount},transaction_uuid=${transactionUuid},product_code=${esewaConfig.productCode}`;
@@ -56,7 +57,7 @@ export const generateTransactionUuid = () => {
     .slice(0, 8)}`;
 };
 
-export const initiateEsewaPaymentService = async ({ studentFeeId, amount }) => {
+export const initiateEsewaPaymentService = async ({ studentFeeId, amount }, performedBy) => {
   const paymentAmount = Number(amount);
 
   if (!studentFeeId) {
@@ -112,6 +113,14 @@ export const initiateEsewaPaymentService = async ({ studentFeeId, amount }) => {
   const paymentData = createEsewaPaymentData({
     amount: paymentAmount,
     transactionUuid,
+  });
+
+  await logActivity({
+    entityType: "Payment",
+    entityId: payment._id,
+    action: "INITIATED",
+    description: "eSewa payment initiated",
+    performedBy,
   });
 
   return {

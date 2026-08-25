@@ -50,7 +50,7 @@ export const listInstallmentPlansByStudent = asyncHandler(async (req, res) => {
 });
 
 export const cancelInstallmentPlan = asyncHandler(async(req, res ) => {
-    const plan = await cancelInstallmentPlanService(req.params.id);
+    const plan = await cancelInstallmentPlanService(req.params.id, req.user.id);
     return successResponse({
       res,
       statusCode: 200,

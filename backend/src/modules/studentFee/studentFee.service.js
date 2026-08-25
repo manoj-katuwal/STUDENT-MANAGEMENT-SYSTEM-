@@ -3,8 +3,9 @@ import { findStudentById } from "../students/student.repository.js";
 import { findAcademicYearById } from "../academicYear/academicYear.repository.js";
 import { findFeeStructureById } from "../feeStructure/feeStructure.repository.js";
 import AppError from "../../shared/utils/error/AppError.js";
+import { logActivity } from "../auditLog/auditLog.service.js";
 
-export const createStudentFeeService = async (studentFeeData) => {
+export const createStudentFeeService = async (studentFeeData, performedBy) => {
   const {
     studentId,
     academicYearId,
@@ -100,6 +101,14 @@ export const createStudentFeeService = async (studentFeeData) => {
     status,
   });
 
+  await logActivity({
+    entityType: "StudentFee",
+    entityId: studentFee._id,
+    action: "CREATED",
+    description: "Student fee assigned",
+    performedBy,
+  });
+
   return studentFee;
 };
 
@@ -169,7 +178,7 @@ export const getStudentFeesService = async ({
   };
 };
 
-export const updateStudentFeeService = async (studentFeeId, updateData) => {
+export const updateStudentFeeService = async (studentFeeId, updateData, performedBy) => {
   const studentFee = await findStudentFeeById(studentFeeId);
 
   if (!studentFee) {
@@ -224,10 +233,18 @@ export const updateStudentFeeService = async (studentFeeId, updateData) => {
     status,
   });
 
+  await logActivity({
+    entityType: "StudentFee",
+    entityId: updatedStudentFee._id,
+    action: "UPDATED",
+    description: "Student fee discount amount updated",
+    performedBy,
+  });
+
   return updatedStudentFee;
 };
 
-export const cancelStudentFeeService = async (studentFeeId) => {
+export const cancelStudentFeeService = async (studentFeeId, performedBy) => {
   const studentFee = await findStudentFeeById(studentFeeId);
 
   if (!studentFee) {
@@ -249,6 +266,14 @@ export const cancelStudentFeeService = async (studentFeeId) => {
 
   const cancelledStudentFee = await updateStudentFee(studentFeeId, {
     status: "CANCELLED",
+  });
+
+  await logActivity({
+    entityType: "StudentFee",
+    entityId: cancelledStudentFee._id,
+    action: "CANCELLED",
+    description: "Student fee cancelled",
+    performedBy,
   });
 
   return cancelledStudentFee;

@@ -9,7 +9,7 @@ import {
 
 
 export const createOfflinePaymentController = asyncHandler(async (req, res) => {
-  const payment = await createOfflinePaymentService(req.body);
+  const payment = await createOfflinePaymentService(req.body, req.user.id);
 
   return successResponse({
     res,

@@ -4,7 +4,7 @@ import { cancelStudentFeeService, createStudentFeeService, getStudentFeeByIdServ
 
 
 export const createStudentFeeController = asyncHandler(async (req, res) => {
-  const studentFee = await createStudentFeeService(req.body);
+  const studentFee = await createStudentFeeService(req.body, req.user.id);
 
   return successResponse({
     res,
@@ -47,6 +47,7 @@ export const updateStudentFeeController = asyncHandler(async (req, res) => {
   const studentFee = await updateStudentFeeService(
     req.params.studentFeeId,
     req.body,
+    req.user.id,
   );
 
   return successResponse({
@@ -58,7 +59,7 @@ export const updateStudentFeeController = asyncHandler(async (req, res) => {
 });
 
 export const cancelStudentFeeController = asyncHandler(async (req, res) => {
-  const studentFee = await cancelStudentFeeService(req.params.studentFeeId);
+  const studentFee = await cancelStudentFeeService(req.params.studentFeeId, req.user.id);
 
   return successResponse({
     res,

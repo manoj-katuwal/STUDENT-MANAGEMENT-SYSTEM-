@@ -1,9 +1,9 @@
 import AppError from "../../shared/utils/error/AppError.js";
 import { findPaymentById } from "../payment/payment.repository.js";
-import StudentFee from "../studentFee/studentFee.model.js";
 import { findStudentFeeById } from "../studentFee/studentFee.repository.js";
 import PaymentReversal from "./paymentReversal.model.js";
 import { createPaymentReversal, findReversalById } from "./paymentReversal.repository.js";
+import { logActivity } from "../auditLog/auditLog.service.js";
 
 
 export const reversePaymentService = async (
@@ -28,7 +28,7 @@ export const reversePaymentService = async (
     throw new AppError("Associated student fee record not found", 404);
   }
 
-  const newPaidAmount = StudentFee.paidAmount - payment.amount;
+  const newPaidAmount = studentFee.paidAmount - payment.amount;
   if (newPaidAmount < 0) {
     throw new AppError(
       "Reversal amount exceeds recorded paid amount for this fee",
@@ -77,5 +77,15 @@ export const reversePaymentService = async (
     );
   }
 
-  return await findReversalById(reversal._id);
+  const completedReversal = await findReversalById(reversal._id);
+
+  await logActivity({
+    entityType: "PaymentReversal",
+    entityId: reversal._id,
+    action: "REVERSED",
+    description: "Payment reversed",
+    performedBy: reversedByUserId,
+  });
+
+  return completedReversal;
 };

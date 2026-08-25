@@ -1,6 +1,7 @@
 import AppError from "../../shared/utils/error/AppError.js";
 import { findStudentFeeById, updateStudentFee } from "../studentFee/studentFee.repository.js";
 import { createDiscount, findActiveDiscountByStudentFeeId } from "./discount.repository.js";
+import { logActivity } from "../auditLog/auditLog.service.js";
 
 export const applyDiscountService = async ({
   studentFeeId,
@@ -78,6 +79,14 @@ export const applyDiscountService = async ({
         netAmount: newNetAmount,
         dueAmount: newDueAmount,
         status: newDueAmount === 0 ? "PAID" : studentFee.status,
+      });
+
+      await logActivity({
+        entityType: "Discount",
+        entityId: discount._id,
+        action: "APPLIED",
+        description: "Discount applied to student fee",
+        performedBy: appliedBy,
       });
 
       return {
