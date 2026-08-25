@@ -3,7 +3,10 @@ import NotificationLog from "./notificationLog.model.js";
 import { getEmailTemplate } from "./notification.templates.js";
 import logger from "../../config/logger.js";
 import Student from "../students/student.model.js";
-import { getOverdueStudentFees, getUpcomingDueStudentFees } from "../studentFee/studentFee.repository.js";
+import {
+  getOverdueStudentFees,
+  getUpcomingDueStudentFees,
+} from "../studentFee/studentFee.repository.js";
 
 const RECURRING_EVENTS = ["FEE_DUE_REMINDER", "INSTALLMENT_OVERDUE"];
 
@@ -15,7 +18,6 @@ const wasAlreadySent = async (entityType, entityId, eventType) => {
     startOfToday.setHours(0, 0, 0, 0);
     query.createdAt = { $gte: startOfToday };
   }
-
 
   const existing = await NotificationLog.findOne(query);
   return !!existing;
@@ -31,7 +33,7 @@ export const sendNotification = async ({
   try {
     const alreadySent = await wasAlreadySent(entityType, entityId, eventType);
     if (alreadySent) {
-      return; 
+      return;
     }
 
     const { subject, html } = getEmailTemplate(eventType, templateData);
@@ -61,7 +63,7 @@ export const sendNotification = async ({
       eventType,
       recipientEmail,
       status: "FAILED",
-    }).catch(() => {}); 
+    }).catch(() => {});
   }
 };
 
@@ -70,6 +72,8 @@ export const checkAndSendFeeReminders = async () => {
   const upcomingFees = await getUpcomingDueStudentFees(3); // 3 दिन भित्र due
   for (const fee of upcomingFees) {
     const student = await Student.findById(fee.studentId).select("name email");
+    if (!student || !student.email) continue; // skip if student missing or no email
+
     await sendNotification({
       entityType: "StudentFee",
       entityId: fee._id,
@@ -89,6 +93,8 @@ export const checkAndSendFeeReminders = async () => {
   const overdueFees = await getOverdueStudentFees(); // Fine module मा पहिले नै बनेको function
   for (const fee of overdueFees) {
     const student = await Student.findById(fee.studentId).select("name email");
+    if (!student || !student.email) continue; // skip if student missing or no email
+
     await sendNotification({
       entityType: "StudentFee",
       entityId: fee._id,

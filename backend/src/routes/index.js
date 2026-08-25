@@ -21,6 +21,7 @@ import fineRoute from "../modules/fines/fine.routes.js";
 import installmentPlanRoutes from "../modules/installment/installmentPlan.routes.js";
 import AuditLogRoutes from "../modules/auditLog/auditLog.routes.js";
 import exportRoutes from "../modules/export/export.routes.js";
+import notificationRoutes from "../modules/notification/notification.routes.js";
 
 const router = express.Router();
 
@@ -59,6 +60,7 @@ router.use("/fine-policies", finePolicyRoutes);
 router.use("/fines", fineRoute);
 router.use("/installment-plans", installmentPlanRoutes);
 router.use("/exports", exportRoutes);
-router.use("audit-logs", AuditLogRoutes);
+router.use("/audit-logs", AuditLogRoutes);
+router.use("/notifications", notificationRoutes);
 
 export default router;
