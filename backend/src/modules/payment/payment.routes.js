@@ -7,7 +7,14 @@ import {
   getStudentFeePaymentHistoryController,
   getPaymentsController,
 } from "./payment.controller.js";
-import { esewaFailureController, esewaSuccessController, initiateEsewaPaymentController } from "./gateways/esewa/esewa.controller.js";
+import {
+  esewaFailureController,
+  esewaSuccessController,
+  initiateEsewaPaymentController,
+} from "./gateways/esewa/esewa.controller.js";
+import validate from "../../middleware/validate.js";
+import { reversePaymentSchema } from "../paymentReversal/paymentReversal.validation.js";
+import { reversePayment } from "../paymentReversal/paymentReversal.controller.js";
 
 const router = express.Router();
 
@@ -48,4 +55,11 @@ router.post(
 
 router.get("/online/esewa/success", esewaSuccessController);
 router.get("/online/esewa/failure", esewaFailureController);
+router.post(
+  "/:id/reverse",
+  authenticate,
+  authorize("ADMIN", "ACCOUNTANT"),
+  validate(reversePaymentSchema),
+  reversePayment,
+);
 export default router;

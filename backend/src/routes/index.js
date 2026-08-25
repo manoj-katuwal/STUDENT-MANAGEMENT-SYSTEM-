@@ -19,6 +19,7 @@ import scholarshipAllocationRoutes from "../modules/scholarships/scholarshipAllo
 import finePolicyRoutes from "../modules/fines/finePolicy/finePolicy.routes.js";
 import fineRoute from "../modules/fines/fine.routes.js";
 import installmentPlanRoutes from "../modules/installment/installmentPlan.routes.js";
+
 const router = express.Router();
 
 router.get("/health", (req, res) => {
