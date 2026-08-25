@@ -68,12 +68,9 @@ export const sendNotification = async ({
 };
 
 export const checkAndSendFeeReminders = async () => {
-  // १. आउँदो ३ दिनभित्र due हुने fees — FEE_DUE_REMINDER
-  const upcomingFees = await getUpcomingDueStudentFees(3); // 3 दिन भित्र due
+  const upcomingFees = await getUpcomingDueStudentFees(3);
   for (const fee of upcomingFees) {
     const student = await Student.findById(fee.studentId).select("name email");
-    if (!student || !student.email) continue; // skip if student missing or no email
-
     await sendNotification({
       entityType: "StudentFee",
       entityId: fee._id,
@@ -87,14 +84,9 @@ export const checkAndSendFeeReminders = async () => {
     });
   }
 
-  // २. पहिले नै overdue भइसकेका (dueDate बितिसकेको, dueAmount > 0) — INSTALLMENT_OVERDUE
-  //    (नाम "Installment" भए पनि, यो सामान्य overdue StudentFee माथि लागू हुन्छ,
-  //     installment मात्र होइन — नामकरण तिम्रो backlog अनुसार राखेको हुँ)
-  const overdueFees = await getOverdueStudentFees(); // Fine module मा पहिले नै बनेको function
+  const overdueFees = await getOverdueStudentFees();
   for (const fee of overdueFees) {
     const student = await Student.findById(fee.studentId).select("name email");
-    if (!student || !student.email) continue; // skip if student missing or no email
-
     await sendNotification({
       entityType: "StudentFee",
       entityId: fee._id,
@@ -107,4 +99,9 @@ export const checkAndSendFeeReminders = async () => {
       },
     });
   }
+
+  return {
+    upcomingCount: upcomingFees.length,
+    overdueCount: overdueFees.length,
+  };
 };

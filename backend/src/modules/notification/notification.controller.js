@@ -3,11 +3,14 @@ import { successResponse } from "../../shared/utils/response/apiResponse.js";
 import { checkAndSendFeeReminders } from "./notification.service.js";
 
 export const triggerFeeReminders = asyncHandler(async (req, res) => {
-  await checkAndSendFeeReminders();
+  const result = await checkAndSendFeeReminders();
 
   return successResponse({
     res,
     statusCode: 200,
     message: "Fee reminder check completed",
+    data : result,
   });
 });
+
+
