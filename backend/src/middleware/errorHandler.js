@@ -1,5 +1,12 @@
+import logger from "../config/logger.js";
+
 const errorHandler = (err, req, res, next) => {
-  console.error(err);
+  logger.error("Unhandled request error", {
+    err,
+    method: req.method,
+    path: req.originalUrl,
+    requestId: req.requestId,
+  });
 
   let statusCode = err.statusCode || 500;
   let message = err.message;

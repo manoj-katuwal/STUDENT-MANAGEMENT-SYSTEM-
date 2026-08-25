@@ -4,6 +4,7 @@ import { findAcademicYearById } from "../academicYear/academicYear.repository.js
 import { findFeeStructureById } from "../feeStructure/feeStructure.repository.js";
 import AppError from "../../shared/utils/error/AppError.js";
 import { logActivity } from "../auditLog/auditLog.service.js";
+import logger from "../../config/logger.js";
 
 export const createStudentFeeService = async (studentFeeData, performedBy) => {
   const {
@@ -108,6 +109,7 @@ export const createStudentFeeService = async (studentFeeData, performedBy) => {
     description: "Student fee assigned",
     performedBy,
   });
+  logger.info("Student fee assigned", { studentFeeId: studentFee._id, performedBy });
 
   return studentFee;
 };
@@ -240,6 +242,10 @@ export const updateStudentFeeService = async (studentFeeId, updateData, performe
     description: "Student fee discount amount updated",
     performedBy,
   });
+  logger.info("Student fee updated", {
+    studentFeeId: updatedStudentFee._id,
+    performedBy,
+  });
 
   return updatedStudentFee;
 };
@@ -273,6 +279,10 @@ export const cancelStudentFeeService = async (studentFeeId, performedBy) => {
     entityId: cancelledStudentFee._id,
     action: "CANCELLED",
     description: "Student fee cancelled",
+    performedBy,
+  });
+  logger.info("Student fee cancelled", {
+    studentFeeId: cancelledStudentFee._id,
     performedBy,
   });
 

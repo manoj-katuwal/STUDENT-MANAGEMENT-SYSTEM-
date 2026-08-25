@@ -5,6 +5,7 @@ import * as feeStructureRepository from "../feeStructure/feeStructure.repository
 import * as installmentPlanRepository from "./installmentPlan.repository.js";
 import * as studentFeeRepository from "../studentFee/studentFee.repository.js";
 import { logActivity } from "../auditLog/auditLog.service.js";
+import logger from "../../config/logger.js";
 
 const AMOUNT_TOLERANCE = 0.01;
 
@@ -230,6 +231,10 @@ export const createInstallmentPlanService = async (payload, userId) => {
       description: "Installment plan created",
       performedBy: userId,
     });
+    logger.info("Installment plan created", {
+      installmentPlanId: plan._id,
+      performedBy: userId,
+    });
 
     return plan;
   } catch (err) {
@@ -308,6 +313,10 @@ export const cancelInstallmentPlanService = async (planId, performedBy) => {
     entityId: plan._id,
     action: "CANCELLED",
     description: "Installment plan cancelled",
+    performedBy,
+  });
+  logger.info("Installment plan cancelled", {
+    installmentPlanId: plan._id,
     performedBy,
   });
 

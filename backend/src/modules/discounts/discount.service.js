@@ -2,6 +2,7 @@ import AppError from "../../shared/utils/error/AppError.js";
 import { findStudentFeeById, updateStudentFee } from "../studentFee/studentFee.repository.js";
 import { createDiscount, findActiveDiscountByStudentFeeId } from "./discount.repository.js";
 import { logActivity } from "../auditLog/auditLog.service.js";
+import logger from "../../config/logger.js";
 
 export const applyDiscountService = async ({
   studentFeeId,
@@ -86,6 +87,11 @@ export const applyDiscountService = async ({
         entityId: discount._id,
         action: "APPLIED",
         description: "Discount applied to student fee",
+        performedBy: appliedBy,
+      });
+      logger.info("Discount applied", {
+        discountId: discount._id,
+        studentFeeId,
         performedBy: appliedBy,
       });
 

@@ -14,6 +14,7 @@ import {
 import { generateReceiptNumber } from "../../../receipt/receiptCounter.service.js";
 import { createReceiptService } from "../../../receipt/receipt.service.js";
 import { logActivity } from "../../../auditLog/auditLog.service.js";
+import logger from "../../../../config/logger.js";
 
 export const generateEsewaSignature = ({ totalAmount, transactionUuid }) => {
   const message = `total_amount=${totalAmount},transaction_uuid=${transactionUuid},product_code=${esewaConfig.productCode}`;
@@ -120,6 +121,11 @@ export const initiateEsewaPaymentService = async ({ studentFeeId, amount }, perf
     entityId: payment._id,
     action: "INITIATED",
     description: "eSewa payment initiated",
+    performedBy,
+  });
+  logger.info("eSewa payment initiated", {
+    paymentId: payment._id,
+    studentFeeId,
     performedBy,
   });
 

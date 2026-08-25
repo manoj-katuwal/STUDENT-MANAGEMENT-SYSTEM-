@@ -15,6 +15,7 @@ import {
 import { generateReceiptNumber } from "../receipt/receiptCounter.service.js";
 import { createReceiptService } from "../receipt/receipt.service.js";
 import { logActivity } from "../auditLog/auditLog.service.js";
+import logger from "../../config/logger.js";
 
 export const createOfflinePaymentService = async (paymentData, performedBy) => {
   const { studentFeeId, amount, paymentMethod, transactionId, remarks } =
@@ -130,6 +131,11 @@ export const createOfflinePaymentService = async (paymentData, performedBy) => {
       entityId: payment._id,
       action: "CREATED",
       description: "Offline payment recorded",
+      performedBy,
+    });
+    logger.info("Offline payment recorded", {
+      paymentId: payment._id,
+      studentFeeId: payment.studentFeeId,
       performedBy,
     });
 

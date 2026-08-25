@@ -4,6 +4,7 @@ import { findStudentFeeById } from "../studentFee/studentFee.repository.js";
 import PaymentReversal from "./paymentReversal.model.js";
 import { createPaymentReversal, findReversalById } from "./paymentReversal.repository.js";
 import { logActivity } from "../auditLog/auditLog.service.js";
+import logger from "../../config/logger.js";
 
 
 export const reversePaymentService = async (
@@ -84,6 +85,11 @@ export const reversePaymentService = async (
     entityId: reversal._id,
     action: "REVERSED",
     description: "Payment reversed",
+    performedBy: reversedByUserId,
+  });
+  logger.info("Payment reversed", {
+    paymentId: payment._id,
+    paymentReversalId: reversal._id,
     performedBy: reversedByUserId,
   });
 
