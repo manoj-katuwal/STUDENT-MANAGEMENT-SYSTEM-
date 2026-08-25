@@ -15,6 +15,8 @@ import {
 import { generateReceiptNumber } from "../receipt/receiptCounter.service.js";
 import { createReceiptService } from "../receipt/receipt.service.js";
 import { logActivity } from "../auditLog/auditLog.service.js";
+import Student from "../students/student.model.js";
+import { sendNotification } from "../notification/notification.service.js";
 import logger from "../../config/logger.js";
 
 export const createOfflinePaymentService = async (paymentData, performedBy) => {
@@ -46,10 +48,11 @@ export const createOfflinePaymentService = async (paymentData, performedBy) => {
 
   try {
     let payment;
+    let studentFee;
 
     await session.withTransaction(async () => {
       // 3. Find StudentFee
-      const studentFee = await findStudentFeeById(studentFeeId, { session });
+      studentFee = await findStudentFeeById(studentFeeId, { session });
 
       if (!studentFee) {
         throw new AppError("Student fee not found", 404);
@@ -138,6 +141,41 @@ export const createOfflinePaymentService = async (paymentData, performedBy) => {
       studentFeeId: payment.studentFeeId,
       performedBy,
     });
+
+    // Send only after the payment transaction has committed. Notification
+    // failures are handled and logged by sendNotification without rolling back
+    // an already-recorded payment.
+    try {
+      const student = await Student.findById(studentFee.studentId).populate(
+        "userId",
+        "email",
+      );
+      const recipientEmail = student?.userId?.email;
+
+      if (recipientEmail) {
+        await sendNotification({
+          entityType: "Payment",
+          entityId: payment._id,
+          eventType: "PAYMENT_RECEIVED",
+          recipientEmail,
+          templateData: {
+            studentName: student.name,
+            amount: payment.amount,
+            date: payment.paidAt.toISOString().slice(0, 10),
+          },
+        });
+      } else {
+        logger.warn(
+          "Payment receipt notification skipped: student email unavailable",
+          { paymentId: payment._id, studentId: studentFee.studentId },
+        );
+      }
+    } catch (err) {
+      logger.error("Payment receipt notification setup failed", {
+        paymentId: payment._id,
+        err,
+      });
+    }
 
     return payment;
   } finally {

@@ -1,9 +1,11 @@
 import AppError from "../../shared/utils/error/AppError.js";
 import { findPaymentById } from "../payment/payment.repository.js";
 import { findStudentFeeById } from "../studentFee/studentFee.repository.js";
+import Student from "../students/student.model.js";
 import PaymentReversal from "./paymentReversal.model.js";
 import { createPaymentReversal, findReversalById } from "./paymentReversal.repository.js";
 import { logActivity } from "../auditLog/auditLog.service.js";
+import { sendNotification } from "../notification/notification.service.js";
 import logger from "../../config/logger.js";
 
 
@@ -92,6 +94,41 @@ export const reversePaymentService = async (
     paymentReversalId: reversal._id,
     performedBy: reversedByUserId,
   });
+
+  // A notification is a post-reversal side effect: it must not undo a
+  // completed reversal if the student's email cannot be resolved or delivered.
+  try {
+    const student = await Student.findById(studentFee.studentId).populate(
+      "userId",
+      "email",
+    );
+    const recipientEmail = student?.userId?.email;
+
+    if (recipientEmail) {
+      await sendNotification({
+        entityType: "PaymentReversal",
+        entityId: reversal._id,
+        eventType: "PAYMENT_REVERSED",
+        recipientEmail,
+        templateData: {
+          studentName: student.name,
+          amount: payment.amount,
+          reason,
+        },
+      });
+    } else {
+      logger.warn(
+        "Payment reversal notification skipped: student email unavailable",
+        { paymentId: payment._id, studentId: studentFee.studentId },
+      );
+    }
+  } catch (err) {
+    logger.error("Payment reversal notification setup failed", {
+      paymentId: payment._id,
+      paymentReversalId: reversal._id,
+      err,
+    });
+  }
 
   return completedReversal;
 };
