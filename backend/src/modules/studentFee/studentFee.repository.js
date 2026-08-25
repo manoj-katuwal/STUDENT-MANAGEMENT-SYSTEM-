@@ -159,3 +159,16 @@ export const getOverdueStudentFees = async () => {
     status: { $nin: ["PAID", "CANCELLED"] },
   }).populate("feeStructureId");
 };
+
+export const getUpcomingDueStudentFees = async (days) => {
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+  const futureDate = new Date(today);
+  futureDate.setDate(futureDate.getDate() + days);
+
+  return await StudentFee.find({
+    dueAmount: { $gt: 0 },
+    status: { $ne: 'CANCELLED' },
+    dueDate: { $gte: today, $lte: futureDate },
+  });
+};
