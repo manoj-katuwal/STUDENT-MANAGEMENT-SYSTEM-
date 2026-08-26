@@ -6,7 +6,10 @@ const studentSchema = new mongoose.Schema(
       type: mongoose.Schema.Types.ObjectId,
       ref: "User",
       default: null,
-      sparse: true,
+      index: {
+        unique: true,
+        partialFilterExpression: { userId: { $type: "objectId" } },
+      },
     },
 
     name: {

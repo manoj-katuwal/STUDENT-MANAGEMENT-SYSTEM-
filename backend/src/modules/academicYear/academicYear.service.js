@@ -1,4 +1,3 @@
-import mongoose from "mongoose";
 import AppError from "../../shared/utils/error/AppError.js";
 import {
   clearCurrentAcademicYear,
@@ -12,28 +11,17 @@ import {
 } from "./academicYear.repository.js";
 
 const switchCurrentAcademicYear = async (academicYearId, updateData = {}) => {
-  const session = await mongoose.startSession();
+  // No transactions — standalone MongoDB doesn't support them.
+  // clearCurrentAcademicYear first, then set the new one as current.
+  await clearCurrentAcademicYear();
 
-  try {
-    session.startTransaction();
+  const updatedAcademicYear = await updateAcademicYear(academicYearId, {
+    ...updateData,
+    isCurrent: true,
+    status: "ACTIVE",
+  });
 
-    await clearCurrentAcademicYear(session);
-
-    const updatedAcademicYear = await updateAcademicYear(
-      academicYearId,
-      { ...updateData, isCurrent: true, status: "ACTIVE" },
-      session,
-    );
-
-    await session.commitTransaction();
-
-    return updatedAcademicYear;
-  } catch (error) {
-    await session.abortTransaction();
-    throw error;
-  } finally {
-    await session.endSession();
-  }
+  return updatedAcademicYear;
 };
 
 export const createAcademicYearService = async (academicYearData) => {
@@ -58,33 +46,13 @@ export const createAcademicYearService = async (academicYearData) => {
   }
 
   if (isCurrent === true) {
-    const session = await mongoose.startSession();
+    const currentAcademicYear = await findCurrentAcademicYear();
 
-    try {
-      session.startTransaction();
-
-      const currentAcademicYear = await findCurrentAcademicYear(session);
-
-      if (currentAcademicYear) {
-        throw new AppError(
-          "Another academic year is already marked as current",
-          400,
-        );
-      }
-
-      const createdAcademicYear = await createAcademicYear(
-        academicYearData,
-        session,
+    if (currentAcademicYear) {
+      throw new AppError(
+        "Another academic year is already marked as current",
+        400,
       );
-
-      await session.commitTransaction();
-
-      return createdAcademicYear;
-    } catch (error) {
-      await session.abortTransaction();
-      throw error;
-    } finally {
-      await session.endSession();
     }
   }
 

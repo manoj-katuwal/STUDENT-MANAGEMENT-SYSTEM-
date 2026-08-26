@@ -60,10 +60,9 @@ export const updateAcademicYear = async (
   });
 };
 
-export const clearCurrentAcademicYear = async (session) => {
+export const clearCurrentAcademicYear = async () => {
   return await AcademicYear.updateMany(
     { isCurrent: true },
     { $set: { isCurrent: false } },
-    { session },
   );
 };
