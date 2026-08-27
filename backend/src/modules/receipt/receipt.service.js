@@ -6,7 +6,10 @@ import {
   findReceiptByReceiptNumber,
 } from "./receipt.repository.js";
 import { findStudentFeeById } from "../studentFee/studentFee.repository.js";
-import { findStudentById, findStudentByUserId } from "../students/student.repository.js";
+import {
+  findStudentById,
+  findStudentByUserId,
+} from "../students/student.repository.js";
 import PDFDocument from "pdfkit";
 
 const ensureReceiptAccess = async (receipt, user) => {
@@ -144,13 +147,15 @@ export const getReceiptPdfDataService = async (receiptId, user) => {
   return {
     receipt,
     studentFee,
-    student
+    student,
   };
 };
 
 export const generateReceiptPdfService = async (receiptId, user) => {
-  const { receipt, studentFee, student } =
-    await getReceiptPdfDataService(receiptId, user);
+  const { receipt, studentFee, student } = await getReceiptPdfDataService(
+    receiptId,
+    user,
+  );
 
   const doc = new PDFDocument({
     size: "A4",
@@ -200,4 +205,3 @@ export const generateReceiptPdfService = async (receiptId, user) => {
 
   return doc;
 };
-

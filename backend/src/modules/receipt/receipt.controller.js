@@ -1,6 +1,11 @@
 import asyncHandler from "../../shared/utils/asyncHandler.js";
 import { successResponse } from "../../shared/utils/response/apiResponse.js";
-import { generateReceiptPdfService, getReceiptByIdService, getReceiptByPaymentIdService, getReceiptByReceiptNumberService } from "./receipt.service.js";
+import {
+  generateReceiptPdfService,
+  getReceiptByIdService,
+  getReceiptByPaymentIdService,
+  getReceiptByReceiptNumberService,
+} from "./receipt.service.js";
 
 export const getReceiptByIdController = asyncHandler(async (req, res) => {
   const receipt = await getReceiptByIdService(req.params.id, req.user);
