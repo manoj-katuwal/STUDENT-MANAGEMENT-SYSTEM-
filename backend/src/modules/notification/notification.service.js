@@ -70,12 +70,18 @@ export const sendNotification = async ({
 export const checkAndSendFeeReminders = async () => {
   const upcomingFees = await getUpcomingDueStudentFees(3);
   for (const fee of upcomingFees) {
-    const student = await Student.findById(fee.studentId).select("name email");
+    const student = await Student.findById(fee.studentId).populate(
+      "userId",
+      "email",
+    );
+    const recipientEmail = student?.userId?.email;
+    if (!student || !recipientEmail) continue;
+
     await sendNotification({
       entityType: "StudentFee",
       entityId: fee._id,
       eventType: "FEE_DUE_REMINDER",
-      recipientEmail: student.email,
+      recipientEmail,
       templateData: {
         studentName: student.name,
         dueAmount: fee.dueAmount,
@@ -86,12 +92,18 @@ export const checkAndSendFeeReminders = async () => {
 
   const overdueFees = await getOverdueStudentFees();
   for (const fee of overdueFees) {
-    const student = await Student.findById(fee.studentId).select("name email");
+    const student = await Student.findById(fee.studentId).populate(
+      "userId",
+      "email",
+    );
+    const recipientEmail = student?.userId?.email;
+    if (!student || !recipientEmail) continue;
+
     await sendNotification({
       entityType: "StudentFee",
       entityId: fee._id,
       eventType: "INSTALLMENT_OVERDUE",
-      recipientEmail: student.email,
+      recipientEmail,
       templateData: {
         studentName: student.name,
         dueAmount: fee.dueAmount,
@@ -103,5 +115,26 @@ export const checkAndSendFeeReminders = async () => {
   return {
     upcomingCount: upcomingFees.length,
     overdueCount: overdueFees.length,
+  };
+};
+
+export const getNotificationLogsService = async (page = 1, limit = 10) => {
+  const skip = (page - 1) * limit;
+  const [logs, total] = await Promise.all([
+    NotificationLog.find()
+      .sort({ createdAt: -1 })
+      .skip(skip)
+      .limit(Number(limit)),
+    NotificationLog.countDocuments(),
+  ]);
+
+  return {
+    logs,
+    pagination: {
+      page: Number(page),
+      limit: Number(limit),
+      total,
+      totalPages: Math.ceil(total / limit),
+    },
   };
 };
