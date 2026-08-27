@@ -4,14 +4,14 @@ import {
   getDashboardSummary,
   getMonthlyCollection,
   getOverdueFeeTotal,
+  getPaymentMethodCollection,
+  getPendingFeeTotal,
   getRecentPayments,
   getStudentDueList,
   getTodayCollection,
 } from "./reports.controller.js";
 import authenticate from "../../middleware/authenticate.js";
 import authorize from "../../middleware/authorize.js";
-import { getPendingFeeTotal } from "./reports.controller.js";
-import { getPaymentMethodCollection } from "./reports.repository.js";
 
 const router = express.Router();
 
