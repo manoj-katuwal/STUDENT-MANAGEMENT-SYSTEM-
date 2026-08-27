@@ -4,6 +4,7 @@ import {
   findLogsByEntity as findLogsByEntityRepository,
 } from "./auditLog.repository.js";
 import logger from "../../config/logger.js";
+import AppError from "../../shared/utils/error/AppError.js";
 
 const toPositiveInteger = (value, fallback) => {
   const parsedValue = Number(value);
@@ -19,7 +20,7 @@ const toValidDate = (value, fieldName) => {
   const date = new Date(value);
 
   if (Number.isNaN(date.getTime())) {
-    throw new TypeError(`${fieldName} must be a valid date`);
+    throw new AppError(`${fieldName} must be a valid date`, 400);
   }
 
   return date;
@@ -65,7 +66,7 @@ export const findAllLogs = async (filters = {}, page = 1, limit = 10) => {
     normalizedFilters.endDate &&
     normalizedFilters.startDate > normalizedFilters.endDate
   ) {
-    throw new RangeError("startDate cannot be after endDate");
+    throw new AppError("startDate cannot be after endDate", 400);
   }
 
   return findAllLogsRepository(
