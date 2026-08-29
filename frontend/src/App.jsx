@@ -1,9 +1,8 @@
-function App() {
-  return (
-    <div className="flex min-h-screen items-center justify-center">
-      <h1 className="text-4xl font-bold">Student Fee Management System 🚀</h1>
-    </div>
-  );
-}
+import React from "react";
+import Router from "./app/Router";
+
+const App = () => {
+  return <Router />;
+};
 
 export default App;
