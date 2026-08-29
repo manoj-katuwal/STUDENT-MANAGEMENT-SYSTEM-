@@ -1,7 +1,7 @@
 @import url('https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600&family=Inter:wght@400;500;600&display=swap');
 @import "tailwindcss";
 
-@theme {
+@theme{
   --color-ink: #16233F;
   --color-parchment: #F8F3E8;
   --color-brass: #B58A4A;

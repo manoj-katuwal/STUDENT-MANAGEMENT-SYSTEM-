@@ -65,7 +65,7 @@ function LoginPage() {
           {/* Compact mark for mobile, where the left panel is hidden */}
           <div className="lg:hidden mb-8 flex items-center gap-3">
             <div
-              className="w-10 h-10 rounded-full flex items-center justify-center flex-shrink-0 border-2 border-brass"
+              className="w-10 h-10 rounded-full flex items-center justify-center shrink-0 border-2 border-brass"
               style={{ transform: "rotate(-8deg)" }}
             >
               <span className="text-xs font-semibold text-brass">SFM</span>
@@ -95,7 +95,7 @@ function LoginPage() {
                 Email
               </label>
               <div className="flex items-center gap-2 pb-2 border-b-2 border-hairline focus-within:border-brass transition-colors duration-200 motion-reduce:transition-none">
-                <Mail className="w-4 h-4 flex-shrink-0 text-slate" />
+                <Mail className="w-4 h-4 shrink-0 text-slate" />
                 <input
                   id="email"
                   name="email"
@@ -120,7 +120,7 @@ function LoginPage() {
                 Password
               </label>
               <div className="flex items-center gap-2 pb-2 border-b-2 border-hairline focus-within:border-brass transition-colors duration-200 motion-reduce:transition-none">
-                <Lock className="w-4 h-4 flex-shrink-0 text-slate" />
+                <Lock className="w-4 h-4 shrink-0 text-slate" />
                 <input
                   id="password"
                   name="password"
@@ -136,7 +136,7 @@ function LoginPage() {
                 <button
                   type="button"
                   onClick={() => setShowPassword((prev) => !prev)}
-                  className="flex-shrink-0 text-slate outline-none focus-visible:outline-2 focus-visible:outline-brass focus-visible:outline-offset-2"
+                  className="shrink-0 text-slate outline-none focus-visible:outline-2 focus-visible:outline-brass focus-visible:outline-offset-2"
                   aria-label={showPassword ? "Hide password" : "Show password"}
                   tabIndex={0}
                 >
