@@ -64,36 +64,38 @@ A robust, enterprise-grade RESTful API built with **Node.js**, **Express.js**, a
 ## 📁 Project Architecture
 
 ```
-backend/
-├── src/
-│   ├── app.js                   # Express application setup & global middlewares
-│   ├── index.js                 # Database connection & server entry point
-│   ├── config/                  # DB and app config
-│   ├── middleware/              # Authentication, authorization, validation, error handler
-│   ├── routes/                  # Central API router mapping
-│   ├── shared/                  # Utilities, logger (Winston), AppError, API responses
-│   └── modules/                 # Modular Domain Architecture
-│       ├── academicYear/        # Academic Years module
-│       ├── auditLog/            # Audit logging module
-│       ├── auth/                # Authentication & Password Reset
-│       ├── classes/             # Class management module
-│       ├── discounts/           # Discount allocation module
-│       ├── export/              # PDF & Excel export module
-│       ├── feeStructure/        # Fee Structure definition module
-│       ├── fines/               # Fine policies & calculation engine
-│       ├── notification/        # System notifications module
-│       ├── payment/             # Payment processing & eSewa integration
-│       ├── paymentReversal/     # Payment reversal module
-│       ├── receipt/             # Payment receipt generation
-│       ├── reports/             # Financial & summary reports
-│       ├── scholarships/        # Scholarship & allocation module
-│       ├── section/             # Section management module
-│       ├── studentFee/          # Student Fee collection & tracking
-│       ├── students/            # Student management module
-│       └── users/               # User account management module
-├── .env                         # Environment variables
-├── .env.example                 # Example environment variables template
-└── package.json                 # Project dependencies & npm scripts
+STUDENT FEE MANAGEMENT/
+├── backend/
+│   ├── src/
+│   │   ├── app.js                   # Express application setup & global middlewares
+│   │   ├── index.js                 # Database connection & server entry point
+│   │   ├── config/                  # DB and app config
+│   │   ├── middleware/              # Authentication, authorization, validation, error handler
+│   │   ├── routes/                  # Central API router mapping
+│   │   ├── shared/                  # Utilities, logger (Winston), AppError, API responses
+│   │   └── modules/                 # Modular Domain Architecture
+│   │       ├── academicYear/        # Academic Years module
+│   │       ├── auditLog/            # Audit logging module
+│   │       ├── auth/                # Authentication & Password Reset
+│   │       ├── classes/             # Class management module
+│   │       ├── discounts/           # Discount allocation module
+│   │       ├── export/              # PDF & Excel export module
+│   │       ├── feeStructure/        # Fee Structure definition module
+│   │       ├── fines/               # Fine policies & calculation engine
+│   │       ├── notification/        # System notifications module
+│   │       ├── payment/             # Payment processing & eSewa integration
+│   │       ├── paymentReversal/     # Payment reversal module
+│   │       ├── receipt/             # Payment receipt generation
+│   │       ├── reports/             # Financial & summary reports
+│   │       ├── scholarships/        # Scholarship & allocation module
+│   │       ├── section/             # Section management module
+│   │       ├── studentFee/          # Student Fee collection & tracking
+│   │       ├── students/            # Student management module
+│   │       └── users/               # User account management module
+│   ├── .env                         # Environment variables
+│   ├── .env.example                 # Example environment variables template
+│   └── package.json                 # Project dependencies & npm scripts
+└── README.md
 ```
 
 ---
@@ -201,3 +203,4 @@ The API will start running at: `http://localhost:5000/api/v1`
 
 ## 📄 License
 This project is licensed under the **ISC License**.
+
