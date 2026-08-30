@@ -5,10 +5,6 @@ import { Navigate, Outlet } from "react-router-dom";
 const ProtectedRoute = () => {
   const { isAuthenticated, isInitializing } = useAuth();
 
-  if (!isAuthenticated) {
-    return <Navigate to="/login" replace />;
-  }
-
   if (isInitializing) {
     return (
       <>
@@ -34,6 +30,11 @@ const ProtectedRoute = () => {
       </>
     );
   }
+
+  if (!isAuthenticated) {
+    return <Navigate to="/login" replace />;
+  }
+  
   return <Outlet />;
 };
 
