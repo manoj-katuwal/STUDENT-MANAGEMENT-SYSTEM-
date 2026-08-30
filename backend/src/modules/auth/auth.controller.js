@@ -1,5 +1,6 @@
 import asyncHandler from "../../shared/utils/asyncHandler.js";
 import { successResponse } from "../../shared/utils/response/apiResponse.js";
+import { findUserById } from "../users/user.repository.js";
 import { changeUserPassword } from "../users/user.service.js";
 import {
   register,
@@ -11,7 +12,10 @@ import {
   resendVerificationEmail,
   verifyEmail,
 } from "./emailVerification/emailVerification.service.js";
-import { forgotPassword, resetPassword } from "./passwordReset/passwordReset.service.js";
+import {
+  forgotPassword,
+  resetPassword,
+} from "./passwordReset/passwordReset.service.js";
 
 export const registerController = asyncHandler(async (req, res) => {
   const user = await register(req.body);
@@ -169,5 +173,16 @@ export const resetPasswordController = asyncHandler(async (req, res) => {
     res,
     statusCode: 200,
     message: "Password has been reset successfully",
+  });
+});
+
+export const getMeController = asyncHandler(async (req, res) => {
+  const user = await findUserById(req.user.id);
+
+  return successResponse({
+    res,
+    statusCode: 200,
+    message: "Current user fetched successfully",
+    data: user,
   });
 });
