@@ -7,6 +7,7 @@ import {
   login,
   refreshAccessToken,
   logoutAllSessions,
+  logout,
 } from "./auth.service.js";
 import {
   resendVerificationEmail,
