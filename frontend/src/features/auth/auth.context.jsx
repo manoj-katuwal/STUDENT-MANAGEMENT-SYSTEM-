@@ -1,73 +1,57 @@
-import { createContext, useContext, useEffect, useState } from "react";
+import {
+  createContext,
+  useContext,
+  useEffect,
+  useState,
+} from "react";
+
+import { authStore } from "./auth.store";
 
 import {
-  getAccessToken,
-  setAccessToken,
-  removeAccessToken,
-} from "../../utils/token";
-
-import { refreshAccessToken, getCurrentUser } from "./auth.api";
+  refreshAccessToken,
+  getCurrentUser,
+} from "./auth.api";
 
 const AuthContext = createContext(null);
 
 export const AuthProvider = ({ children }) => {
-  const [accessToken, setAccessTokenState] = useState(getAccessToken());
-
+  const [accessToken, setAccessTokenState] = useState(null);
   const [user, setUser] = useState(null);
-
   const [isInitializing, setIsInitializing] = useState(true);
 
   const login = ({ user, accessToken }) => {
-    setAccessToken(accessToken);
+    authStore.setAccessToken(accessToken);
 
     setAccessTokenState(accessToken);
-
     setUser(user);
   };
 
   const logout = () => {
-    removeAccessToken();
+    authStore.clearAccessToken();
 
     setAccessTokenState(null);
-
     setUser(null);
   };
 
   useEffect(() => {
     const restoreSession = async () => {
       try {
-        /**
-         * First try the existing access token.
-         */
-        let token = getAccessToken();
+        const refreshResponse = await refreshAccessToken();
 
-        if (!token) {
-          /**
-           * Access token missing → use refresh cookie.
-           */
-          const refreshResponse = await refreshAccessToken();
+        const newAccessToken =
+          refreshResponse.data.accessToken;
 
-          token = refreshResponse.data.accessToken;
+        authStore.setAccessToken(newAccessToken);
 
-          setAccessToken(token);
+        setAccessTokenState(newAccessToken);
 
-          setAccessTokenState(token);
-        }
-
-        /**
-         * Fetch the currently logged-in user.
-         */
         const userResponse = await getCurrentUser();
 
         setUser(userResponse.data);
       } catch (error) {
-        /**
-         * Session is invalid or expired.
-         */
-        removeAccessToken();
+        authStore.clearAccessToken();
 
         setAccessTokenState(null);
-
         setUser(null);
       } finally {
         setIsInitializing(false);
@@ -88,7 +72,11 @@ export const AuthProvider = ({ children }) => {
     logout,
   };
 
-  return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
+  return (
+    <AuthContext.Provider value={value}>
+      {children}
+    </AuthContext.Provider>
+  );
 };
 
 export const useAuth = () => {

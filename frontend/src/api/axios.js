@@ -1,11 +1,6 @@
 import axios from "axios";
 
-import {
-  getAccessToken,
-  setAccessToken,
-  removeAccessToken,
-} from "../utils/token";
-
+import { authStore } from "../features/auth/auth.store";
 import refreshClient from "./refreshClient";
 
 const apiClient = axios.create({
@@ -18,7 +13,7 @@ const apiClient = axios.create({
 
 apiClient.interceptors.request.use(
   (config) => {
-    const token = getAccessToken();
+    const token = authStore.getAccessToken();
 
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;
@@ -45,13 +40,13 @@ apiClient.interceptors.response.use(
 
         const newAccessToken = refreshResponse.data.data.accessToken;
 
-        setAccessToken(newAccessToken);
+        authStore.setAccessToken(newAccessToken);
 
         originalRequest.headers.Authorization = `Bearer ${newAccessToken}`;
 
         return apiClient(originalRequest);
       } catch (refreshError) {
-        removeAccessToken();
+        authStore.clearAccessToken();
 
         return Promise.reject(refreshError);
       }
