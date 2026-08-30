@@ -17,7 +17,7 @@ function LoginPage() {
   const handleSubmit = (event) => {
     event.preventDefault();
     login(formData, {
-      onSuccess: () => navigate("/"),
+      onSuccess: () => navigate("/dashboard"),
     });
   };
 
