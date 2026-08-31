@@ -3,6 +3,8 @@ import { useAuth } from "../features/auth/auth.context";
 import { useLogout } from "../features/auth/auth.hooks";
 import { useDashboardData } from "../hooks/useDashboardData";
 import DashboardStatCard from "../components/dashboard/DashboardStats";
+import PaymentMethods from "../components/dashboard/PaymentMethods";
+import RecentPayments from "../components/dashboard/RecentPayments";
 function DashboardPage() {
   const navigate = useNavigate();
   const { user } = useAuth();
@@ -73,6 +75,11 @@ function DashboardPage() {
           title="Overdue Fees"
           value={`Rs. ${dashboard.overdueFee.totalOverdue}`}
         />
+      </div>
+      <div className="grid gap-6 lg:grid-cols-2">
+        <PaymentMethods paymentMethods={dashboard.paymentMethods} />
+
+        <RecentPayments payments={dashboard.recentPayments} />
       </div>
     </div>
   );
