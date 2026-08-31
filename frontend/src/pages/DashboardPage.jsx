@@ -6,6 +6,7 @@ import DashboardStatCard from "../components/dashboard/DashboardStats";
 import PaymentMethods from "../components/dashboard/PaymentMethods";
 import RecentPayments from "../components/dashboard/RecentPayments";
 import AcademicYearSummary from "../components/dashboard/AcademicYearSummary";
+import { formatCurrency } from "../utils/formatCurrency";
 function DashboardPage() {
   const navigate = useNavigate();
   const { user } = useAuth();
@@ -59,22 +60,22 @@ function DashboardPage() {
       <div className="grid w-full max-w-6xl gap-6 md:grid-cols-2 lg:grid-cols-4">
         <DashboardStatCard
           title="Today's Collection"
-          value={`Rs. ${dashboard.todayCollection.totalCollection}`}
+          value={formatCurrency(dashboard.todayCollection.totalCollection)}
         />
 
         <DashboardStatCard
           title="Monthly Collection"
-          value={`Rs. ${dashboard.monthlyCollection.totalCollection}`}
+          value={formatCurrency(dashboard.monthlyCollection.totalCollection)}
         />
 
         <DashboardStatCard
           title="Pending Fees"
-          value={`Rs. ${dashboard.pendingFee.totalPending}`}
+          value={formatCurrency(dashboard.pendingFee.totalPending)}
         />
 
         <DashboardStatCard
           title="Overdue Fees"
-          value={`Rs. ${dashboard.overdueFee.totalOverdue}`}
+          value={formatCurrency(dashboard.overdueFee.totalOverdue)}
         />
       </div>
       <div className="grid gap-6 lg:grid-cols-2">

@@ -1,3 +1,5 @@
+import { formatCurrency } from "../../utils/formatCurrency";
+
 function AcademicYearSummary({ summaries = [] }) {
   const formatDate = (date) => {
     if (!date) return "-";
@@ -62,7 +64,7 @@ function AcademicYearSummary({ summaries = [] }) {
                   </td>
 
                   <td className="py-4 text-right text-sm font-semibold text-gray-900">
-                    Rs. {item.totalCollection}
+                    {formatCurrency(item.totalCollection)}
                   </td>
                 </tr>
               ))}

@@ -1,3 +1,5 @@
+import { formatCurrency } from "../../utils/formatCurrency";
+
 function PaymentMethods({ paymentMethods = [] }) {
   return (
     <div className="rounded-xl border bg-white p-6 shadow-sm">
@@ -17,7 +19,7 @@ function PaymentMethods({ paymentMethods = [] }) {
                 </span>
 
                 <span className="text-sm font-semibold text-gray-900">
-                  Rs. {item.totalCollection}
+                  {formatCurrency(item.totalCollection)}
                 </span>
               </div>
 

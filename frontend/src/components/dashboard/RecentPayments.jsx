@@ -1,3 +1,5 @@
+import { formatCurrency } from "../../utils/formatCurrency";
+
 function RecentPayments({ payments = [] }) {
   const formatDate = (date) => {
     if (!date) return "-";
@@ -46,7 +48,7 @@ function RecentPayments({ payments = [] }) {
                   </td>
 
                   <td className="py-4 text-sm font-medium text-gray-900">
-                    Rs. {payment.amount}
+                    {formatCurrency(payment.amount)}
                   </td>
 
                   <td className="py-4">
