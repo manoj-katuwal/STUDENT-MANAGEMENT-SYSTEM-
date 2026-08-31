@@ -5,6 +5,7 @@ import { useDashboardData } from "../hooks/useDashboardData";
 import DashboardStatCard from "../components/dashboard/DashboardStats";
 import PaymentMethods from "../components/dashboard/PaymentMethods";
 import RecentPayments from "../components/dashboard/RecentPayments";
+import AcademicYearSummary from "../components/dashboard/AcademicYearSummary";
 function DashboardPage() {
   const navigate = useNavigate();
   const { user } = useAuth();
@@ -81,6 +82,8 @@ function DashboardPage() {
 
         <RecentPayments payments={dashboard.recentPayments} />
       </div>
+
+      <AcademicYearSummary summaries={dashboard.academicYearSummary} />
     </div>
   );
 }
