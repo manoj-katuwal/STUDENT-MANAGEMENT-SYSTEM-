@@ -5,6 +5,7 @@ import LoginPage from "../pages/LoginPage";
 import NotFoundPage from "../pages/NotFoundPage";
 import ProtectedRoute from "../components/common/ProtectedRoute";
 import DashboardPage from "../pages/DashboardPage";
+import UnauthorizedPage from "../pages/UnauthorizedPage";
 
 const Router = () => {
   return (
@@ -13,6 +14,7 @@ const Router = () => {
         <Routes>
           <Route path="/" element={<HomePage />} />
           <Route path="/login" element={<LoginPage />} />
+          <Route path="/unauthorized" element={<UnauthorizedPage />} />
           <Route element={<ProtectedRoute />}>
             <Route path="/dashboard" element={<DashboardPage />} />
           </Route>
