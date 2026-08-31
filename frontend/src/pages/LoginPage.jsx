@@ -1,13 +1,19 @@
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Navigate } from "react-router-dom";
 import { Mail, Lock, Eye, EyeOff, Loader2 } from "lucide-react";
 import { useLogin } from "../features/auth/auth.hooks";
+import { useAuth } from "../features/auth/auth.context";
 
 function LoginPage() {
   const navigate = useNavigate();
+  const { isAuthenticated } = useAuth();
   const { mutate: login, isPending, error } = useLogin();
   const [formData, setFormData] = useState({ email: "", password: "" });
   const [showPassword, setShowPassword] = useState(false);
+
+  if (isAuthenticated) {
+    return <Navigate to="/dashboard" replace />;
+  }
 
   const handleChange = (event) => {
     const { name, value } = event.target;

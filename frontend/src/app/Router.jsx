@@ -11,6 +11,7 @@ import UsersPage from "../pages/UsersPage";
 import PaymentsPage from "../pages/PaymentsPage";
 import ReportsPage from "../pages/ReportsPage";
 import MyFeesPage from "../pages/MyFeesPage";
+import AppLayout from "../components/layout/AppLayout";
 
 const Router = () => {
   return (
@@ -21,27 +22,29 @@ const Router = () => {
           <Route path="/login" element={<LoginPage />} />
           <Route path="/unauthorized" element={<UnauthorizedPage />} />
           <Route element={<ProtectedRoute />}>
-            <Route path="/dashboard" element={<DashboardPage />} />
-            {/* ADMIN */}
-            <Route element={<RoleRoute allowedRoles={["ADMIN"]} />}>
-              <Route path="/users" element={<UsersPage />} />
-            </Route>
-            {/* ADMIN AND ACCOUNTANT  */}
-            <Route
-              element={<RoleRoute allowedRoles={["ADMIN", "ACCOUNTANT"]} />}
-            >
-              <Route path="/payments" element={<PaymentsPage />} />
-            </Route>
-            {/* ADMIN AND PRINCIPAL  */}
-            <Route
-              element={<RoleRoute allowedRoles={["ADMIN", "PRINCIPAL"]} />}
-            >
-              <Route path="/reports" element={<ReportsPage />} />
-            </Route>
+            <Route element={<AppLayout />}>
+              <Route path="/dashboard" element={<DashboardPage />} />
+              {/* ADMIN */}
+              <Route element={<RoleRoute allowedRoles={["ADMIN"]} />}>
+                <Route path="/users" element={<UsersPage />} />
+              </Route>
+              {/* ADMIN AND ACCOUNTANT  */}
+              <Route
+                element={<RoleRoute allowedRoles={["ADMIN", "ACCOUNTANT"]} />}
+              >
+                <Route path="/payments" element={<PaymentsPage />} />
+              </Route>
+              {/* ADMIN AND PRINCIPAL  */}
+              <Route
+                element={<RoleRoute allowedRoles={["ADMIN", "PRINCIPAL"]} />}
+              >
+                <Route path="/reports" element={<ReportsPage />} />
+              </Route>
 
-            {/* STUDENT  */}
-            <Route element={<RoleRoute allowedRoles={["STUDENT"]} />}>
-              <Route path="/my-fees" element={<MyFeesPage />} />
+              {/* STUDENT  */}
+              <Route element={<RoleRoute allowedRoles={["STUDENT"]} />}>
+                <Route path="/my-fees" element={<MyFeesPage />} />
+              </Route>
             </Route>
           </Route>
           <Route path="*" element={<NotFoundPage />} />
