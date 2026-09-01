@@ -1,3 +1,4 @@
+import { Link } from "react-router-dom";
 import { formatCurrency } from "../../utils/formatCurrency";
 import {
   ArrowUpRight,
@@ -41,17 +42,31 @@ function RecentPayments({ payments = [] }) {
     return statusStyles[key] || statusStyles.default;
   };
 
+  // Limit to 5 latest items on dashboard to prevent layout stretch
+  const displayedPayments = payments.slice(0, 5);
+
   return (
-    <div className="rounded-xl border border-slate-200/80 bg-white p-6 shadow-xs">
-      {/* Header with "View All" */}
-      <div className="mb-6 flex flex-wrap items-center justify-between gap-3">
-        <div>
-          <h2 className="text-lg font-semibold font-poppins text-slate-900">
-            Recent Payments
-          </h2>
-          <p className="text-xs text-slate-500">
-            Latest successful transactions
-          </p>
+    <div className="flex flex-col justify-between rounded-xl border border-slate-200/80 bg-white p-6 shadow-xs h-full">
+      <div>
+        {/* Header with "View All" */}
+        <div className="mb-5 flex flex-wrap items-center justify-between gap-3">
+          <div>
+            <h2 className="text-lg font-semibold font-poppins text-slate-900">
+              Recent Payments
+            </h2>
+            <p className="text-xs text-slate-500">
+              Latest successful transactions
+            </p>
+          </div>
+          {payments.length > 0 && (
+            <Link
+              to="/payments"
+              className="inline-flex items-center gap-1 text-xs font-semibold text-blue-600 transition-colors hover:text-blue-700 focus-visible:outline-2 focus-visible:outline-blue-500"
+            >
+              View All
+              <ArrowUpRight className="h-3.5 w-3.5" aria-hidden="true" />
+            </Link>
+          )}
         </div>
       </div>
 
@@ -82,7 +97,7 @@ function RecentPayments({ payments = [] }) {
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-100 font-roboto">
-              {payments.map((payment) => {
+              {displayedPayments.map((payment) => {
                 const studentObj =
                   typeof payment.studentFeeId?.studentId === "object"
                     ? payment.studentFeeId?.studentId
@@ -157,6 +172,19 @@ function RecentPayments({ payments = [] }) {
               })}
             </tbody>
           </table>
+        </div>
+      )}
+
+      {/* Footer */}
+      {payments.length > 5 && (
+        <div className="mt-4 pt-3 border-t border-slate-100 flex items-center justify-between text-xs text-slate-500">
+          <span>Showing 5 of {payments.length} recent payments</span>
+          <Link
+            to="/payments"
+            className="font-medium text-blue-600 hover:text-blue-700 hover:underline"
+          >
+            View all payments →
+          </Link>
         </div>
       )}
     </div>
