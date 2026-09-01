@@ -1,5 +1,6 @@
 import Payment from "../payment/payment.model.js";
 import StudentFee from "../studentFee/studentFee.model.js";
+import Student from "../students/student.model.js";
 
 export const getTodayCollection = async () => {
   const startOfDay = new Date();
@@ -201,7 +202,14 @@ export const getRecentPayments = async (limit = 5) => {
   })
     .sort({ paidAt: -1 })
     .limit(limit)
-    .populate("studentFeeId", "studentId")
+    .populate({
+      path: "studentFeeId",
+      select: "studentId",
+      populate: {
+        path: "studentId",
+        select: "name admissionNumber rollNumber",
+      },
+    })
     .lean();
 };
 
