@@ -7,12 +7,20 @@ import PaymentMethods from "../components/dashboard/PaymentMethods";
 import RecentPayments from "../components/dashboard/RecentPayments";
 import AcademicYearSummary from "../components/dashboard/AcademicYearSummary";
 import { formatCurrency } from "../utils/formatCurrency";
+import DashboardLoading from "../components/dashboard/DashboardLoading";
+import DashboardError from "../components/dashboard/DashboardError";
 function DashboardPage() {
   const navigate = useNavigate();
   const { user } = useAuth();
   const { mutate: logout, isPending } = useLogout();
 
-  const { data: dashboard, isLoading, isError, error } = useDashboardData();
+  const {
+    data: dashboard,
+    isLoading,
+    isError,
+    error,
+    refetch,
+  } = useDashboardData();
 
   const handleLogout = () => {
     logout(undefined, {
@@ -23,19 +31,11 @@ function DashboardPage() {
   };
 
   if (isLoading) {
-    return (
-      <div className="flex min-h-screen items-center justify-center">
-        Loading dashboard...
-      </div>
-    );
+    return <DashboardLoading />;
   }
 
   if (isError) {
-    return (
-      <div className="flex min-h-screen items-center justify-center text-red-500">
-        Failed to load dashboard: {error?.message || "Something went wrong"}
-      </div>
-    );
+    return <DashboardError onRetry={refetch} />;
   }
 
   return (
