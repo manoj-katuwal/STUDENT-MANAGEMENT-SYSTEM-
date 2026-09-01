@@ -51,6 +51,10 @@ function DashboardPage() {
         <PaymentMethods paymentMethods={dashboard.paymentMethods} />
         <RecentPayments payments={dashboard.recentPayments} />
       </div>
+
+      <div className="mt-8">
+        <AcademicYearSummary summaries={dashboard?.academicYearSummary} />
+      </div>
     </div>
   );
 }
