@@ -52,7 +52,7 @@ const DashboardStats = ({ data }) => {
         return (
           <div
             key={stat.title}
-            className="group relative overflow-hidden rounded-xl border border-slate-200/80 bg-white p-5 shadow-xs transition-all duration-200 hover:-translate-y-0.5 hover:shadow-md focus-visible:outline focus-visible:outline-2 focus-visible:outline-blue-500"
+            className="group relative overflow-hidden rounded-xl border border-slate-200/80 bg-white p-5 shadow-xs transition-all duration-200 hover:-translate-y-0.5 hover:shadow-md  focus-visible:outline-2 focus-visible:outline-blue-500"
           >
             <div className="flex items-center justify-between gap-3">
               <span className="text-xs font-semibold uppercase tracking-wider text-slate-500 font-poppins">

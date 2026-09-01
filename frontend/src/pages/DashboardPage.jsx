@@ -46,6 +46,11 @@ function DashboardPage() {
       <DashboardHeader />
 
       <DashboardStats data={dashboard} />
+
+      <div className="mt-8 grid grid-cols-1 gap-6 lg:grid-cols-2">
+        <PaymentMethods paymentMethods={dashboard.paymentMethods} />
+        <RecentPayments payments={dashboard.recentPayments} />
+      </div>
     </div>
   );
 }
