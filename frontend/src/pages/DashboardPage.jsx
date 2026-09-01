@@ -10,6 +10,7 @@ import { formatCurrency } from "../utils/formatCurrency";
 import DashboardLoading from "../components/dashboard/DashboardLoading";
 import DashboardError from "../components/dashboard/DashboardError";
 import DashboardHeader from "../components/dashboard/DashboardHeader";
+import DashboardStats from "../components/dashboard/DashboardStats";
 
 function DashboardPage() {
   const navigate = useNavigate();
@@ -41,8 +42,10 @@ function DashboardPage() {
   }
 
   return (
-    <div>
+    <div className="min-h-full p-6 lg:p-8">
       <DashboardHeader />
+
+      <DashboardStats data={dashboard} />
     </div>
   );
 }

@@ -1,21 +1,24 @@
-@import url('https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600&family=Inter:wght@400;500;600&display=swap');
+@import url("https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&family=Roboto:wght@300;400;500;700&display=swap");
 @import "tailwindcss";
 
-@theme{
-  --color-ink: #16233F;
-  --color-parchment: #F8F3E8;
-  --color-brass: #B58A4A;
-  --color-slate: #62697A;
-  --color-rust: #B3432B;
+@theme {
+  --color-ink: #16233f;
+  --color-parchment: #f8f3e8;
+  --color-brass: #b58a4a;
+  --color-slate: #62697a;
+  --color-rust: #b3432b;
 
-  --font-display: 'Fraunces', Georgia, serif;
-  --font-body: 'Inter', system-ui, sans-serif;
+  --font-display: "Poppins", sans-serif;
+  --font-body: "Roboto", sans-serif;
+  --font-poppins: "Poppins", sans-serif;
+  --font-roboto: "Roboto", sans-serif;
 
+  --color-primary: #1e293b;
+  --color-secondary: #2563eb;
+  --color-tertiary: #10b981;
+  --color-neutral: #64748b;
+}
 
-  --color-primary: #1E293B;
-  --color-secondary: #2563EB;
-  --color-tertiary: #10B981;
-  --color-neutral: #64748B;
-
-  
+body {
+  font-family: "Roboto", sans-serif;
 }
