@@ -5,22 +5,24 @@ import UsersHeader from "../components/users/UsersHeader";
 import UsersTable from "../components/users/UsersTable";
 
 import { useUsers } from "../features/user/user.hooks";
+import useDebounce from "../hooks/useDebounce";
 
 const UsersPage = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedRole, setSelectedRole] = useState("");
   const [selectedStatus, setSelectedStatus] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
+  const debouncedSearchTerm = useDebounce(searchTerm, 700);
 
   const params = {
     page: currentPage,
     limit: 10,
-    search: searchTerm || undefined,
+    search: debouncedSearchTerm || undefined,
     role: selectedRole || undefined,
     isActive:
-      selectedStatus === "active"
+      selectedStatus === "true" || selectedStatus === "active"
         ? true
-        : selectedStatus === "inactive"
+        : selectedStatus === "false" || selectedStatus === "inactive"
           ? false
           : undefined,
   };
