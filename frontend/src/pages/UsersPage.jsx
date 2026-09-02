@@ -1,16 +1,37 @@
 import { useState } from "react";
+
 import UsersFilter from "../components/users/UsersFilter";
 import UsersHeader from "../components/users/UsersHeader";
-import { useUsers } from "../features/user/user.hooks";
 import UsersTable from "../components/users/UsersTable";
 
+import { useUsers } from "../features/user/user.hooks";
+
 const UsersPage = () => {
-  const { data: users, isLoading, isError, refetch } = useUsers();
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedRole, setSelectedRole] = useState("");
   const [selectedStatus, setSelectedStatus] = useState("");
+  const [currentPage, setCurrentPage] = useState(1);
+
+  const params = {
+    page: currentPage,
+    limit: 10,
+    search: searchTerm || undefined,
+    role: selectedRole || undefined,
+    isActive:
+      selectedStatus === "active"
+        ? true
+        : selectedStatus === "inactive"
+          ? false
+          : undefined,
+  };
+
+  const { data, isLoading, isError, refetch } = useUsers(params);
+
+  const users = data?.users ?? [];
+  const pagination = data?.pagination;
 
   console.log("Users:", users);
+  console.log("Pagination:", pagination);
 
   if (isLoading) {
     return <div>Loading users...</div>;
@@ -21,7 +42,9 @@ const UsersPage = () => {
       <div>
         <p>Unable to load users.</p>
 
-        <button onClick={refetch}>Try Again</button>
+        <button type="button" onClick={refetch}>
+          Try Again
+        </button>
       </div>
     );
   }
@@ -32,14 +55,25 @@ const UsersPage = () => {
 
       <UsersFilter
         searchTerm={searchTerm}
-        onSearchChange={setSearchTerm}
+        onSearchChange={(value) => {
+          setSearchTerm(value);
+          setCurrentPage(1);
+        }}
         selectedRole={selectedRole}
-        onRoleChange={setSelectedRole}
+        onRoleChange={(value) => {
+          setSelectedRole(value);
+          setCurrentPage(1);
+        }}
         selectedStatus={selectedStatus}
-        onStatusChange={setSelectedStatus}
+        onStatusChange={(value) => {
+          setSelectedStatus(value);
+          setCurrentPage(1);
+        }}
       />
 
-      <UsersTable users={[]} />
+      <UsersTable users={users} />
+
+      {/* Pagination will come here */}
     </div>
   );
 };
