@@ -1,7 +1,7 @@
-
+import UsersHeader from "../components/users/UsersHeader";
 import { useUsers } from "../features/user/user.hooks";
 
-const Users = () => {
+const UsersPage = () => {
   const { data: users, isLoading, isError, refetch } = useUsers();
 
   console.log("Users:", users);
@@ -21,12 +21,10 @@ const Users = () => {
   }
 
   return (
-    <div>
-      <h1>Users</h1>
-
-      <p>Total Users: {users?.length || 0}</p>
+    <div className="min-h-full p-6 lg:p-8">
+      <UsersHeader />
     </div>
   );
 };
 
-export default Users;
+export default UsersPage;
