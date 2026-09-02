@@ -44,22 +44,24 @@ export const createUserController = asyncHandler(async (req, res) => {
 });
 
 export const getAllUsersController = asyncHandler(async (req, res) => {
-  const { role, isActive, search } = req.query;
+  const { role, isActive, search, page = 1, limit = 10 } = req.query;
 
   const filters = {
     role,
     search,
     isActive:
       isActive === "true" ? true : isActive === "false" ? false : undefined,
+    page: parseInt(page, 10) || 1,
+    limit: parseInt(limit, 10) || 10,
   };
 
-  const users = await getAllUsers(filters);
+  const result = await getAllUsers(filters);
 
   return successResponse({
     res,
     statusCode: 200,
     message: "Users fetched successfully",
-    data: users,
+    data: result,
   });
 });
 

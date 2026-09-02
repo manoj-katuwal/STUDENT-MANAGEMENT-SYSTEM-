@@ -48,7 +48,11 @@ export const registerUser = async ({ name, email, password }) => {
   return user;
 };
 
-export const changeUserPassword = async (userId, currentPassword, newPassword) => {
+export const changeUserPassword = async (
+  userId,
+  currentPassword,
+  newPassword,
+) => {
   const user = await findUserByIdWithPassword(userId);
 
   if (!user) {
@@ -95,7 +99,13 @@ export const createNewUser = async ({ name, email, password, role }) => {
   return user;
 };
 
-export const findAllUsers = async ({ role, isActive, search } = {}) => {
+export const findAllUsers = async ({
+  role,
+  isActive,
+  search,
+  page = 1,
+  limit = 10,
+} = {}) => {
   const filter = {};
 
   if (role) filter.role = role;
@@ -108,7 +118,32 @@ export const findAllUsers = async ({ role, isActive, search } = {}) => {
     ];
   }
 
-  return await User.find(filter).sort({ createdAt: -1 });
+  const pageNum = Math.max(1, parseInt(page, 10) || 1);
+  const limitNum = Math.max(1, parseInt(limit, 10) || 10);
+  const skip = (pageNum - 1) * limitNum;
+
+  const [users, totalUsers] = await Promise.all([
+    User.find(filter)
+      .select("-password")
+      .sort({ createdAt: -1 })
+      .skip(skip)
+      .limit(limitNum),
+    User.countDocuments(filter),
+  ]);
+
+  const totalPages = Math.ceil(totalUsers / limitNum) || 1;
+
+  return {
+    users,
+    pagination: {
+      totalUsers,
+      totalPages,
+      currentPage: pageNum,
+      limit: limitNum,
+      hasNextPage: pageNum < totalPages,
+      hasPrevPage: pageNum > 1,
+    },
+  };
 };
 
 export const updateUserRole = async (userId, role) => {
