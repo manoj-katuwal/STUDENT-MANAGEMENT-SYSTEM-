@@ -2,6 +2,7 @@ import { useState } from "react";
 import UsersFilter from "../components/users/UsersFilter";
 import UsersHeader from "../components/users/UsersHeader";
 import { useUsers } from "../features/user/user.hooks";
+import UsersTable from "../components/users/UsersTable";
 
 const UsersPage = () => {
   const { data: users, isLoading, isError, refetch } = useUsers();
@@ -37,6 +38,8 @@ const UsersPage = () => {
         selectedStatus={selectedStatus}
         onStatusChange={setSelectedStatus}
       />
+
+      <UsersTable users={[]} />
     </div>
   );
 };
