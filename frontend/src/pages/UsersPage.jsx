@@ -6,6 +6,7 @@ import UsersTable from "../components/users/UsersTable";
 
 import { useUsers } from "../features/user/user.hooks";
 import useDebounce from "../hooks/useDebounce";
+import UsersPagination from "../components/users/UsersPagination";
 
 const UsersPage = () => {
   const [searchTerm, setSearchTerm] = useState("");
@@ -54,7 +55,6 @@ const UsersPage = () => {
   return (
     <div className="min-h-full p-6 lg:p-8">
       <UsersHeader />
-
       <UsersFilter
         searchTerm={searchTerm}
         onSearchChange={(value) => {
@@ -72,10 +72,20 @@ const UsersPage = () => {
           setCurrentPage(1);
         }}
       />
-
       <UsersTable users={users} />
-
       {/* Pagination will come here */}
+
+      {pagination && pagination.totalUsers > 0 && (
+        <UsersPagination
+          currentPage={pagination.currentPage}
+          totalPages={pagination.totalPages}
+          totalUsers={pagination.totalUsers}
+          limit={pagination.limit}
+          hasNextPage={pagination.hasNextPage}
+          hasPrevPage={pagination.hasPrevPage}
+          onPageChange={setCurrentPage}
+        />
+      )}
     </div>
   );
 };
