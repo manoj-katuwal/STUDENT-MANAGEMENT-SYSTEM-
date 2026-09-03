@@ -1,5 +1,39 @@
 import { ChevronLeft, ChevronRight } from "lucide-react";
 
+const ELLIPSIS = "...";
+
+const getPageNumbers = (currentPage, totalPages) => {
+  if (totalPages <= 7) {
+    return Array.from({ length: totalPages }, (_, index) => index + 1);
+  }
+
+  if (currentPage <= 4) {
+    return [1, 2, 3, 4, 5, ELLIPSIS, totalPages];
+  }
+
+  if (currentPage >= totalPages - 3) {
+    return [
+      1,
+      ELLIPSIS,
+      totalPages - 4,
+      totalPages - 3,
+      totalPages - 2,
+      totalPages - 1,
+      totalPages,
+    ];
+  }
+
+  return [
+    1,
+    ELLIPSIS,
+    currentPage - 1,
+    currentPage,
+    currentPage + 1,
+    ELLIPSIS,
+    totalPages,
+  ];
+};
+
 const UsersPagination = ({
   currentPage,
   totalPages,
@@ -14,43 +48,10 @@ const UsersPagination = ({
   const start = (currentPage - 1) * limit + 1;
   const end = Math.min(currentPage * limit, totalUsers);
 
-  // Helper function to generate page numbers with ellipsis for large page counts
-  const getPageNumbers = () => {
-    if (totalPages <= 7) {
-      return Array.from({ length: totalPages }, (_, i) => i + 1);
-    }
-
-    if (currentPage <= 4) {
-      return [1, 2, 3, 4, 5, "...", totalPages];
-    }
-
-    if (currentPage >= totalPages - 3) {
-      return [
-        1,
-        "...",
-        totalPages - 4,
-        totalPages - 3,
-        totalPages - 2,
-        totalPages - 1,
-        totalPages,
-      ];
-    }
-
-    return [
-      1,
-      "...",
-      currentPage - 1,
-      currentPage,
-      currentPage + 1,
-      "...",
-      totalPages,
-    ];
-  };
-
-  const pageNumbers = getPageNumbers();
+  const pageNumbers = getPageNumbers(currentPage, totalPages);
 
   return (
-    <div className="mt-4 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between font-body border-t border-gray-200/80 pt-4">
+    <div className="mt-4 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between border-t border-gray-200/80 pt-4">
       {/* Items count summary */}
       <p className="text-xs sm:text-sm text-gray-500 font-medium">
         Showing{" "}
@@ -70,7 +71,7 @@ const UsersPagination = ({
             disabled={!hasPrevPage}
             onClick={() => onPageChange(currentPage - 1)}
             aria-label="Previous page"
-            className="inline-flex items-center gap-1 rounded-lg border border-gray-200 bg-white px-3 py-1.5 text-xs font-semibold text-gray-700 shadow-xs transition-colors hover:bg-gray-50 disabled:cursor-not-allowed disabled:opacity-40 disabled:hover:bg-white"
+            className="inline-flex items-center gap-1 rounded-lg border border-gray-200 bg-white px-3 py-1.5 text-xs font-semibold text-gray-700 shadow-sm transition-colors hover:bg-gray-50 disabled:cursor-not-allowed disabled:opacity-40 disabled:hover:bg-white"
           >
             <ChevronLeft className="w-3.5 h-3.5" />
             <span>Prev</span>
@@ -79,7 +80,7 @@ const UsersPagination = ({
           {/* Page Numbers */}
           <div className="flex items-center gap-1">
             {pageNumbers.map((page, idx) => {
-              if (page === "...") {
+              if (page === ELLIPSIS) {
                 return (
                   <span
                     key={`ellipsis-${idx}`}
@@ -94,7 +95,7 @@ const UsersPagination = ({
 
               return (
                 <button
-                  key={page}
+                  key={`page-${page}`}
                   type="button"
                   onClick={() => !isActive && onPageChange(page)}
                   disabled={isActive}
@@ -102,7 +103,7 @@ const UsersPagination = ({
                   aria-current={isActive ? "page" : undefined}
                   className={`min-w-8 h-8 rounded-lg px-2 text-xs font-semibold transition-colors ${
                     isActive
-                      ? "cursor-default bg-blue-600 text-white shadow-xs"
+                      ? "cursor-default bg-blue-600 text-white shadow-sm"
                       : "text-gray-600 hover:bg-gray-100 hover:text-gray-900"
                   }`}
                 >
@@ -118,7 +119,7 @@ const UsersPagination = ({
             disabled={!hasNextPage}
             onClick={() => onPageChange(currentPage + 1)}
             aria-label="Next page"
-            className="inline-flex items-center gap-1 rounded-lg border border-gray-200 bg-white px-3 py-1.5 text-xs font-semibold text-gray-700 shadow-xs transition-colors hover:bg-gray-50 disabled:cursor-not-allowed disabled:opacity-40 disabled:hover:bg-white"
+            className="inline-flex items-center gap-1 rounded-lg border border-gray-200 bg-white px-3 py-1.5 text-xs font-semibold text-gray-700 shadow-sm transition-colors hover:bg-gray-50 disabled:cursor-not-allowed disabled:opacity-40 disabled:hover:bg-white"
           >
             <span>Next</span>
             <ChevronRight className="w-3.5 h-3.5" />

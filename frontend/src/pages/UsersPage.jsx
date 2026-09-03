@@ -28,7 +28,8 @@ const UsersPage = () => {
           : undefined,
   };
 
-  const { data, isLoading, isError, refetch } = useUsers(params);
+  const { data, isLoading, isError, refetch, isPlaceholderData } =
+    useUsers(params);
 
   const users = data?.users ?? [];
   const pagination = data?.pagination;
