@@ -35,17 +35,7 @@ const DEFAULT_ROLE_CONFIG = {
   badgeClass: "bg-gray-100 text-gray-700 border-gray-200",
 };
 
-// Date formatter helper
-// const formatDate = (dateString) => {
-//   if (!dateString) return "N/A";
-//   return new Date(dateString).toLocaleDateString("en-US", {
-//     year: "numeric",
-//     month: "short",
-//     day: "numeric",
-//   });
-// };
-
-const UsersTable = ({ users = [] }) => {
+const UsersTable = ({ users = [], onDelete }) => {
   const [activeMenuId, setActiveMenuId] = useState(null);
 
   const toggleActionMenu = (id) => {
@@ -71,8 +61,8 @@ const UsersTable = ({ users = [] }) => {
   }
 
   return (
-    <div className="w-full bg-white border border-gray-200 rounded-xl shadow-sm overflow-hidden">
-      <div className="overflow-x-auto">
+    <div className="w-full bg-white border border-gray-200 rounded-xl shadow-sm overflow-hidden min-h-[280px]">
+      <div className="overflow-x-auto min-h-[280px]">
         <table
           className="w-full text-left border-collapse"
           aria-label="Users list table"
@@ -103,10 +93,14 @@ const UsersTable = ({ users = [] }) => {
 
           {/* Table Body */}
           <tbody className="divide-y divide-gray-200 text-sm text-gray-700">
-            {users.map((user) => {
+            {users.map((user, index) => {
               const userId = user._id || user.id;
               const roleConfig = ROLE_CONFIG[user.role] || DEFAULT_ROLE_CONFIG;
               const isUserActive = Boolean(user.isActive);
+
+              // If it's one of the last rows, pop menu upwards to prevent clipping
+              const isNearBottom =
+                index >= users.length - 2 && users.length > 2;
 
               // Helper to generate User Initials (e.g. "Manoj Katwal" -> "MK")
               const initials = user.name
@@ -179,11 +173,15 @@ const UsersTable = ({ users = [] }) => {
                       <>
                         {/* Backdrop to close menu */}
                         <div
-                          className="fixed inset-0 z-10"
+                          className="fixed inset-0 z-20"
                           onClick={() => setActiveMenuId(null)}
                         />
 
-                        <div className="absolute right-6 mt-1 w-44 bg-white rounded-lg shadow-lg border border-gray-100 py-1 z-20 text-left">
+                        <div
+                          className={`absolute right-4 w-44 bg-white rounded-lg shadow-xl border border-gray-200 py-1 z-30 text-left transition-all ${
+                            isNearBottom ? "bottom-full mb-2" : "top-full mt-1"
+                          }`}
+                        >
                           <button
                             onClick={() => setActiveMenuId(null)}
                             className="w-full px-3 py-2 text-xs text-gray-700 hover:bg-gray-50 flex items-center gap-2"
@@ -220,7 +218,10 @@ const UsersTable = ({ users = [] }) => {
 
                           <div className="my-1 border-t border-gray-100" />
                           <button
-                            onClick={() => setActiveMenuId(null)}
+                            onClick={() => {
+                              setActiveMenuId(null);
+                              onDelete?.(userId);
+                            }}
                             className="w-full px-3 py-2 text-xs text-red-600 hover:bg-red-50 flex items-center gap-2"
                           >
                             <Trash2 className="w-3.5 h-3.5 text-red-500" />

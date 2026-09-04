@@ -4,9 +4,20 @@ import UsersFilter from "../components/users/UsersFilter";
 import UsersHeader from "../components/users/UsersHeader";
 import UsersTable from "../components/users/UsersTable";
 
-import { useUsers } from "../features/user/user.hooks";
+import { useUsers, useDeleteUser } from "../features/user/user.hooks";
 import useDebounce from "../hooks/useDebounce";
 import UsersPagination from "../components/users/UsersPagination";
+import { deleteUser } from "../features/user/user.api";
+
+const handleDeleteUser = (userId) => {
+  const confirmed = window.confirm(
+    "Are you sure you want to delete this user?",
+  );
+
+  if (!confirmed) return;
+
+  deleteUser(userId);
+};
 
 const UsersPage = () => {
   const [searchTerm, setSearchTerm] = useState("");
@@ -14,6 +25,7 @@ const UsersPage = () => {
   const [selectedStatus, setSelectedStatus] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
   const debouncedSearchTerm = useDebounce(searchTerm, 700);
+  const { mutate: deleteUser, isPending: isDeleting } = useDeleteUser();
 
   const params = {
     page: currentPage,
@@ -73,7 +85,7 @@ const UsersPage = () => {
           setCurrentPage(1);
         }}
       />
-      <UsersTable users={users} />
+      <UsersTable users={users} onDelete={handleDeleteUser} />
       {/* Pagination will come here */}
 
       {pagination && pagination.totalUsers > 0 && (
