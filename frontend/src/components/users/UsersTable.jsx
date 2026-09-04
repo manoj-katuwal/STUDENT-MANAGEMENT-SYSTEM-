@@ -1,4 +1,5 @@
-import { useState } from "react";
+import { useState, useRef, useEffect, useCallback } from "react";
+import { createPortal } from "react-dom";
 import {
   MoreVertical,
   Eye,
@@ -29,20 +30,198 @@ const ROLE_CONFIG = {
   },
 };
 
-// Fallback configuration for safety
 const DEFAULT_ROLE_CONFIG = {
   label: "User",
   badgeClass: "bg-gray-100 text-gray-700 border-gray-200",
 };
 
+// ── Portal Dropdown ────────────────────────────────────────────────────────────
+const ActionMenu = ({ anchorRef, onClose, isUserActive, onDelete }) => {
+  const [style, setStyle] = useState({});
+  const menuRef = useRef(null);
+
+  // Calculate position from anchor button
+  useEffect(() => {
+    if (!anchorRef.current) return;
+    const rect = anchorRef.current.getBoundingClientRect();
+    const menuHeight = 160; // approx height of the menu
+    const spaceBelow = window.innerHeight - rect.bottom;
+
+    const top =
+      spaceBelow >= menuHeight ? rect.bottom + 4 : rect.top - menuHeight - 4;
+
+    setStyle({
+      position: "fixed",
+      top,
+      right: window.innerWidth - rect.right,
+      width: 176,
+      zIndex: 9999,
+    });
+  }, [anchorRef]);
+
+  // Close on outside click / scroll / resize
+  useEffect(() => {
+    const handleOutside = (e) => {
+      if (menuRef.current && !menuRef.current.contains(e.target)) {
+        onClose();
+      }
+    };
+    document.addEventListener("mousedown", handleOutside);
+    document.addEventListener("scroll", onClose, true);
+    window.addEventListener("resize", onClose);
+    return () => {
+      document.removeEventListener("mousedown", handleOutside);
+      document.removeEventListener("scroll", onClose, true);
+      window.removeEventListener("resize", onClose);
+    };
+  }, [onClose]);
+
+  return createPortal(
+    <div
+      ref={menuRef}
+      style={style}
+      className="bg-white rounded-xl shadow-xl border border-gray-200 py-1 text-left"
+    >
+      <button
+        onClick={onClose}
+        className="w-full px-3 py-2 text-xs text-gray-700 hover:bg-gray-50 flex items-center gap-2"
+      >
+        <Eye className="w-3.5 h-3.5 text-gray-400" />
+        View Profile
+      </button>
+
+      <button
+        onClick={onClose}
+        className="w-full px-3 py-2 text-xs text-gray-700 hover:bg-gray-50 flex items-center gap-2"
+      >
+        <Shield className="w-3.5 h-3.5 text-gray-400" />
+        Change Role
+      </button>
+
+      {isUserActive ? (
+        <button
+          onClick={onClose}
+          className="w-full px-3 py-2 text-xs text-gray-700 hover:bg-gray-50 flex items-center gap-2"
+        >
+          <UserX className="w-3.5 h-3.5 text-amber-500" />
+          Deactivate
+        </button>
+      ) : (
+        <button
+          onClick={onClose}
+          className="w-full px-3 py-2 text-xs text-gray-700 hover:bg-gray-50 flex items-center gap-2"
+        >
+          <UserCheck className="w-3.5 h-3.5 text-emerald-500" />
+          Activate
+        </button>
+      )}
+
+      <div className="my-1 border-t border-gray-100" />
+
+      <button
+        onClick={() => {
+          onClose();
+          onDelete?.();
+        }}
+        className="w-full px-3 py-2 text-xs text-red-600 hover:bg-red-50 flex items-center gap-2"
+      >
+        <Trash2 className="w-3.5 h-3.5 text-red-500" />
+        Delete User
+      </button>
+    </div>,
+    document.body,
+  );
+};
+
+// ── Row Component ──────────────────────────────────────────────────────────────
+const UserRow = ({ user, onDelete }) => {
+  const [menuOpen, setMenuOpen] = useState(false);
+  const btnRef = useRef(null);
+
+  const userId = user._id || user.id;
+  const roleConfig = ROLE_CONFIG[user.role] || DEFAULT_ROLE_CONFIG;
+  const isUserActive = Boolean(user.isActive);
+
+  const initials = user.name
+    ? user.name
+        .split(" ")
+        .map((n) => n[0])
+        .join("")
+        .toUpperCase()
+        .slice(0, 2)
+    : "U";
+
+  const close = useCallback(() => setMenuOpen(false), []);
+
+  return (
+    <tr className="hover:bg-gray-50/50 transition-colors">
+      {/* User */}
+      <td className="py-3.5 px-4 lg:px-6 font-medium text-gray-900 whitespace-nowrap">
+        <div className="flex items-center gap-3">
+          <div className="w-8 h-8 rounded-full bg-slate-200 text-slate-700 flex items-center justify-center font-bold text-xs shrink-0 border border-slate-300">
+            {initials}
+          </div>
+          <span className="truncate max-w-[140px]">{user.name}</span>
+        </div>
+      </td>
+
+      {/* Email */}
+      <td className="py-3.5 px-4 lg:px-6 text-gray-600 whitespace-nowrap text-sm">
+        {user.email}
+      </td>
+
+      {/* Role */}
+      <td className="py-3.5 px-4 lg:px-6 whitespace-nowrap">
+        <span
+          className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold border ${roleConfig.badgeClass}`}
+        >
+          {roleConfig.label}
+        </span>
+      </td>
+
+      {/* Status */}
+      <td className="py-3.5 px-4 lg:px-6 whitespace-nowrap">
+        <div className="flex items-center gap-1.5">
+          <span
+            className={`w-2 h-2 rounded-full ${isUserActive ? "bg-emerald-500" : "bg-gray-400"}`}
+          />
+          <span className="text-xs text-gray-600">
+            {isUserActive ? "Active" : "Inactive"}
+          </span>
+        </div>
+      </td>
+
+      {/* Created */}
+      <td className="py-3.5 px-4 lg:px-6 text-gray-500 whitespace-nowrap text-xs">
+        {formatDate(user.createdAt)}
+      </td>
+
+      {/* Actions */}
+      <td className="py-3.5 px-4 lg:px-6 text-right whitespace-nowrap">
+        <button
+          ref={btnRef}
+          onClick={() => setMenuOpen((o) => !o)}
+          aria-label={`Actions for ${user.name}`}
+          className="p-1.5 text-gray-400 hover:text-gray-600 rounded-lg hover:bg-gray-100 transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500/20"
+        >
+          <MoreVertical className="w-4 h-4" />
+        </button>
+
+        {menuOpen && (
+          <ActionMenu
+            anchorRef={btnRef}
+            onClose={close}
+            isUserActive={isUserActive}
+            onDelete={() => onDelete?.(userId)}
+          />
+        )}
+      </td>
+    </tr>
+  );
+};
+
+// ── Main Table ─────────────────────────────────────────────────────────────────
 const UsersTable = ({ users = [], onDelete }) => {
-  const [activeMenuId, setActiveMenuId] = useState(null);
-
-  const toggleActionMenu = (id) => {
-    setActiveMenuId((prev) => (prev === id ? null : id));
-  };
-
-  // 1. Empty State Rendering
   if (!users || users.length === 0) {
     return (
       <div className="w-full bg-white border border-gray-200 rounded-xl p-12 text-center shadow-sm">
@@ -61,13 +240,12 @@ const UsersTable = ({ users = [], onDelete }) => {
   }
 
   return (
-    <div className="w-full bg-white border border-gray-200 rounded-xl shadow-sm overflow-hidden min-h-[280px]">
-      <div className="overflow-x-auto min-h-[280px]">
+    <div className="w-full bg-white border border-gray-200 rounded-xl shadow-sm overflow-hidden">
+      <div className="overflow-x-auto">
         <table
           className="w-full text-left border-collapse"
           aria-label="Users list table"
         >
-          {/* Table Header */}
           <thead>
             <tr className="bg-gray-50/75 border-b border-gray-200 text-xs font-semibold uppercase tracking-wider text-gray-500">
               <th scope="col" className="py-3.5 px-4 lg:px-6">
@@ -91,149 +269,14 @@ const UsersTable = ({ users = [], onDelete }) => {
             </tr>
           </thead>
 
-          {/* Table Body */}
           <tbody className="divide-y divide-gray-200 text-sm text-gray-700">
-            {users.map((user, index) => {
-              const userId = user._id || user.id;
-              const roleConfig = ROLE_CONFIG[user.role] || DEFAULT_ROLE_CONFIG;
-              const isUserActive = Boolean(user.isActive);
-
-              // If it's one of the last rows, pop menu upwards to prevent clipping
-              const isNearBottom =
-                index >= users.length - 2 && users.length > 2;
-
-              // Helper to generate User Initials (e.g. "Manoj Katwal" -> "MK")
-              const initials = user.name
-                ? user.name
-                    .split(" ")
-                    .map((n) => n[0])
-                    .join("")
-                    .toUpperCase()
-                    .slice(0, 2)
-                : "U";
-
-              return (
-                <tr
-                  key={userId}
-                  className="hover:bg-gray-50/50 transition-colors"
-                >
-                  {/* User Avatar Initials & Name */}
-                  <td className="py-4 px-4 lg:px-6 font-medium text-gray-900 whitespace-nowrap">
-                    <div className="flex items-center gap-3">
-                      <div className="w-8 h-8 rounded-full bg-slate-200 text-slate-700 flex items-center justify-center font-bold text-xs shrink-0 border border-slate-300">
-                        {initials}
-                      </div>
-                      <span className="truncate">{user.name}</span>
-                    </div>
-                  </td>
-
-                  {/* Email */}
-                  <td className="py-4 px-4 lg:px-6 text-gray-600 whitespace-nowrap">
-                    {user.email}
-                  </td>
-
-                  {/* Role Badge */}
-                  <td className="py-4 px-4 lg:px-6 whitespace-nowrap">
-                    <span
-                      className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold border ${roleConfig.badgeClass}`}
-                    >
-                      {roleConfig.label}
-                    </span>
-                  </td>
-
-                  {/* Status Indicator */}
-                  <td className="py-4 px-4 lg:px-6 whitespace-nowrap">
-                    <div className="flex items-center gap-1.5">
-                      <span
-                        className={`w-2 h-2 rounded-full ${isUserActive ? "bg-emerald-500" : "bg-gray-400"}`}
-                      />
-                      <span className="text-sm text-gray-600">
-                        {isUserActive ? "Active" : "Inactive"}
-                      </span>
-                    </div>
-                  </td>
-
-                  {/* Created Date */}
-                  <td className="py-4 px-4 lg:px-6 text-gray-500 whitespace-nowrap">
-                    {formatDate(user.createdAt)}
-                  </td>
-
-                  {/* Actions Dropdown */}
-                  <td className="py-4 px-4 lg:px-6 text-right whitespace-nowrap relative">
-                    <button
-                      onClick={() => toggleActionMenu(userId)}
-                      aria-label={`Actions for ${user.name}`}
-                      className="p-1.5 text-gray-400 hover:text-gray-600 rounded-lg hover:bg-gray-100 transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500/20"
-                    >
-                      <MoreVertical className="w-4 h-4" />
-                    </button>
-
-                    {/* Popover Action Menu */}
-                    {activeMenuId === userId && (
-                      <>
-                        {/* Backdrop to close menu */}
-                        <div
-                          className="fixed inset-0 z-20"
-                          onClick={() => setActiveMenuId(null)}
-                        />
-
-                        <div
-                          className={`absolute right-4 w-44 bg-white rounded-lg shadow-xl border border-gray-200 py-1 z-30 text-left transition-all ${
-                            isNearBottom ? "bottom-full mb-2" : "top-full mt-1"
-                          }`}
-                        >
-                          <button
-                            onClick={() => setActiveMenuId(null)}
-                            className="w-full px-3 py-2 text-xs text-gray-700 hover:bg-gray-50 flex items-center gap-2"
-                          >
-                            <Eye className="w-3.5 h-3.5 text-gray-400" />
-                            View Profile
-                          </button>
-                          <button
-                            onClick={() => setActiveMenuId(null)}
-                            className="w-full px-3 py-2 text-xs text-gray-700 hover:bg-gray-50 flex items-center gap-2"
-                          >
-                            <Shield className="w-3.5 h-3.5 text-gray-400" />
-                            Change Role
-                          </button>
-
-                          {/* Dynamic Action Icon & Text */}
-                          {isUserActive ? (
-                            <button
-                              onClick={() => setActiveMenuId(null)}
-                              className="w-full px-3 py-2 text-xs text-gray-700 hover:bg-gray-50 flex items-center gap-2"
-                            >
-                              <UserX className="w-3.5 h-3.5 text-amber-500" />
-                              Deactivate
-                            </button>
-                          ) : (
-                            <button
-                              onClick={() => setActiveMenuId(null)}
-                              className="w-full px-3 py-2 text-xs text-gray-700 hover:bg-gray-50 flex items-center gap-2"
-                            >
-                              <UserCheck className="w-3.5 h-3.5 text-emerald-500" />
-                              Activate
-                            </button>
-                          )}
-
-                          <div className="my-1 border-t border-gray-100" />
-                          <button
-                            onClick={() => {
-                              setActiveMenuId(null);
-                              onDelete?.(userId);
-                            }}
-                            className="w-full px-3 py-2 text-xs text-red-600 hover:bg-red-50 flex items-center gap-2"
-                          >
-                            <Trash2 className="w-3.5 h-3.5 text-red-500" />
-                            Delete User
-                          </button>
-                        </div>
-                      </>
-                    )}
-                  </td>
-                </tr>
-              );
-            })}
+            {users.map((user) => (
+              <UserRow
+                key={user._id || user.id}
+                user={user}
+                onDelete={onDelete}
+              />
+            ))}
           </tbody>
         </table>
       </div>
