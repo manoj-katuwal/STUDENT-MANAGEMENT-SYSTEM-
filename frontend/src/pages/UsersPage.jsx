@@ -7,6 +7,7 @@ import UsersPagination from "../components/users/UsersPagination";
 import DeleteUserModal from "../components/users/DeleteUserModal";
 import UserStatusModal from "../components/users/UserStatusModal";
 import ChangeRoleModal from "../components/users/ChangeRoleModal";
+import ViewUserModal from "../components/users/ViewUserModal";
 
 import {
   useUsers,
@@ -14,6 +15,7 @@ import {
   useActivateUser,
   useDeactivateUser,
   useChangeUserRole,
+  useUserById,
 } from "../features/user/user.hooks";
 import useDebounce from "../hooks/useDebounce";
 
@@ -26,6 +28,7 @@ const UsersPage = () => {
   const [statusUser, setStatusUser] = useState(null);
   const [roleUser, setRoleUser] = useState(null);
   const [selectedNewRole, setSelectedNewRole] = useState("");
+  const [selectedViewUserId, setSelectedViewUserId] = useState(null);
   const debouncedSearchTerm = useDebounce(searchTerm, 700);
 
   const {
@@ -56,6 +59,13 @@ const UsersPage = () => {
     error: changeRoleError,
     reset: resetChangeRole,
   } = useChangeUserRole();
+
+  const {
+    data: viewedUser,
+    isLoading: isViewingUser,
+    isError: isViewUserError,
+    error: viewUserError,
+  } = useUserById(selectedViewUserId);
 
   const handleDeleteUser = (user) => {
     resetDelete?.();
@@ -146,6 +156,15 @@ const UsersPage = () => {
     setSelectedUser(null);
   };
 
+  const handleViewUser = (user) => {
+    const userId = typeof user === "object" ? user._id || user.id : user;
+    setSelectedViewUserId(userId);
+  };
+
+  const handleCloseViewModal = () => {
+    setSelectedViewUserId(null);
+  };
+
   const params = {
     page: currentPage,
     limit: 10,
@@ -205,6 +224,7 @@ const UsersPage = () => {
         onDelete={handleDeleteUser}
         onToggleStatus={handleOpenStatusModal}
         onChangeRole={handleOpenRoleModal}
+        onViewUser={handleViewUser}
       />
 
       {pagination && pagination.totalUsers > 0 && (
@@ -250,6 +270,16 @@ const UsersPage = () => {
         onConfirm={handleConfirmRoleChange}
         isPending={isChangingRole}
         error={changeRoleError}
+      />
+
+      {/* View User Profile Modal */}
+      <ViewUserModal
+        isOpen={Boolean(selectedViewUserId)}
+        user={viewedUser}
+        isLoading={isViewingUser}
+        isError={isViewUserError}
+        error={viewUserError}
+        onClose={handleCloseViewModal}
       />
     </div>
   );

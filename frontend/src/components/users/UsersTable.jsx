@@ -43,6 +43,7 @@ const ActionMenu = ({
   onDelete,
   onToggleStatus,
   onChangeRole,
+  onViewUser,
 }) => {
   const [style, setStyle] = useState({});
   const menuRef = useRef(null);
@@ -94,7 +95,10 @@ const ActionMenu = ({
       className="bg-white rounded-xl shadow-xl border border-gray-200 py-1 text-left"
     >
       <button
-        onClick={onClose}
+        onClick={() => {
+          onClose();
+          onViewUser?.();
+        }}
         className="w-full px-3 py-2 text-xs text-gray-700 hover:bg-gray-50 flex items-center gap-2"
       >
         <Eye className="w-3.5 h-3.5 text-gray-400" />
@@ -154,7 +158,13 @@ const ActionMenu = ({
 };
 
 // ── Row Component ──────────────────────────────────────────────────────────────
-const UserRow = ({ user, onDelete, onToggleStatus, onChangeRole }) => {
+const UserRow = ({
+  user,
+  onDelete,
+  onToggleStatus,
+  onChangeRole,
+  onViewUser,
+}) => {
   const [menuOpen, setMenuOpen] = useState(false);
   const btnRef = useRef(null);
 
@@ -235,6 +245,7 @@ const UserRow = ({ user, onDelete, onToggleStatus, onChangeRole }) => {
             onDelete={() => onDelete?.(user)}
             onToggleStatus={() => onToggleStatus?.(user)}
             onChangeRole={() => onChangeRole?.(user)}
+            onViewUser={() => onViewUser?.(user)}
           />
         )}
       </td>
@@ -248,6 +259,7 @@ const UsersTable = ({
   onDelete,
   onToggleStatus,
   onChangeRole,
+  onViewUser,
   error = null,
 }) => {
   if (!users || users.length === 0) {
@@ -305,6 +317,7 @@ const UsersTable = ({
                 onDelete={onDelete}
                 onToggleStatus={onToggleStatus}
                 onChangeRole={onChangeRole}
+                onViewUser={onViewUser}
               />
             ))}
           </tbody>
