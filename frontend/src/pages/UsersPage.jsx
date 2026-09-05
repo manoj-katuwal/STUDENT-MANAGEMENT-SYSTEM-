@@ -6,7 +6,12 @@ import UsersTable from "../components/users/UsersTable";
 import UsersPagination from "../components/users/UsersPagination";
 import DeleteUserModal from "../components/users/DeleteUserModal";
 
-import { useUsers, useDeleteUser } from "../features/user/user.hooks";
+import {
+  useUsers,
+  useDeleteUser,
+  useActivateUser,
+  useDeactivateUser,
+} from "../features/user/user.hooks";
 import useDebounce from "../hooks/useDebounce";
 
 const UsersPage = () => {
@@ -24,12 +29,25 @@ const UsersPage = () => {
     reset: resetDelete,
   } = useDeleteUser();
 
+  const { mutate: activateUser, isPending: isActivating } = useActivateUser();
+
+  const { mutate: deactivateUser, isPending: isDeactivating } =
+    useDeactivateUser();
+
   const handleDeleteUser = (user) => {
     resetDelete?.();
     setSelectedUser(user);
   };
 
- 
+  const handleToggleUserStatus = (user) => {
+    const userId = user._id || user.id;
+
+    if (user.isActive) {
+      deactivateUser(userId);
+    } else {
+      activateUser(userId);
+    }
+  };
 
   const handleConfirmDelete = () => {
     if (!selectedUser) return;
@@ -108,7 +126,11 @@ const UsersPage = () => {
           setCurrentPage(1);
         }}
       />
-      <UsersTable users={users} onDelete={handleDeleteUser} />
+      <UsersTable
+        users={users}
+        onDelete={handleDeleteUser}
+        onToggleStatus={handleToggleUserStatus}
+      />
 
       {pagination && pagination.totalUsers > 0 && (
         <UsersPagination

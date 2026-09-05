@@ -36,7 +36,13 @@ const DEFAULT_ROLE_CONFIG = {
 };
 
 // ── Portal Dropdown ────────────────────────────────────────────────────────────
-const ActionMenu = ({ anchorRef, onClose, isUserActive, onDelete }) => {
+const ActionMenu = ({
+  anchorRef,
+  onClose,
+  isUserActive,
+  onDelete,
+  onToggleStatus,
+}) => {
   const [style, setStyle] = useState({});
   const menuRef = useRef(null);
 
@@ -104,7 +110,10 @@ const ActionMenu = ({ anchorRef, onClose, isUserActive, onDelete }) => {
 
       {isUserActive ? (
         <button
-          onClick={onClose}
+          onClick={() => {
+            onClose();
+            onToggleStatus?.();
+          }}
           className="w-full px-3 py-2 text-xs text-gray-700 hover:bg-gray-50 flex items-center gap-2"
         >
           <UserX className="w-3.5 h-3.5 text-amber-500" />
@@ -112,7 +121,10 @@ const ActionMenu = ({ anchorRef, onClose, isUserActive, onDelete }) => {
         </button>
       ) : (
         <button
-          onClick={onClose}
+          onClick={() => {
+            onClose();
+            onToggleStatus?.();
+          }}
           className="w-full px-3 py-2 text-xs text-gray-700 hover:bg-gray-50 flex items-center gap-2"
         >
           <UserCheck className="w-3.5 h-3.5 text-emerald-500" />
@@ -138,7 +150,7 @@ const ActionMenu = ({ anchorRef, onClose, isUserActive, onDelete }) => {
 };
 
 // ── Row Component ──────────────────────────────────────────────────────────────
-const UserRow = ({ user, onDelete }) => {
+const UserRow = ({ user, onDelete, onToggleStatus }) => {
   const [menuOpen, setMenuOpen] = useState(false);
   const btnRef = useRef(null);
 
@@ -165,7 +177,7 @@ const UserRow = ({ user, onDelete }) => {
           <div className="w-8 h-8 rounded-full bg-slate-200 text-slate-700 flex items-center justify-center font-bold text-xs shrink-0 border border-slate-300">
             {initials}
           </div>
-          <span className="truncate max-w-40">{user.name}</span>
+          <span className="truncate max-w-[160px]">{user.name}</span>
         </div>
       </td>
 
@@ -217,6 +229,7 @@ const UserRow = ({ user, onDelete }) => {
             onClose={close}
             isUserActive={isUserActive}
             onDelete={() => onDelete?.(user)}
+            onToggleStatus={() => onToggleStatus?.(user)}
           />
         )}
       </td>
@@ -225,7 +238,7 @@ const UserRow = ({ user, onDelete }) => {
 };
 
 // ── Main Table ─────────────────────────────────────────────────────────────────
-const UsersTable = ({ users = [], onDelete, error = null }) => {
+const UsersTable = ({ users = [], onDelete, onToggleStatus, error = null }) => {
   if (!users || users.length === 0) {
     return (
       <div className="w-full bg-white border border-gray-200 rounded-xl p-12 text-center shadow-sm">
@@ -279,6 +292,7 @@ const UsersTable = ({ users = [], onDelete, error = null }) => {
                 key={user._id || user.id}
                 user={user}
                 onDelete={onDelete}
+                onToggleStatus={onToggleStatus}
               />
             ))}
           </tbody>
