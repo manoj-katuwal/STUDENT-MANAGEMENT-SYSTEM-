@@ -5,6 +5,7 @@ import UsersHeader from "../components/users/UsersHeader";
 import UsersTable from "../components/users/UsersTable";
 import UsersPagination from "../components/users/UsersPagination";
 import DeleteUserModal from "../components/users/DeleteUserModal";
+import UserStatusModal from "../components/users/UserStatusModal";
 
 import {
   useUsers,
@@ -20,7 +21,9 @@ const UsersPage = () => {
   const [selectedStatus, setSelectedStatus] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
   const [selectedUser, setSelectedUser] = useState(null);
+  const [statusUser, setStatusUser] = useState(null);
   const debouncedSearchTerm = useDebounce(searchTerm, 700);
+
   const {
     mutate: deleteUser,
     isPending: isDeleting,
@@ -29,23 +32,54 @@ const UsersPage = () => {
     reset: resetDelete,
   } = useDeleteUser();
 
-  const { mutate: activateUser, isPending: isActivating } = useActivateUser();
+  const {
+    mutate: activateUser,
+    isPending: isActivating,
+    error: activateError,
+    reset: resetActivate,
+  } = useActivateUser();
 
-  const { mutate: deactivateUser, isPending: isDeactivating } =
-    useDeactivateUser();
+  const {
+    mutate: deactivateUser,
+    isPending: isDeactivating,
+    error: deactivateError,
+    reset: resetDeactivate,
+  } = useDeactivateUser();
 
   const handleDeleteUser = (user) => {
     resetDelete?.();
     setSelectedUser(user);
   };
 
-  const handleToggleUserStatus = (user) => {
-    const userId = user._id || user.id;
+  const handleOpenStatusModal = (user) => {
+    resetActivate?.();
+    resetDeactivate?.();
+    setStatusUser(user);
+  };
 
-    if (user.isActive) {
-      deactivateUser(userId);
+  const handleCloseStatusModal = () => {
+    if (isActivating || isDeactivating) return;
+    resetActivate?.();
+    resetDeactivate?.();
+    setStatusUser(null);
+  };
+
+  const handleConfirmStatusChange = () => {
+    if (!statusUser) return;
+    const userId = statusUser._id || statusUser.id;
+
+    if (statusUser.isActive) {
+      deactivateUser(userId, {
+        onSuccess: () => {
+          handleCloseStatusModal();
+        },
+      });
     } else {
-      activateUser(userId);
+      activateUser(userId, {
+        onSuccess: () => {
+          handleCloseStatusModal();
+        },
+      });
     }
   };
 
@@ -129,7 +163,7 @@ const UsersPage = () => {
       <UsersTable
         users={users}
         onDelete={handleDeleteUser}
-        onToggleStatus={handleToggleUserStatus}
+        onToggleStatus={handleOpenStatusModal}
       />
 
       {pagination && pagination.totalUsers > 0 && (
@@ -152,6 +186,17 @@ const UsersPage = () => {
         onConfirm={handleConfirmDelete}
         isDeleting={isDeleting}
         error={isDeleteError ? deleteError : null}
+      />
+
+      {/* User Status (Activate/Deactivate) Confirmation Modal */}
+      <UserStatusModal
+        isOpen={Boolean(statusUser)}
+        user={statusUser}
+        action={statusUser?.isActive ? "deactivate" : "activate"}
+        onClose={handleCloseStatusModal}
+        onConfirm={handleConfirmStatusChange}
+        isPending={isActivating || isDeactivating}
+        error={activateError || deactivateError}
       />
     </div>
   );
