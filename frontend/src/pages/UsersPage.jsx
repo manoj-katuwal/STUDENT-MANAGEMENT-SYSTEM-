@@ -3,29 +3,42 @@ import { useState } from "react";
 import UsersFilter from "../components/users/UsersFilter";
 import UsersHeader from "../components/users/UsersHeader";
 import UsersTable from "../components/users/UsersTable";
+import UsersPagination from "../components/users/UsersPagination";
+import DeleteUserModal from "../components/users/DeleteUserModal";
 
 import { useUsers, useDeleteUser } from "../features/user/user.hooks";
 import useDebounce from "../hooks/useDebounce";
-import UsersPagination from "../components/users/UsersPagination";
-import { deleteUser } from "../features/user/user.api";
-
-const handleDeleteUser = (userId) => {
-  const confirmed = window.confirm(
-    "Are you sure you want to delete this user?",
-  );
-
-  if (!confirmed) return;
-
-  deleteUser(userId);
-};
 
 const UsersPage = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedRole, setSelectedRole] = useState("");
   const [selectedStatus, setSelectedStatus] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
+  const [selectedUser, setSelectedUser] = useState(null);
   const debouncedSearchTerm = useDebounce(searchTerm, 700);
   const { mutate: deleteUser, isPending: isDeleting } = useDeleteUser();
+
+  const handleDeleteUser = (user) => {
+    setSelectedUser(user);
+  };
+
+  const handleConfirmDelete = () => {
+    if (!selectedUser) return;
+
+    const userId = selectedUser._id || selectedUser.id;
+
+    deleteUser(userId, {
+      onSuccess: () => {
+        setSelectedUser(null);
+      },
+    });
+  };
+
+  const handleCancelDelete = () => {
+    if (isDeleting) return;
+
+    setSelectedUser(null);
+  };
 
   const params = {
     page: currentPage,
@@ -40,14 +53,10 @@ const UsersPage = () => {
           : undefined,
   };
 
-  const { data, isLoading, isError, refetch, isPlaceholderData } =
-    useUsers(params);
+  const { data, isLoading, isError, refetch } = useUsers(params);
 
   const users = data?.users ?? [];
   const pagination = data?.pagination;
-
-  console.log("Users:", users);
-  console.log("Pagination:", pagination);
 
   if (isLoading) {
     return <div>Loading users...</div>;
@@ -86,7 +95,6 @@ const UsersPage = () => {
         }}
       />
       <UsersTable users={users} onDelete={handleDeleteUser} />
-      {/* Pagination will come here */}
 
       {pagination && pagination.totalUsers > 0 && (
         <UsersPagination
@@ -99,6 +107,15 @@ const UsersPage = () => {
           onPageChange={setCurrentPage}
         />
       )}
+
+      {/* Delete User Confirmation Modal */}
+      <DeleteUserModal
+        isOpen={Boolean(selectedUser)}
+        user={selectedUser}
+        onClose={handleCancelDelete}
+        onConfirm={handleConfirmDelete}
+        isDeleting={isDeleting}
+      />
     </div>
   );
 };
