@@ -15,7 +15,7 @@ import {
   registerUserController,
   updateMyProfileController,
 } from "./user.controller.js";
-import { registerUserSchema } from "./user.validation.js";
+import { createUserSchema, registerUserSchema } from "./user.validation.js";
 
 const router = Router();
 
@@ -25,7 +25,13 @@ router.patch("/me", authenticate, updateMyProfileController);
 
 router.post("/", authenticate, authorize("ADMIN"), createUserController);
 router.get("/", authenticate, authorize("ADMIN"), getAllUsersController);
-router.get("/:userId", authenticate, authorize("ADMIN"), getUserByIdController);
+router.get(
+  "/:userId",
+  authenticate,
+  authorize("ADMIN"),
+  validate(createUserSchema),
+  getUserByIdController,
+);
 router.patch(
   "/:userId/role",
   authenticate,
