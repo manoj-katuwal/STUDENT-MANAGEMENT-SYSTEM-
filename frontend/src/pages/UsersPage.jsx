@@ -29,6 +29,8 @@ const UsersPage = () => {
     setSelectedUser(user);
   };
 
+ 
+
   const handleConfirmDelete = () => {
     if (!selectedUser) return;
 
@@ -36,8 +38,11 @@ const UsersPage = () => {
 
     deleteUser(userId, {
       onSuccess: () => {
-        resetDelete?.();
         setSelectedUser(null);
+
+        if (users.length === 1 && currentPage > 1) {
+          setCurrentPage((page) => page - 1);
+        }
       },
     });
   };
