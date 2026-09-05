@@ -6,10 +6,15 @@ const DeleteUserModal = ({
   onClose,
   onConfirm,
   isDeleting = false,
+  error = null,
 }) => {
   if (!isOpen || !user) {
     return null;
   }
+
+  const errorMessage =
+    error?.response?.data?.message ||
+    (typeof error === "string" ? error : null);
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 px-4">
@@ -52,12 +57,18 @@ const DeleteUserModal = ({
         </div>
 
         {/* Body */}
-        <div className="px-5 py-5">
+        <div className="px-5 py-5 space-y-3">
           <p className="text-sm leading-6 text-gray-600">
             Are you sure you want to delete{" "}
             <span className="font-semibold text-gray-900">{user.name}</span>?
             The user account will be permanently removed.
           </p>
+
+          {errorMessage && (
+            <div className="rounded-lg border border-red-200 bg-red-50 px-3.5 py-2.5">
+              <p className="text-xs font-medium text-red-700">{errorMessage}</p>
+            </div>
+          )}
         </div>
 
         {/* Footer */}

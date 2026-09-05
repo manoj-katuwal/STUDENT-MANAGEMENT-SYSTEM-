@@ -16,9 +16,16 @@ const UsersPage = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [selectedUser, setSelectedUser] = useState(null);
   const debouncedSearchTerm = useDebounce(searchTerm, 700);
-  const { mutate: deleteUser, isPending: isDeleting } = useDeleteUser();
+  const {
+    mutate: deleteUser,
+    isPending: isDeleting,
+    isError: isDeleteError,
+    error: deleteError,
+    reset: resetDelete,
+  } = useDeleteUser();
 
   const handleDeleteUser = (user) => {
+    resetDelete?.();
     setSelectedUser(user);
   };
 
@@ -29,6 +36,7 @@ const UsersPage = () => {
 
     deleteUser(userId, {
       onSuccess: () => {
+        resetDelete?.();
         setSelectedUser(null);
       },
     });
@@ -37,6 +45,7 @@ const UsersPage = () => {
   const handleCancelDelete = () => {
     if (isDeleting) return;
 
+    resetDelete?.();
     setSelectedUser(null);
   };
 
@@ -115,6 +124,7 @@ const UsersPage = () => {
         onClose={handleCancelDelete}
         onConfirm={handleConfirmDelete}
         isDeleting={isDeleting}
+        error={isDeleteError ? deleteError : null}
       />
     </div>
   );

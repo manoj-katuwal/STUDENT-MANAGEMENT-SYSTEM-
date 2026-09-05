@@ -165,7 +165,7 @@ const UserRow = ({ user, onDelete }) => {
           <div className="w-8 h-8 rounded-full bg-slate-200 text-slate-700 flex items-center justify-center font-bold text-xs shrink-0 border border-slate-300">
             {initials}
           </div>
-          <span className="truncate max-w-[160px]">{user.name}</span>
+          <span className="truncate max-w-40">{user.name}</span>
         </div>
       </td>
 
@@ -225,7 +225,7 @@ const UserRow = ({ user, onDelete }) => {
 };
 
 // ── Main Table ─────────────────────────────────────────────────────────────────
-const UsersTable = ({ users = [], onDelete }) => {
+const UsersTable = ({ users = [], onDelete, error = null }) => {
   if (!users || users.length === 0) {
     return (
       <div className="w-full bg-white border border-gray-200 rounded-xl p-12 text-center shadow-sm">
