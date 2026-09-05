@@ -13,3 +13,15 @@ export const deleteUser = async (userId) => {
 
   return response.data;
 };
+
+export const activateUser = async (userId) => {
+  const response = await apiClient.patch(`/users/${userId}/activate`);
+
+  return response.data;
+};
+
+export const deactivateUser = async (userId) => {
+  const response = await apiClient.patch(`/users/${userId}/deactivate`);
+
+  return response.data;
+};
