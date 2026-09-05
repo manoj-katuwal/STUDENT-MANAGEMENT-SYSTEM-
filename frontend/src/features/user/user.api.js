@@ -33,3 +33,9 @@ export const changeUserRole = async (userId, role) => {
 
   return response.data;
 };
+
+export const getUserById = async (userId) => {
+  const response = await apiClient.get(`/users/${userId}`);
+
+  return response.data.data;
+};

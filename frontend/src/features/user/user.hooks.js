@@ -11,6 +11,7 @@ import {
   activateUser,
   deactivateUser,
   changeUserRole,
+  getUserById
 } from "./user.api";
 
 export const useUsers = (params = {}) => {
@@ -70,5 +71,14 @@ export const useChangeUserRole = () => {
         queryKey: ["users"],
       });
     },
+  });
+};
+
+
+export const useUserById = (userId) => {
+  return useQuery({
+    queryKey: ["user", userId],
+    queryFn: () => getUserById(userId),
+    enabled: Boolean(userId),
   });
 };
