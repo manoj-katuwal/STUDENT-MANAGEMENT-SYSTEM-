@@ -103,13 +103,8 @@ const AddUserModal = ({
     }
   };
 
-  // Helper to unlock inputs on focus (stops chrome autofill)
-  const handleFocus = (e) => {
-    e.target.removeAttribute("readOnly");
-  };
-
   const getInputClass = (fieldName) =>
-    `w-full rounded-lg border bg-gray-50 px-3.5 py-2.5 text-sm text-gray-700 placeholder:text-gray-400 transition-colors focus:bg-white focus:outline-none focus:ring-2 disabled:cursor-not-allowed disabled:opacity-60 [&:-webkit-autofill]:[transition:background-color_5000s_ease-in-out_0s] ${
+    `w-full rounded-lg border bg-gray-50 px-3.5 py-2.5 text-sm text-gray-700 placeholder:text-gray-400 transition-colors focus:bg-white focus:outline-none focus:ring-2 disabled:cursor-not-allowed disabled:opacity-60 ${
       formErrors[fieldName]
         ? "border-red-300 focus:border-red-500 focus:ring-red-500/20"
         : "border-gray-200 focus:border-indigo-500 focus:ring-indigo-500/20"
@@ -156,7 +151,7 @@ const AddUserModal = ({
         </div>
 
         {/* Form */}
-        <form onSubmit={handleSubmit} autoComplete="off">
+        <form onSubmit={handleSubmit}>
           <div className="space-y-4 px-6 py-5">
             {/* Full Name */}
             <div>
@@ -170,7 +165,6 @@ const AddUserModal = ({
                 id="add-user-name"
                 name="name"
                 type="text"
-                autoComplete="off"
                 placeholder="e.g. Ram Sharma"
                 value={formData.name}
                 onChange={handleChange}
@@ -194,9 +188,6 @@ const AddUserModal = ({
                 id="add-user-email"
                 name="email"
                 type="email"
-                autoComplete="one-time-code"
-                readOnly
-                onFocus={handleFocus}
                 placeholder="name@school.edu"
                 value={formData.email}
                 onChange={handleChange}
@@ -223,9 +214,6 @@ const AddUserModal = ({
                   id="add-user-password"
                   name="password"
                   type={showPassword ? "text" : "password"}
-                  autoComplete="one-time-code"
-                  readOnly
-                  onFocus={handleFocus}
                   placeholder="Minimum 8 characters"
                   value={formData.password}
                   onChange={handleChange}

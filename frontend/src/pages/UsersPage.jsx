@@ -8,6 +8,7 @@ import DeleteUserModal from "../components/users/DeleteUserModal";
 import UserStatusModal from "../components/users/UserStatusModal";
 import ChangeRoleModal from "../components/users/ChangeRoleModal";
 import ViewUserModal from "../components/users/ViewUserModal";
+import AddUserModal from "../components/users/AddUserModal";
 
 import {
   useUsers,
@@ -16,6 +17,7 @@ import {
   useDeactivateUser,
   useChangeUserRole,
   useUserById,
+  useCreateUser,
 } from "../features/user/user.hooks";
 import useDebounce from "../hooks/useDebounce";
 
@@ -29,6 +31,7 @@ const UsersPage = () => {
   const [roleUser, setRoleUser] = useState(null);
   const [selectedNewRole, setSelectedNewRole] = useState("");
   const [selectedViewUserId, setSelectedViewUserId] = useState(null);
+  const [isAddUserModalOpen, setIsAddUserModalOpen] = useState(false);
   const debouncedSearchTerm = useDebounce(searchTerm, 700);
 
   const {
@@ -66,6 +69,12 @@ const UsersPage = () => {
     isError: isViewUserError,
     error: viewUserError,
   } = useUserById(selectedViewUserId);
+
+  const {
+    mutate: createUser,
+    isPending: isCreating,
+    error: createUserError,
+  } = useCreateUser();
 
   const handleDeleteUser = (user) => {
     resetDelete?.();
@@ -165,6 +174,14 @@ const UsersPage = () => {
     setSelectedViewUserId(null);
   };
 
+
+  const handleCreateUser = (formData) => {
+    createUser(formData, {
+      onSuccess: () => {
+        setIsAddUserModalOpen(false);
+      },
+    });
+  };
   const params = {
     page: currentPage,
     limit: 10,
@@ -201,7 +218,7 @@ const UsersPage = () => {
 
   return (
     <div className="min-h-full p-6 lg:p-8">
-      <UsersHeader />
+      <UsersHeader onAddUser={() => setIsAddUserModalOpen(true)} />
       <UsersFilter
         searchTerm={searchTerm}
         onSearchChange={(value) => {
@@ -280,6 +297,16 @@ const UsersPage = () => {
         isError={isViewUserError}
         error={viewUserError}
         onClose={handleCloseViewModal}
+      />
+
+
+      {/* Add User Modal */}
+      <AddUserModal
+        isOpen={isAddUserModalOpen}
+        onClose={() => setIsAddUserModalOpen(false)}
+        onSubmit={handleCreateUser}
+        isCreating={isCreating}
+        error={createUserError}
       />
     </div>
   );
