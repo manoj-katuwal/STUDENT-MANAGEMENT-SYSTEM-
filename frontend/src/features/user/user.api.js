@@ -39,3 +39,9 @@ export const getUserById = async (userId) => {
 
   return response.data.data;
 };
+
+export const createUser = async (userData) => {
+  const response = await apiClient.post("/users", userData);
+
+  return response.data;
+};

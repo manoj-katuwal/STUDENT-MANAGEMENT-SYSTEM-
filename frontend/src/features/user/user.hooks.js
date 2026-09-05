@@ -11,7 +11,8 @@ import {
   activateUser,
   deactivateUser,
   changeUserRole,
-  getUserById
+  getUserById,
+  createUser,
 } from "./user.api";
 
 export const useUsers = (params = {}) => {
@@ -74,11 +75,24 @@ export const useChangeUserRole = () => {
   });
 };
 
-
 export const useUserById = (userId) => {
   return useQuery({
     queryKey: ["user", userId],
     queryFn: () => getUserById(userId),
     enabled: Boolean(userId),
+  });
+};
+
+export const useCreateUser = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: createUser,
+
+    onSuccess: () => {
+      queryClient.invalidateQueries({
+        queryKey: ["users"],
+      });
+    },
   });
 };
