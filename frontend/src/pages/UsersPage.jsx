@@ -76,7 +76,18 @@ const UsersPage = () => {
     mutate: createUser,
     isPending: isCreating,
     error: createUserError,
+    reset: resetCreateUser,
   } = useCreateUser();
+
+  const handleOpenAddUserModal = () => {
+    // Reset any previous create‑user mutation state (error, loading, etc.)
+    resetCreateUser?.();
+    setIsAddUserModalOpen(true);
+  };
+
+  const handleCloseAddUserModal = () => {
+    setIsAddUserModalOpen(false);
+  };
 
   const handleDeleteUser = (user) => {
     resetDelete?.();
@@ -211,7 +222,7 @@ const UsersPage = () => {
 
   return (
     <div className="min-h-full p-6 lg:p-8">
-      <UsersHeader onAddUser={() => setIsAddUserModalOpen(true)} />
+      <UsersHeader onAddUser={handleOpenAddUserModal} />
       <UsersFilter
         searchTerm={searchTerm}
         onSearchChange={(value) => {
@@ -295,7 +306,7 @@ const UsersPage = () => {
       {/* Add User Modal */}
       <AddUserModal
         isOpen={isAddUserModalOpen}
-        onClose={() => setIsAddUserModalOpen(false)}
+        onClose={handleCloseAddUserModal}
         onSubmit={handleCreateUser}
         isCreating={isCreating}
         error={createUserError}
