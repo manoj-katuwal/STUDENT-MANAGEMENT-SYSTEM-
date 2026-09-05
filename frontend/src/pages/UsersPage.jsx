@@ -6,12 +6,14 @@ import UsersTable from "../components/users/UsersTable";
 import UsersPagination from "../components/users/UsersPagination";
 import DeleteUserModal from "../components/users/DeleteUserModal";
 import UserStatusModal from "../components/users/UserStatusModal";
+import ChangeRoleModal from "../components/users/ChangeRoleModal";
 
 import {
   useUsers,
   useDeleteUser,
   useActivateUser,
   useDeactivateUser,
+  useChangeUserRole,
 } from "../features/user/user.hooks";
 import useDebounce from "../hooks/useDebounce";
 
@@ -22,6 +24,8 @@ const UsersPage = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [selectedUser, setSelectedUser] = useState(null);
   const [statusUser, setStatusUser] = useState(null);
+  const [roleUser, setRoleUser] = useState(null);
+  const [selectedNewRole, setSelectedNewRole] = useState("");
   const debouncedSearchTerm = useDebounce(searchTerm, 700);
 
   const {
@@ -45,6 +49,13 @@ const UsersPage = () => {
     error: deactivateError,
     reset: resetDeactivate,
   } = useDeactivateUser();
+
+  const {
+    mutate: changeUserRole,
+    isPending: isChangingRole,
+    error: changeRoleError,
+    reset: resetChangeRole,
+  } = useChangeUserRole();
 
   const handleDeleteUser = (user) => {
     resetDelete?.();
@@ -81,6 +92,35 @@ const UsersPage = () => {
         },
       });
     }
+  };
+
+  const handleOpenRoleModal = (user) => {
+    resetChangeRole?.();
+    setRoleUser(user);
+    setSelectedNewRole(user.role || "");
+  };
+
+  const handleCloseRoleModal = () => {
+    if (isChangingRole) return;
+    resetChangeRole?.();
+    setRoleUser(null);
+    setSelectedNewRole("");
+  };
+
+  const handleConfirmRoleChange = () => {
+    if (!roleUser || !selectedNewRole || selectedNewRole === roleUser.role)
+      return;
+
+    const userId = roleUser._id || roleUser.id;
+
+    changeUserRole(
+      { userId, role: selectedNewRole },
+      {
+        onSuccess: () => {
+          handleCloseRoleModal();
+        },
+      },
+    );
   };
 
   const handleConfirmDelete = () => {
@@ -164,6 +204,7 @@ const UsersPage = () => {
         users={users}
         onDelete={handleDeleteUser}
         onToggleStatus={handleOpenStatusModal}
+        onChangeRole={handleOpenRoleModal}
       />
 
       {pagination && pagination.totalUsers > 0 && (
@@ -197,6 +238,18 @@ const UsersPage = () => {
         onConfirm={handleConfirmStatusChange}
         isPending={isActivating || isDeactivating}
         error={activateError || deactivateError}
+      />
+
+      {/* Change User Role Modal */}
+      <ChangeRoleModal
+        isOpen={Boolean(roleUser)}
+        user={roleUser}
+        selectedRole={selectedNewRole}
+        onRoleChange={setSelectedNewRole}
+        onClose={handleCloseRoleModal}
+        onConfirm={handleConfirmRoleChange}
+        isPending={isChangingRole}
+        error={changeRoleError}
       />
     </div>
   );

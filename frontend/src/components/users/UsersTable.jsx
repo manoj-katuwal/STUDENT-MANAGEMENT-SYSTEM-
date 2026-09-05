@@ -42,6 +42,7 @@ const ActionMenu = ({
   isUserActive,
   onDelete,
   onToggleStatus,
+  onChangeRole,
 }) => {
   const [style, setStyle] = useState({});
   const menuRef = useRef(null);
@@ -101,7 +102,10 @@ const ActionMenu = ({
       </button>
 
       <button
-        onClick={onClose}
+        onClick={() => {
+          onClose();
+          onChangeRole?.();
+        }}
         className="w-full px-3 py-2 text-xs text-gray-700 hover:bg-gray-50 flex items-center gap-2"
       >
         <Shield className="w-3.5 h-3.5 text-gray-400" />
@@ -150,7 +154,7 @@ const ActionMenu = ({
 };
 
 // ── Row Component ──────────────────────────────────────────────────────────────
-const UserRow = ({ user, onDelete, onToggleStatus }) => {
+const UserRow = ({ user, onDelete, onToggleStatus, onChangeRole }) => {
   const [menuOpen, setMenuOpen] = useState(false);
   const btnRef = useRef(null);
 
@@ -177,7 +181,7 @@ const UserRow = ({ user, onDelete, onToggleStatus }) => {
           <div className="w-8 h-8 rounded-full bg-slate-200 text-slate-700 flex items-center justify-center font-bold text-xs shrink-0 border border-slate-300">
             {initials}
           </div>
-          <span className="truncate max-w-40">{user.name}</span>
+          <span className="truncate max-w-[160px]">{user.name}</span>
         </div>
       </td>
 
@@ -230,6 +234,7 @@ const UserRow = ({ user, onDelete, onToggleStatus }) => {
             isUserActive={isUserActive}
             onDelete={() => onDelete?.(user)}
             onToggleStatus={() => onToggleStatus?.(user)}
+            onChangeRole={() => onChangeRole?.(user)}
           />
         )}
       </td>
@@ -238,7 +243,13 @@ const UserRow = ({ user, onDelete, onToggleStatus }) => {
 };
 
 // ── Main Table ─────────────────────────────────────────────────────────────────
-const UsersTable = ({ users = [], onDelete, onToggleStatus, error = null }) => {
+const UsersTable = ({
+  users = [],
+  onDelete,
+  onToggleStatus,
+  onChangeRole,
+  error = null,
+}) => {
   if (!users || users.length === 0) {
     return (
       <div className="w-full bg-white border border-gray-200 rounded-xl p-12 text-center shadow-sm">
@@ -293,6 +304,7 @@ const UsersTable = ({ users = [], onDelete, onToggleStatus, error = null }) => {
                 user={user}
                 onDelete={onDelete}
                 onToggleStatus={onToggleStatus}
+                onChangeRole={onChangeRole}
               />
             ))}
           </tbody>

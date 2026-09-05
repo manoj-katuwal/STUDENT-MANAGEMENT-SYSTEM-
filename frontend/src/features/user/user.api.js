@@ -25,3 +25,11 @@ export const deactivateUser = async (userId) => {
 
   return response.data;
 };
+
+export const changeUserRole = async (userId, role) => {
+  const response = await apiClient.patch(`/users/${userId}/role`, {
+    role,
+  });
+
+  return response.data;
+};
