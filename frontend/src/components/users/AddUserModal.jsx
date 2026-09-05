@@ -26,11 +26,20 @@ const AddUserModal = ({
   const [formData, setFormData] = useState(INITIAL_FORM);
   const [formErrors, setFormErrors] = useState({});
 
+  const resetForm = () => {
+    setFormData(INITIAL_FORM);
+    setFormErrors({});
+    setShowPassword(false);
+  };
+
+  const handleClose = () => {
+    resetForm();
+    onClose?.();
+  };
+
   useEffect(() => {
     if (isOpen) {
-      setFormData(INITIAL_FORM);
-      setFormErrors({});
-      setShowPassword(false);
+      resetForm();
     }
   }, [isOpen]);
 
@@ -141,7 +150,7 @@ const AddUserModal = ({
 
           <button
             type="button"
-            onClick={onClose}
+            onClick={handleClose}
             disabled={isCreating}
             aria-label="Close add user modal"
             className="rounded-lg p-1.5 text-gray-400 transition-colors hover:bg-gray-100 hover:text-gray-600 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gray-300 disabled:cursor-not-allowed disabled:opacity-50"
@@ -287,7 +296,7 @@ const AddUserModal = ({
           <div className="flex justify-end gap-3 border-t border-gray-100 bg-gray-50/50 px-6 py-4 rounded-b-2xl">
             <button
               type="button"
-              onClick={onClose}
+              onClick={handleClose}
               disabled={isCreating}
               className="rounded-lg border border-gray-200 bg-white px-4 py-2 text-sm font-medium text-gray-700 transition-colors hover:bg-gray-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gray-300 disabled:cursor-not-allowed disabled:opacity-50"
             >
