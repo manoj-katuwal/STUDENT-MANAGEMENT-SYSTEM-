@@ -9,6 +9,8 @@ import UserStatusModal from "../components/users/UserStatusModal";
 import ChangeRoleModal from "../components/users/ChangeRoleModal";
 import ViewUserModal from "../components/users/ViewUserModal";
 import AddUserModal from "../components/users/AddUserModal";
+import UsersError from "../components/users/UsersError";
+import UsersLoading from "../components/users/UsersLoading";
 
 import {
   useUsers,
@@ -174,7 +176,6 @@ const UsersPage = () => {
     setSelectedViewUserId(null);
   };
 
-
   const handleCreateUser = (formData) => {
     createUser(formData, {
       onSuccess: () => {
@@ -201,19 +202,11 @@ const UsersPage = () => {
   const pagination = data?.pagination;
 
   if (isLoading) {
-    return <div>Loading users...</div>;
+    return <UsersLoading />;
   }
 
   if (isError) {
-    return (
-      <div>
-        <p>Unable to load users.</p>
-
-        <button type="button" onClick={refetch}>
-          Try Again
-        </button>
-      </div>
-    );
+    return <UsersError onRetry={refetch} />;
   }
 
   return (
@@ -298,7 +291,6 @@ const UsersPage = () => {
         error={viewUserError}
         onClose={handleCloseViewModal}
       />
-
 
       {/* Add User Modal */}
       <AddUserModal
