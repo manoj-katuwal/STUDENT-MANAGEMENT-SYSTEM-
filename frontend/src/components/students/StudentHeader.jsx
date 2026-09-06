@@ -3,7 +3,7 @@ import { Upload, Plus } from "lucide-react";
 
 const StudentHeader = () => {
   return (
-    <div className="bg-white border border-slate-200 rounded-xl  px-5 py-4 md:px-6 md:py-5">
+    <div className="bg-white border border-slate-200 rounded-xl shadow-sm px-5 py-4 md:px-6 md:py-5">
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
         {/* Left side: Title, Pill Badge, Description */}
         <div className="space-y-1.5">

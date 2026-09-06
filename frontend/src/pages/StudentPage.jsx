@@ -1,6 +1,7 @@
 import { useStudents } from "../features/students/student.hooks";
 import StudentContextBar from "../components/students/StudentContextBar";
 import StudentHeader from "../components/students/StudentHeader";
+import StudentStats from "../components/students/StudentStats";
 
 const StudentsPage = () => {
   const { data, isLoading, isError, error } = useStudents();
@@ -16,11 +17,12 @@ const StudentsPage = () => {
   }
 
   return (
-    <div className="min-h-full p-6 lg:p-8">
+    <div className="min-h-full p-6 lg:p-8 space-y-6">
       <StudentContextBar />
       <StudentHeader
         totalStudents={data?.pagination?.total ?? data?.students?.length}
       />
+      <StudentStats data={data} />
     </div>
   );
 };
