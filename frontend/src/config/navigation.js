@@ -4,6 +4,7 @@ import {
   CreditCard,
   BarChart3,
   Wallet,
+  Users2,
 } from "lucide-react";
 
 export const NAV_ITEMS = [
@@ -46,6 +47,14 @@ export const NAV_ITEMS = [
     group: null,
     allowedRoles: ["STUDENT"],
   },
+
+  {
+    label: "Students",
+    path: "/students",
+    icon: Users2,
+    group: "null",
+    allowedRoles: ["ADMIN", "ACCOUNTANT", "PRINCIPAL"],
+  }
 ];
 
 export const getNavItemsForRole = (role) => {

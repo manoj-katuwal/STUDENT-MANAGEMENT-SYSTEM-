@@ -12,6 +12,7 @@ import PaymentsPage from "../pages/PaymentsPage";
 import ReportsPage from "../pages/ReportsPage";
 import MyFeesPage from "../pages/MyFeesPage";
 import AppLayout from "../components/layout/AppLayout";
+import StudentsPage from "../pages/StudentPage";
 
 const Router = () => {
   return (
@@ -27,6 +28,16 @@ const Router = () => {
               {/* ADMIN */}
               <Route element={<RoleRoute allowedRoles={["ADMIN"]} />}>
                 <Route path="/users" element={<UsersPage />} />
+              </Route>
+
+              <Route
+                element={
+                  <RoleRoute
+                    allowedRoles={["ADMIN", "ACCOUNTANT", "PRINCIPAL"]}
+                  />
+                }
+              >
+                <Route path="/students" element={<StudentsPage />} />
               </Route>
               {/* ADMIN AND ACCOUNTANT  */}
               <Route
