@@ -1,4 +1,5 @@
 import { useStudents } from "../features/students/student.hooks";
+import StudentContextBar from "../components/students/StudentContextBar";
 
 const StudentsPage = () => {
   const { data, isLoading, isError, error } = useStudents();
@@ -14,12 +15,8 @@ const StudentsPage = () => {
   }
 
   return (
-    <div>
-      <h1>Students</h1>
-
-      <p>Total Students: {data?.pagination?.total ?? 0}</p>
-
-      <pre>{JSON.stringify(data?.students, null, 2)}</pre>
+    <div className="min-h-full p-6 lg:p-8">
+      <StudentContextBar />
     </div>
   );
 };
