@@ -1,7 +1,7 @@
 import React from "react";
 import { Eye, Edit3, Phone } from "lucide-react";
 
-const StudentsTable = ({ students = [] }) => {
+const StudentsTable = ({ students = [], isLoading = false }) => {
   return (
     <div className="w-full overflow-hidden bg-white border border-slate-200 rounded-xl shadow-sm">
       <div className="overflow-x-auto">
@@ -21,7 +21,48 @@ const StudentsTable = ({ students = [] }) => {
 
           {/* Table Body */}
           <tbody className="divide-y divide-slate-100 text-sm">
-            {students.length === 0 ? (
+            {isLoading ? (
+              Array.from({ length: 5 }).map((_, index) => (
+                <tr key={`skeleton-${index}`} className="animate-pulse">
+                  {/* Student */}
+                  <td className="py-3 px-4">
+                    <div className="flex items-center gap-3">
+                      <div className="w-9 h-9 rounded-full bg-slate-200 shrink-0" />
+                      <div className="space-y-1.5 flex-1">
+                        <div className="h-3.5 bg-slate-200 rounded w-28" />
+                      </div>
+                    </div>
+                  </td>
+                  {/* Admission No */}
+                  <td className="py-3 px-4">
+                    <div className="h-5 bg-slate-200 rounded w-20" />
+                  </td>
+                  {/* Class */}
+                  <td className="py-3 px-4">
+                    <div className="h-4 bg-slate-200 rounded w-16" />
+                  </td>
+                  {/* Section */}
+                  <td className="py-3 px-4">
+                    <div className="h-4 bg-slate-200 rounded w-12" />
+                  </td>
+                  {/* Phone */}
+                  <td className="py-3 px-4">
+                    <div className="h-4 bg-slate-200 rounded w-24" />
+                  </td>
+                  {/* Status */}
+                  <td className="py-3 px-4">
+                    <div className="h-5 bg-slate-200 rounded-full w-16" />
+                  </td>
+                  {/* Actions */}
+                  <td className="py-3 px-4 text-right">
+                    <div className="flex items-center justify-end gap-1">
+                      <div className="w-7 h-7 bg-slate-200 rounded-lg" />
+                      <div className="w-7 h-7 bg-slate-200 rounded-lg" />
+                    </div>
+                  </td>
+                </tr>
+              ))
+            ) : students.length === 0 ? (
               <tr>
                 <td
                   colSpan="7"

@@ -22,12 +22,12 @@ const StudentsPage = () => {
   });
   const { data: statsData, isLoading: isStatsLoading } = useStudentStats();
 
-  if (isLoading) {
-    return <div>Loading students...</div>;
-  }
-
   if (isError) {
-    return <div>Failed to load students: {error?.message}</div>;
+    return (
+      <div className="p-8 text-center text-red-500 font-medium">
+        Failed to load students: {error?.message}
+      </div>
+    );
   }
 
   const handleResetFilters = () => {
@@ -53,7 +53,7 @@ const StudentsPage = () => {
         onSectionChange={setSectionId}
         onReset={handleResetFilters}
       />
-      <StudentTable students={data?.students ?? []} />
+      <StudentTable students={data?.students ?? []} isLoading={isLoading} />
     </div>
   );
 };
