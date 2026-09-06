@@ -6,6 +6,7 @@ import {
   findStudentByAdmissionNumber,
   findStudentById,
   findStudents,
+  getStudentStats,
   updateStudent,
 } from "./student.repository.js";
 
@@ -203,4 +204,8 @@ export const getStudentsService = async (
       totalPages,
     },
   };
+};
+
+export const getStudentStatsService = async () => {
+  return await getStudentStats();
 };

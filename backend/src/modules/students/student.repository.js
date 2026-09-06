@@ -45,3 +45,31 @@ export const findStudents = async ({
 export const countStudents = async (filter = {}) => {
   return await Student.countDocuments(filter);
 };
+
+export const getStudentStats = async () => {
+  const totalStudents = await Student.countDocuments();
+
+  const activeStudents = await Student.countDocuments({
+    status: "ACTIVE",
+  });
+
+  const inactiveStudents = await Student.countDocuments({
+    status: "INACTIVE",
+  });
+
+  const thirtyDaysAgo = new Date();
+  thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
+
+  const recentlyAdded = await Student.countDocuments({
+    createdAt: {
+      $gte: thirtyDaysAgo,
+    },
+  });
+
+  return {
+    totalStudents,
+    activeStudents,
+    inactiveStudents,
+    recentlyAdded,
+  };
+};

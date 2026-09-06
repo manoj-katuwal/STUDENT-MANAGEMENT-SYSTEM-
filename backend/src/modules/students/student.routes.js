@@ -4,6 +4,7 @@ import {
   createStudentController,
   getStudentByIdController,
   getStudentsController,
+  getStudentStatsController,
   updateStudentController,
   updateStudentStatusController,
 } from "./student.controller.js";
@@ -27,7 +28,16 @@ router.post(
   validate(createStudentSchema),
   createStudentController,
 );
+
+
 router.get("/", authenticate, authorize("ADMIN"), getStudentsController);
+
+router.get(
+  "/stats",
+  authenticate,
+  authorize("ADMIN"),
+  getStudentStatsController,
+);
 router.get(
   "/:id",
   authenticate,
