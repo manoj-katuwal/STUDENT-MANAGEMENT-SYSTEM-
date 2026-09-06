@@ -9,18 +9,25 @@ import StudentFilters from "../components/students/StudentFilters";
 import { useState } from "react";
 import useDebounce from "../hooks/useDebounce";
 import StudentTable from "../components/students/StudentTable";
+import StudentPagination from "../components/students/StudentPagination";
 
 const StudentsPage = () => {
   const [search, setSearch] = useState("");
   const [classId, setClassId] = useState("");
   const [sectionId, setSectionId] = useState("");
+  const [currentPage, setCurrentPage] = useState(1);
   const debouncedSearch = useDebounce(search, 700);
+
   const { data, isLoading, isError, error } = useStudents({
     search: debouncedSearch,
     classId,
     sectionId,
+    page: currentPage,
+    limit: 10,
   });
   const { data: statsData, isLoading: isStatsLoading } = useStudentStats();
+
+  const pagination = data?.pagination;
 
   if (isError) {
     return (
@@ -34,6 +41,7 @@ const StudentsPage = () => {
     setSearch("");
     setClassId("");
     setSectionId("");
+    setCurrentPage(1);
   };
 
   const totalStudents =
@@ -46,14 +54,30 @@ const StudentsPage = () => {
       <StudentStats data={statsData} isLoading={isStatsLoading} />
       <StudentFilters
         search={search}
-        onSearchChange={setSearch}
+        onSearchChange={(value) => {
+          setSearch(value);
+          setCurrentPage(1);
+        }}
         classId={classId}
-        onClassChange={setClassId}
+        onClassChange={(value) => {
+          setClassId(value);
+          setCurrentPage(1);
+        }}
         sectionId={sectionId}
-        onSectionChange={setSectionId}
+        onSectionChange={(value) => {
+          setSectionId(value);
+          setCurrentPage(1);
+        }}
         onReset={handleResetFilters}
       />
       <StudentTable students={data?.students ?? []} isLoading={isLoading} />
+      {/* {pagination && pagination.totalPages > 1 && ( */}
+        <StudentPagination
+          page={pagination?.page || 1}
+          totalPages={pagination?.totalPages || 1}
+          onPageChange={setCurrentPage}
+        />
+      {/* )} */}
     </div>
   );
 };
