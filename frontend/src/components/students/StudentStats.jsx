@@ -7,66 +7,59 @@ import {
   TrendingUp,
 } from "lucide-react";
 
-const StudentStats = ({ data }) => {
-  // Extract or calculate stats from data
-  const studentsList = Array.isArray(data?.students) ? data.students : [];
+const StudentStats = ({ data, isLoading = false }) => {
+  if (isLoading) {
+    return (
+      <section
+        className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4"
+        aria-label="Loading student statistics"
+      >
+        {[1, 2, 3, 4].map((i) => (
+          <div
+            key={i}
+            className="animate-pulse rounded-xl border border-slate-200/80 bg-white p-5 shadow-xs"
+          >
+            <div className="flex items-center justify-between">
+              <div className="h-3.5 w-24 bg-slate-200 rounded"></div>
+              <div className="h-9 w-9 bg-slate-100 rounded-lg"></div>
+            </div>
+            <div className="mt-3.5 space-y-2">
+              <div className="h-7 w-20 bg-slate-200 rounded"></div>
+              <div className="h-3 w-32 bg-slate-100 rounded"></div>
+            </div>
+          </div>
+        ))}
+      </section>
+    );
+  }
 
-  const total =
-    typeof data?.totalStudents === "number"
-      ? data.totalStudents
-      : typeof data?.pagination?.total === "number"
-        ? data.pagination.total
-        : typeof data?.total === "number"
-          ? data.total
-          : studentsList.length || 0;
-
-  const active =
-    typeof data?.activeStudents === "number"
-      ? data.activeStudents
-      : studentsList.length > 0
-        ? studentsList.filter((s) => s.status === "ACTIVE").length
-        : total > 0
-          ? total - (data?.inactiveStudents || 0)
-          : 0;
-
-  const inactive =
-    typeof data?.inactiveStudents === "number"
-      ? data.inactiveStudents
-      : studentsList.length > 0
-        ? studentsList.filter((s) => s.status !== "ACTIVE").length
-        : 0;
-
-  const recentlyAdded =
-    typeof data?.recentlyAdded === "number"
-      ? data.recentlyAdded
-      : studentsList.length > 0
-        ? studentsList.filter((s) => {
-            if (!s.createdAt) return false;
-            const created = new Date(s.createdAt);
-            const thirtyDaysAgo = new Date();
-            thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
-            return created >= thirtyDaysAgo;
-          }).length
-        : 0;
+  const {
+    totalStudents = 0,
+    activeStudents = 0,
+    inactiveStudents = 0,
+    recentlyAdded = 0,
+  } = data || {};
 
   const activePercentage =
-    total > 0 ? ((active / total) * 100).toFixed(1) : "0.0";
+    totalStudents > 0
+      ? ((activeStudents / totalStudents) * 100).toFixed(1)
+      : "0.0";
 
   const stats = [
     {
       title: "Total Students",
-      value: total.toLocaleString(),
+      value: totalStudents.toLocaleString(),
       icon: GraduationCap,
       bg: "bg-indigo-50 text-indigo-600 ring-indigo-200/60",
       hoverBar: "bg-indigo-500",
       subtext: `${recentlyAdded} added recently`,
       subtextClass: "text-emerald-600 font-semibold",
       showTrend: recentlyAdded > 0,
-      description: "active academic term",
+      description: "active academic year",
     },
     {
       title: "Active Students",
-      value: active.toLocaleString(),
+      value: activeStudents.toLocaleString(),
       icon: UserCheck,
       bg: "bg-emerald-50 text-emerald-600 ring-emerald-200/60",
       hoverBar: "bg-emerald-500",
@@ -76,12 +69,12 @@ const StudentStats = ({ data }) => {
       progressWidth: `${Math.min(100, Math.max(0, parseFloat(activePercentage)))}%`,
     },
     {
-      title: "Inactive / Leave",
-      value: inactive.toLocaleString(),
+      title: "Inactive Students",
+      value: inactiveStudents.toLocaleString(),
       icon: UserX,
       bg: "bg-slate-100 text-slate-600 ring-slate-200/60",
       hoverBar: "bg-slate-500",
-      description: "Transferred or suspended",
+      description: "Currently inactive",
     },
     {
       title: "Recently Added",
