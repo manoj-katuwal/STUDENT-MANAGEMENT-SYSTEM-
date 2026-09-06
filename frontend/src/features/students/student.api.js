@@ -11,3 +11,9 @@ export const getStudents = async (params = {}) => {
   };
 };
 
+export const getStudentStats = async () => {
+  const response = await apiClient.get("/students/stats");
+
+  return response.data.data;
+};
+
