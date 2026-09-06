@@ -7,13 +7,15 @@ import StudentHeader from "../components/students/StudentHeader";
 import StudentStats from "../components/students/StudentStats";
 import StudentFilters from "../components/students/StudentFilters";
 import { useState } from "react";
+import useDebounce from "../hooks/useDebounce";
 
 const StudentsPage = () => {
   const [search, setSearch] = useState("");
   const [classId, setClassId] = useState("");
   const [sectionId, setSectionId] = useState("");
+  const debouncedSearch = useDebounce(search, 700);
   const { data, isLoading, isError, error } = useStudents({
-    search,
+    search: debouncedSearch,
     classId,
     sectionId,
   });
