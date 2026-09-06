@@ -72,11 +72,13 @@ const StudentsPage = () => {
       />
       <StudentTable students={data?.students ?? []} isLoading={isLoading} />
       {/* {pagination && pagination.totalPages > 1 && ( */}
-        <StudentPagination
-          page={pagination?.page || 1}
-          totalPages={pagination?.totalPages || 1}
-          onPageChange={setCurrentPage}
-        />
+      <StudentPagination
+        page={pagination?.page || 1}
+        totalPages={pagination?.totalPages || 1}
+        onPageChange={setCurrentPage}
+        limit={pagination?.limit || 10}
+        total={pagination?.total || 0}
+      />
       {/* )} */}
     </div>
   );
