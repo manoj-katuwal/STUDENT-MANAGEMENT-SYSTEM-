@@ -8,6 +8,7 @@ import StudentStats from "../components/students/StudentStats";
 import StudentFilters from "../components/students/StudentFilters";
 import { useState } from "react";
 import useDebounce from "../hooks/useDebounce";
+import StudentTable from "../components/students/StudentTable";
 
 const StudentsPage = () => {
   const [search, setSearch] = useState("");
@@ -52,6 +53,7 @@ const StudentsPage = () => {
         onSectionChange={setSectionId}
         onReset={handleResetFilters}
       />
+      <StudentTable students={data?.students ?? []} />
     </div>
   );
 };
