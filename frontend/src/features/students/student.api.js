@@ -17,3 +17,9 @@ export const getStudentStats = async () => {
   return response.data.data;
 };
 
+export const getStudentById = async (studentId) => {
+  const response = await apiClient.get(`/students/${studentId}`);
+
+  return response.data.data;
+};
+
