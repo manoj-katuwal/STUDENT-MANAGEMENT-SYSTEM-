@@ -6,7 +6,7 @@ import {
   useUpdateStudent,
 } from "../features/students/student.hooks";
 
-// Reusable section shell — same visual pattern as StudentDetailsPage's SectionCard
+// Reusable section shell
 const SectionCard = ({ icon: Icon, title, children }) => (
   <div className="bg-white border border-slate-200 rounded-xl shadow-sm px-5 py-4">
     <div className="flex items-center gap-2 mb-4">
@@ -19,18 +19,23 @@ const SectionCard = ({ icon: Icon, title, children }) => (
   </div>
 );
 
-// Reusable label + input wrapper
-const FormField = ({ label, children }) => (
+// Reusable label + input + error wrapper
+const FormField = ({ label, error, children }) => (
   <div>
     <label className="block text-sm font-medium text-slate-700 mb-1">
       {label}
     </label>
     {children}
+    {error && <p className="mt-1 text-xs text-red-600">{error}</p>}
   </div>
 );
 
-const inputClass =
-  "w-full px-3 py-2 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors";
+const inputClass = (hasError) =>
+  `w-full px-3 py-2 border ${
+    hasError
+      ? "border-red-500 focus:ring-red-500"
+      : "border-slate-200 focus:ring-blue-500"
+  } rounded-lg text-sm focus:outline-none focus:ring-2 focus:border-transparent transition-colors`;
 
 const StudentEditPage = () => {
   const navigate = useNavigate();
@@ -51,6 +56,8 @@ const StudentEditPage = () => {
     guardianRelationship: "",
     guardianPhone: "",
   });
+
+  const [errors, setErrors] = useState({});
 
   useEffect(() => {
     if (!student) return;
@@ -75,31 +82,71 @@ const StudentEditPage = () => {
       ...prev,
       [field]: e.target.value,
     }));
+    // Typo mistake reset errors on user change
+    if (errors[field]) {
+      setErrors((prev) => ({ ...prev, [field]: null }));
+    }
+  };
+
+  const validateForm = () => {
+    const newErrors = {};
+
+    if (!formData.name.trim()) {
+      newErrors.name = "Student name is required";
+    } else if (formData.name.trim().length < 2) {
+      newErrors.name = "Student name must be at least 2 characters";
+    }
+
+    if (!formData.admissionNumber.trim()) {
+      newErrors.admissionNumber = "Admission number is required";
+    }
+
+    if (formData.phone && !/^[0-9]{10}$/.test(formData.phone)) {
+      newErrors.phone = "Phone number must be exactly 10 digits";
+    }
+
+    if (formData.guardianPhone && !/^[0-9]{10}$/.test(formData.guardianPhone)) {
+      newErrors.guardianPhone = "Phone number must be exactly 10 digits";
+    }
+
+    return newErrors;
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    const updatedStudent = await updateStudentMutation.mutateAsync({
-      studentId,
-      data: {
-        name: formData.name,
-        admissionNumber: formData.admissionNumber,
-        dateOfBirth: formData.dateOfBirth || null,
-        gender: formData.gender || null,
-        phone: formData.phone || null,
-        address: formData.address || null,
-        classId: formData.classId,
-        sectionId: formData.sectionId,
-        guardian: {
-          name: formData.guardianName || null,
-          relationship: formData.guardianRelationship || null,
-          phone: formData.guardianPhone || null,
-        },
-      },
-    });
+    const validationErrors = validateForm();
+    if (Object.keys(validationErrors).length > 0) {
+      setErrors(validationErrors);
+      return;
+    }
 
-    navigate(`/students/${updatedStudent._id}`);
+    setErrors({});
+
+    try {
+      const updatedStudent = await updateStudentMutation.mutateAsync({
+        studentId,
+        data: {
+          name: formData.name.trim(),
+          admissionNumber: formData.admissionNumber.trim(),
+          dateOfBirth: formData.dateOfBirth || null,
+          gender: formData.gender || null,
+          phone: formData.phone || null,
+          address: formData.address.trim(),
+          classId: formData.classId,
+          sectionId: formData.sectionId,
+          guardian: {
+            name: formData.guardianName.trim() || null,
+            relationship: formData.guardianRelationship.trim() || null,
+            phone: formData.guardianPhone || null,
+          },
+        },
+      });
+
+      navigate(`/students/${updatedStudent._id}`);
+    } catch (err) {
+      console.error("Failed to update student:", err);
+    }
   };
 
   if (isLoading) {
@@ -140,38 +187,38 @@ const StudentEditPage = () => {
       <form onSubmit={handleSubmit} className="space-y-4">
         {/* Personal Information */}
         <SectionCard icon={User} title="Personal Information">
-          <FormField label="Student Name">
+          <FormField label="Student Name" error={errors.name}>
             <input
               type="text"
               value={formData.name}
               onChange={handleChange("name")}
-              className={inputClass}
+              className={inputClass(errors.name)}
             />
           </FormField>
 
-          <FormField label="Admission Number">
+          <FormField label="Admission Number" error={errors.admissionNumber}>
             <input
               type="text"
               value={formData.admissionNumber}
               onChange={handleChange("admissionNumber")}
-              className={inputClass}
+              className={inputClass(errors.admissionNumber)}
             />
           </FormField>
 
-          <FormField label="Date of Birth">
+          <FormField label="Date of Birth" error={errors.dateOfBirth}>
             <input
               type="date"
               value={formData.dateOfBirth}
               onChange={handleChange("dateOfBirth")}
-              className={inputClass}
+              className={inputClass(errors.dateOfBirth)}
             />
           </FormField>
 
-          <FormField label="Gender">
+          <FormField label="Gender" error={errors.gender}>
             <select
               value={formData.gender}
               onChange={handleChange("gender")}
-              className={inputClass}
+              className={inputClass(errors.gender)}
             >
               <option value="">Select Gender</option>
               <option value="Male">Male</option>
@@ -180,76 +227,74 @@ const StudentEditPage = () => {
             </select>
           </FormField>
 
-          <FormField label="Phone">
+          <FormField label="Phone" error={errors.phone}>
             <input
               type="text"
               value={formData.phone}
               onChange={handleChange("phone")}
-              className={inputClass}
+              className={inputClass(errors.phone)}
             />
           </FormField>
 
-          <FormField label="Address">
+          <FormField label="Address" error={errors.address}>
             <input
               type="text"
               value={formData.address}
               onChange={handleChange("address")}
-              className={inputClass}
+              className={inputClass(errors.address)}
             />
           </FormField>
         </SectionCard>
 
         {/* Academic Information */}
         <SectionCard icon={GraduationCap} title="Academic Information">
-          <FormField label="Class">
+          <FormField label="Class" error={errors.classId}>
             <select
               value={formData.classId}
               onChange={handleChange("classId")}
-              className={inputClass}
+              className={inputClass(errors.classId)}
             >
               <option value="">Select Class</option>
-              {/* options will come from real class data in a later step */}
             </select>
           </FormField>
 
-          <FormField label="Section">
+          <FormField label="Section" error={errors.sectionId}>
             <select
               value={formData.sectionId}
               onChange={handleChange("sectionId")}
-              className={inputClass}
+              className={inputClass(errors.sectionId)}
             >
               <option value="">Select Section</option>
-              {/* options will come from real section data in a later step */}
             </select>
           </FormField>
         </SectionCard>
 
         {/* Guardian Information */}
         <SectionCard icon={Users} title="Guardian Information">
-          <FormField label="Guardian Name">
+          <FormField label="Guardian Name" error={errors.guardianName}>
             <input
               type="text"
               value={formData.guardianName}
               onChange={handleChange("guardianName")}
-              className={inputClass}
+              className={inputClass(errors.guardianName)}
             />
           </FormField>
 
-          <FormField label="Relationship">
+          <FormField label="Relationship" error={errors.guardianRelationship}>
             <input
               type="text"
               value={formData.guardianRelationship}
               onChange={handleChange("guardianRelationship")}
-              className={inputClass}
+              className={inputClass(errors.guardianRelationship)}
             />
           </FormField>
 
-          <FormField label="Guardian Phone">
+          <FormField label="Guardian Phone" error={errors.guardianPhone}>
             <input
               type="text"
               value={formData.guardianPhone}
               onChange={handleChange("guardianPhone")}
-              className={inputClass}
+              className={inputClass(errors.guardianPhone)}
             />
           </FormField>
         </SectionCard>
@@ -266,7 +311,7 @@ const StudentEditPage = () => {
           <button
             type="submit"
             disabled={updateStudentMutation.isPending}
-            className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium rounded-lg shadow-sm transition-colors"
+            className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium rounded-lg shadow-sm transition-colors disabled:opacity-50"
           >
             {updateStudentMutation.isPending ? "Saving..." : "Save Changes"}
           </button>
