@@ -1,6 +1,6 @@
 import React from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import { ArrowLeft, User, GraduationCap, Users } from "lucide-react";
+import { ArrowLeft, User, GraduationCap, Users, Pencil } from "lucide-react";
 import { useStudent } from "../features/students/student.hooks";
 import formatDate from "../utils/formatDate";
 
@@ -34,8 +34,13 @@ const SectionCard = ({ icon: Icon, title, children }) => (
 const StudentDetailsPage = () => {
   const { studentId } = useParams();
   const navigate = useNavigate();
-  const { data: student, isLoading, isError, error, refetch } = useStudent(studentId);
-
+  const {
+    data: student,
+    isLoading,
+    isError,
+    error,
+    refetch,
+  } = useStudent(studentId);
 
   if (isLoading) {
     return (
@@ -91,40 +96,30 @@ const StudentDetailsPage = () => {
     );
   }
 
-//   if (isError) {
-//     return (
-//       <div className="max-w-4xl mx-auto py-6 px-4">
-//         <p className="text-sm text-red-600">
-//           {error?.message || "Failed to load student"}
-//         </p>
-//       </div>
-//     );
-//   }
+  if (isError) {
+    return (
+      <div className="max-w-4xl mx-auto py-10 px-4">
+        <div className="bg-white border border-slate-200 rounded-xl shadow-sm px-6 py-8 text-center">
+          <p className="text-sm font-semibold text-slate-800">
+            Failed to load student details
+          </p>
 
+          <p className="text-sm text-slate-500 mt-1">
+            {error?.message ||
+              "Something went wrong while loading the student."}
+          </p>
 
-if (isError) {
-  return (
-    <div className="max-w-4xl mx-auto py-10 px-4">
-      <div className="bg-white border border-slate-200 rounded-xl shadow-sm px-6 py-8 text-center">
-        <p className="text-sm font-semibold text-slate-800">
-          Failed to load student details
-        </p>
-
-        <p className="text-sm text-slate-500 mt-1">
-          {error?.message || "Something went wrong while loading the student."}
-        </p>
-
-        <button
-          type="button"
-          onClick={() => refetch()}
-          className="mt-4 inline-flex items-center px-4 py-2 text-sm font-medium text-white bg-slate-900 rounded-lg hover:bg-slate-800 transition-colors"
-        >
-          Try Again
-        </button>
+          <button
+            type="button"
+            onClick={() => refetch()}
+            className="mt-4 inline-flex items-center px-4 py-2 text-sm font-medium text-white bg-slate-900 rounded-lg hover:bg-slate-800 transition-colors"
+          >
+            Try Again
+          </button>
+        </div>
       </div>
-    </div>
-  );
-}
+    );
+  }
 
   const isActive = student?.status === "ACTIVE";
 
@@ -133,35 +128,51 @@ if (isError) {
       {/* Header */}
       <div className="bg-white border border-slate-200 rounded-xl shadow-sm px-5 py-4">
         <button
-          onClick={() => navigate(-1)}
+          onClick={() => navigate("/students")}
           className="inline-flex items-center gap-1.5 text-sm font-medium text-slate-500 hover:text-slate-800 transition-colors mb-3"
         >
           <ArrowLeft className="w-4 h-4" />
           <span>Back</span>
         </button>
 
-        <div className="flex items-center flex-wrap gap-3">
-          <h1 className="text-xl font-bold text-slate-900 tracking-tight">
-            {student?.name}
-          </h1>
-          <span
-            className={`text-[11px] font-semibold px-2.5 py-1 rounded-full border ${
-              isActive
-                ? "bg-emerald-50 text-emerald-600 border-emerald-100"
-                : "bg-slate-100 text-slate-500 border-slate-200"
-            }`}
+        <div className="flex items-center justify-between gap-4 flex-wrap">
+          <div>
+            <div className="flex items-center gap-3 flex-wrap">
+              <h1 className="text-xl font-bold text-slate-900 tracking-tight">
+                {student?.name}
+              </h1>
+              <span
+                className={`text-[11px] font-semibold px-2.5 py-1 rounded-full border ${
+                  isActive
+                    ? "bg-emerald-50 text-emerald-600 border-emerald-100"
+                    : "bg-slate-100 text-slate-500 border-slate-200"
+                }`}
+              >
+                {isActive ? "Active" : "Inactive"}
+              </span>
+            </div>
+            <p className="text-sm text-slate-500 mt-1">
+              Admission No. {student?.admissionNumber}
+            </p>
+          </div>
+
+          <button
+            type="button"
+            onClick={() => navigate(`/students/${studentId}/edit`)}
+            className="inline-flex items-center gap-1.5 px-3 py-2 text-sm font-medium text-slate-700 bg-slate-100 rounded-lg hover:bg-slate-200 transition-colors"
           >
-            {isActive ? "Active" : "Inactive"}
-          </span>
+            <Pencil className="w-4 h-4" />
+            <span>Edit Student</span>
+          </button>
         </div>
-        <p className="text-sm text-slate-500 mt-1">
-          Admission No. {student?.admissionNumber}
-        </p>
       </div>
 
       {/* Personal Information */}
       <SectionCard icon={User} title="Personal Information">
-        <DetailField label="Date of Birth" value={formatDate(student?.dateOfBirth)} />
+        <DetailField
+          label="Date of Birth"
+          value={formatDate(student?.dateOfBirth)}
+        />
         <DetailField label="Gender" value={student?.gender} />
         <DetailField label="Phone" value={student?.phone} />
         <DetailField label="Address" value={student?.address} />

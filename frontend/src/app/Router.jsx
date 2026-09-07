@@ -14,6 +14,7 @@ import MyFeesPage from "../pages/MyFeesPage";
 import AppLayout from "../components/layout/AppLayout";
 import StudentsPage from "../pages/StudentPage";
 import StudentDetailsPage from "../pages/StudentDetailsPage";
+import StudentEditPage from "../pages/StudentEditPage";
 
 const Router = () => {
   return (
@@ -42,6 +43,10 @@ const Router = () => {
                 <Route
                   path="/students/:studentId"
                   element={<StudentDetailsPage />}
+                />
+                <Route
+                  path="/students/:studentId/edit"
+                  element={<StudentEditPage />}
                 />
               </Route>
               {/* ADMIN AND ACCOUNTANT  */}
