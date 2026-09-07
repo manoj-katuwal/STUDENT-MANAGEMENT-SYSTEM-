@@ -57,12 +57,16 @@ const StudentEditPage = () => {
     guardianPhone: "",
   });
 
+  // Track initial state to disable save button if unchanged
+  const [initialFormData, setInitialFormData] = useState(null);
   const [errors, setErrors] = useState({});
+  // 1. Server error state
+  const [submitError, setSubmitError] = useState("");
 
   useEffect(() => {
     if (!student) return;
 
-    setFormData({
+    const initialData = {
       name: student.name || "",
       admissionNumber: student.admissionNumber || "",
       dateOfBirth: student.dateOfBirth ? student.dateOfBirth.slice(0, 10) : "",
@@ -74,7 +78,10 @@ const StudentEditPage = () => {
       guardianName: student.guardian?.name || "",
       guardianRelationship: student.guardian?.relationship || "",
       guardianPhone: student.guardian?.phone || "",
-    });
+    };
+
+    setFormData(initialData);
+    setInitialFormData(initialData);
   }, [student]);
 
   const handleChange = (field) => (e) => {
@@ -82,7 +89,7 @@ const StudentEditPage = () => {
       ...prev,
       [field]: e.target.value,
     }));
-    // Typo mistake reset errors on user change
+
     if (errors[field]) {
       setErrors((prev) => ({ ...prev, [field]: null }));
     }
@@ -115,6 +122,9 @@ const StudentEditPage = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
+    // 2. Submit अघि clear गर्ने
+    setSubmitError("");
+
     const validationErrors = validateForm();
     if (Object.keys(validationErrors).length > 0) {
       setErrors(validationErrors);
@@ -145,9 +155,18 @@ const StudentEditPage = () => {
 
       navigate(`/students/${updatedStudent._id}`);
     } catch (err) {
-      console.error("Failed to update student:", err);
+      // 3. catch replace
+      setSubmitError(
+        err?.response?.data?.message ||
+          err?.message ||
+          "Failed to update student",
+      );
     }
   };
+
+  // Form मा केही परिवर्तन भएको छ कि छैन चेक गर्ने
+  const isFormUnchanged =
+    JSON.stringify(formData) === JSON.stringify(initialFormData);
 
   if (isLoading) {
     return (
@@ -183,6 +202,13 @@ const StudentEditPage = () => {
           Edit Student
         </h1>
       </div>
+
+      {/* 4. Form माथि error banner */}
+      {submitError && (
+        <div className="rounded-lg border border-red-200 bg-red-50 px-4 py-3">
+          <p className="text-sm font-medium text-red-700">{submitError}</p>
+        </div>
+      )}
 
       <form onSubmit={handleSubmit} className="space-y-4">
         {/* Personal Information */}
@@ -308,10 +334,12 @@ const StudentEditPage = () => {
           >
             Cancel
           </button>
+
+          {/* 5. Save button logic */}
           <button
             type="submit"
-            disabled={updateStudentMutation.isPending}
-            className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium rounded-lg shadow-sm transition-colors disabled:opacity-50"
+            disabled={updateStudentMutation.isPending || isFormUnchanged}
+            className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium rounded-lg shadow-sm transition-colors disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:bg-blue-600"
           >
             {updateStudentMutation.isPending ? "Saving..." : "Save Changes"}
           </button>
