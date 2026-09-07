@@ -1,5 +1,10 @@
-import { keepPreviousData, useQuery } from "@tanstack/react-query";
-import { getStudentById, getStudents, getStudentStats, updateStudent } from "./student.api";
+import { keepPreviousData, useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import {
+  getStudentById,
+  getStudents,
+  getStudentStats,
+  updateStudent,
+} from "./student.api";
 
 export const useStudents = (params = {}) => {
   return useQuery({
@@ -24,8 +29,27 @@ export const useStudent = (studentId) => {
   });
 };
 
+
+
 export const useUpdateStudent = () => {
+  const queryClient = useQueryClient();
+
   return useMutation({
     mutationFn: ({ studentId, data }) => updateStudent(studentId, data),
+
+    onSuccess: (updatedStudent, variables) => {
+      queryClient.setQueryData(
+        ["student", variables.studentId],
+        updatedStudent,
+      );
+
+      queryClient.invalidateQueries({
+        queryKey: ["students"],
+      });
+
+      queryClient.invalidateQueries({
+        queryKey: ["student-stats"],
+      });
+    },
   });
 };

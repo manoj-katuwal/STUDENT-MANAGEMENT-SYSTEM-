@@ -1,7 +1,10 @@
 import React, { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { ArrowLeft, User, GraduationCap, Users } from "lucide-react";
-import { useStudent } from "../features/students/student.hooks";
+import {
+  useStudent,
+  useUpdateStudent,
+} from "../features/students/student.hooks";
 
 // Reusable section shell — same visual pattern as StudentDetailsPage's SectionCard
 const SectionCard = ({ icon: Icon, title, children }) => (
@@ -32,6 +35,7 @@ const inputClass =
 const StudentEditPage = () => {
   const navigate = useNavigate();
   const { studentId } = useParams();
+  const updateStudentMutation = useUpdateStudent();
   const { data: student, isLoading, isError, error } = useStudent(studentId);
 
   const [formData, setFormData] = useState({
@@ -73,9 +77,29 @@ const StudentEditPage = () => {
     }));
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    // No API call yet — wiring comes in a later step
+
+    const updatedStudent = await updateStudentMutation.mutateAsync({
+      studentId,
+      data: {
+        name: formData.name,
+        admissionNumber: formData.admissionNumber,
+        dateOfBirth: formData.dateOfBirth || null,
+        gender: formData.gender || null,
+        phone: formData.phone || null,
+        address: formData.address || null,
+        classId: formData.classId,
+        sectionId: formData.sectionId,
+        guardian: {
+          name: formData.guardianName || null,
+          relationship: formData.guardianRelationship || null,
+          phone: formData.guardianPhone || null,
+        },
+      },
+    });
+
+    navigate(`/students/${updatedStudent._id}`);
   };
 
   if (isLoading) {
@@ -241,9 +265,10 @@ const StudentEditPage = () => {
           </button>
           <button
             type="submit"
+            disabled={updateStudentMutation.isPending}
             className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium rounded-lg shadow-sm transition-colors"
           >
-            Save Changes
+            {updateStudentMutation.isPending ? "Saving..." : "Save Changes"}
           </button>
         </div>
       </form>
