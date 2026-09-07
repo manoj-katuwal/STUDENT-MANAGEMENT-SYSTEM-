@@ -1,6 +1,7 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { ArrowLeft, User, GraduationCap, Users } from "lucide-react";
+import { useStudent } from "../features/students/student.hooks";
 
 // Reusable section shell — same visual pattern as StudentDetailsPage's SectionCard
 const SectionCard = ({ icon: Icon, title, children }) => (
@@ -15,7 +16,7 @@ const SectionCard = ({ icon: Icon, title, children }) => (
   </div>
 );
 
-// Reusable label + input wrapper, so we're not repeating the label/className block 11 times
+// Reusable label + input wrapper
 const FormField = ({ label, children }) => (
   <div>
     <label className="block text-sm font-medium text-slate-700 mb-1">
@@ -31,6 +32,7 @@ const inputClass =
 const StudentEditPage = () => {
   const navigate = useNavigate();
   const { studentId } = useParams();
+  const { data: student, isLoading, isError, error } = useStudent(studentId);
 
   const [formData, setFormData] = useState({
     name: "",
@@ -46,6 +48,24 @@ const StudentEditPage = () => {
     guardianPhone: "",
   });
 
+  useEffect(() => {
+    if (!student) return;
+
+    setFormData({
+      name: student.name || "",
+      admissionNumber: student.admissionNumber || "",
+      dateOfBirth: student.dateOfBirth ? student.dateOfBirth.slice(0, 10) : "",
+      gender: student.gender || "",
+      phone: student.phone || "",
+      address: student.address || "",
+      classId: student.classId?._id || "",
+      sectionId: student.sectionId?._id || "",
+      guardianName: student.guardian?.name || "",
+      guardianRelationship: student.guardian?.relationship || "",
+      guardianPhone: student.guardian?.phone || "",
+    });
+  }, [student]);
+
   const handleChange = (field) => (e) => {
     setFormData((prev) => ({
       ...prev,
@@ -57,6 +77,24 @@ const StudentEditPage = () => {
     e.preventDefault();
     // No API call yet — wiring comes in a later step
   };
+
+  if (isLoading) {
+    return (
+      <div className="max-w-4xl mx-auto py-6 px-4">
+        <p className="text-sm text-slate-500">Loading student...</p>
+      </div>
+    );
+  }
+
+  if (isError) {
+    return (
+      <div className="max-w-4xl mx-auto py-6 px-4">
+        <p className="text-sm text-red-600">
+          {error?.message || "Failed to load student"}
+        </p>
+      </div>
+    );
+  }
 
   return (
     <div className="max-w-4xl mx-auto py-6 px-4 space-y-4">
