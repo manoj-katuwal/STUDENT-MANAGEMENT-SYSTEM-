@@ -29,3 +29,9 @@ export const updateStudent = async (studentId, data) => {
   return response.data.data;
 };
 
+export const createStudent = async (data) => {
+  const response = await apiClient.post("/students", data);
+
+  return response.data.data;
+};
+

@@ -1,5 +1,6 @@
 import { keepPreviousData, useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import {
+  createStudent,
   getStudentById,
   getStudents,
   getStudentStats,
@@ -43,6 +44,25 @@ export const useUpdateStudent = () => {
         updatedStudent,
       );
 
+      queryClient.invalidateQueries({
+        queryKey: ["students"],
+      });
+
+      queryClient.invalidateQueries({
+        queryKey: ["student-stats"],
+      });
+    },
+  });
+};
+
+
+export const useCreateStudent = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: createStudent,
+
+    onSuccess: () => {
       queryClient.invalidateQueries({
         queryKey: ["students"],
       });
