@@ -162,6 +162,9 @@ const StudentsTable = ({ students = [], isLoading = false }) => {
                           type="button"
                           className="p-1.5 text-slate-500 hover:text-amber-600 hover:bg-amber-50 rounded-lg transition-colors"
                           title="Edit Student"
+                          onClick={() =>
+                            navigate(`/students/${student._id}/edit`)
+                          }
                         >
                           <Edit3 className="w-4 h-4" />
                         </button>
