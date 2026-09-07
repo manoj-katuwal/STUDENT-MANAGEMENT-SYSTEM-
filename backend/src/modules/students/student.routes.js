@@ -29,7 +29,6 @@ router.post(
   createStudentController,
 );
 
-
 router.get("/", authenticate, authorize("ADMIN"), getStudentsController);
 
 router.get(
@@ -42,13 +41,13 @@ router.get(
   "/:id",
   authenticate,
   authorize("ADMIN"),
-  validateQuery(listStudentsQuerySchema),
+  // No query validation needed for fetching a single student by ID
   getStudentByIdController,
 );
 router.patch(
   "/:id",
   authenticate,
-  authorize("ADMIN"), 
+  authorize("ADMIN"),
   validate(updateStudentSchema),
   updateStudentController,
 );
