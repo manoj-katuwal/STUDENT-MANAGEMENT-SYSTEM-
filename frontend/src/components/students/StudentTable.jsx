@@ -1,7 +1,9 @@
 import React from "react";
 import { Eye, Edit3, Phone } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 
 const StudentsTable = ({ students = [], isLoading = false }) => {
+  const navigate = useNavigate();
   return (
     <div className="w-full overflow-hidden bg-white border border-slate-200 rounded-xl shadow-sm">
       <div className="overflow-x-auto">
@@ -152,6 +154,7 @@ const StudentsTable = ({ students = [], isLoading = false }) => {
                           type="button"
                           className="p-1.5 text-slate-500 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
                           title="View Details"
+                          onClick={() => navigate(`/students/${student._id}`)}
                         >
                           <Eye className="w-4 h-4" />
                         </button>

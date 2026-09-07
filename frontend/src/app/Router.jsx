@@ -13,6 +13,7 @@ import ReportsPage from "../pages/ReportsPage";
 import MyFeesPage from "../pages/MyFeesPage";
 import AppLayout from "../components/layout/AppLayout";
 import StudentsPage from "../pages/StudentPage";
+import StudentDetailsPage from "../pages/StudentDetailsPage";
 
 const Router = () => {
   return (
@@ -38,6 +39,10 @@ const Router = () => {
                 }
               >
                 <Route path="/students" element={<StudentsPage />} />
+                <Route
+                  path="/students/:studentId"
+                  element={<StudentDetailsPage />}
+                />
               </Route>
               {/* ADMIN AND ACCOUNTANT  */}
               <Route
