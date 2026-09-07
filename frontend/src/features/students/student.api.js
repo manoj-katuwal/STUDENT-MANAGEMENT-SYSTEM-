@@ -23,3 +23,9 @@ export const getStudentById = async (studentId) => {
   return response.data.data;
 };
 
+export const updateStudent = async (studentId, data) => {
+  const response = await apiClient.patch(`/students/${studentId}`, data);
+
+  return response.data.data;
+};
+
