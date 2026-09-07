@@ -15,6 +15,7 @@ import AppLayout from "../components/layout/AppLayout";
 import StudentsPage from "../pages/StudentPage";
 import StudentDetailsPage from "../pages/StudentDetailsPage";
 import StudentEditPage from "../pages/StudentEditPage";
+import StudentAddPage from "../pages/StudentAddPage";
 
 const Router = () => {
   return (
@@ -48,6 +49,7 @@ const Router = () => {
                   path="/students/:studentId/edit"
                   element={<StudentEditPage />}
                 />
+                <Route path="/students/new" element={<StudentAddPage />} />
               </Route>
               {/* ADMIN AND ACCOUNTANT  */}
               <Route
