@@ -36,10 +36,57 @@ const StudentDetailsPage = () => {
   const navigate = useNavigate();
   const { data: student, isLoading, isError, error } = useStudent(studentId);
 
+
   if (isLoading) {
     return (
-      <div className="max-w-4xl mx-auto py-6 px-4">
-        <p className="text-sm text-slate-500">Loading student details...</p>
+      <div className="max-w-4xl mx-auto py-6 px-4 space-y-4 animate-pulse">
+        <div className="bg-white border border-slate-200 rounded-xl shadow-sm px-5 py-5">
+          <div className="h-4 w-16 bg-slate-200 rounded mb-4" />
+          <div className="h-6 w-56 bg-slate-200 rounded" />
+          <div className="h-4 w-40 bg-slate-200 rounded mt-2" />
+        </div>
+
+        <div className="bg-white border border-slate-200 rounded-xl shadow-sm px-5 py-5">
+          <div className="h-4 w-40 bg-slate-200 rounded mb-5" />
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+            <div>
+              <div className="h-3 w-24 bg-slate-200 rounded mb-2" />
+              <div className="h-4 w-32 bg-slate-200 rounded" />
+            </div>
+
+            <div>
+              <div className="h-3 w-16 bg-slate-200 rounded mb-2" />
+              <div className="h-4 w-24 bg-slate-200 rounded" />
+            </div>
+
+            <div>
+              <div className="h-3 w-20 bg-slate-200 rounded mb-2" />
+              <div className="h-4 w-28 bg-slate-200 rounded" />
+            </div>
+
+            <div>
+              <div className="h-3 w-20 bg-slate-200 rounded mb-2" />
+              <div className="h-4 w-40 bg-slate-200 rounded" />
+            </div>
+          </div>
+        </div>
+
+        <div className="bg-white border border-slate-200 rounded-xl shadow-sm px-5 py-5">
+          <div className="h-4 w-44 bg-slate-200 rounded mb-5" />
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+            <div>
+              <div className="h-3 w-16 bg-slate-200 rounded mb-2" />
+              <div className="h-4 w-32 bg-slate-200 rounded" />
+            </div>
+
+            <div>
+              <div className="h-3 w-20 bg-slate-200 rounded mb-2" />
+              <div className="h-4 w-24 bg-slate-200 rounded" />
+            </div>
+          </div>
+        </div>
       </div>
     );
   }
