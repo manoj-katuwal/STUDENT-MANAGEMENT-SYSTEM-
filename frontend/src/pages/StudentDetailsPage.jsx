@@ -34,7 +34,7 @@ const SectionCard = ({ icon: Icon, title, children }) => (
 const StudentDetailsPage = () => {
   const { studentId } = useParams();
   const navigate = useNavigate();
-  const { data: student, isLoading, isError, error } = useStudent(studentId);
+  const { data: student, isLoading, isError, error, refetch } = useStudent(studentId);
 
 
   if (isLoading) {
@@ -91,15 +91,40 @@ const StudentDetailsPage = () => {
     );
   }
 
-  if (isError) {
-    return (
-      <div className="max-w-4xl mx-auto py-6 px-4">
-        <p className="text-sm text-red-600">
-          {error?.message || "Failed to load student"}
+//   if (isError) {
+//     return (
+//       <div className="max-w-4xl mx-auto py-6 px-4">
+//         <p className="text-sm text-red-600">
+//           {error?.message || "Failed to load student"}
+//         </p>
+//       </div>
+//     );
+//   }
+
+
+if (isError) {
+  return (
+    <div className="max-w-4xl mx-auto py-10 px-4">
+      <div className="bg-white border border-slate-200 rounded-xl shadow-sm px-6 py-8 text-center">
+        <p className="text-sm font-semibold text-slate-800">
+          Failed to load student details
         </p>
+
+        <p className="text-sm text-slate-500 mt-1">
+          {error?.message || "Something went wrong while loading the student."}
+        </p>
+
+        <button
+          type="button"
+          onClick={() => refetch()}
+          className="mt-4 inline-flex items-center px-4 py-2 text-sm font-medium text-white bg-slate-900 rounded-lg hover:bg-slate-800 transition-colors"
+        >
+          Try Again
+        </button>
       </div>
-    );
-  }
+    </div>
+  );
+}
 
   const isActive = student?.status === "ACTIVE";
 
