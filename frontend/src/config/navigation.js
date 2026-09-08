@@ -5,6 +5,7 @@ import {
   BarChart3,
   Wallet,
   Users2,
+  GraduationCap,
 } from "lucide-react";
 
 export const NAV_ITEMS = [
@@ -54,7 +55,15 @@ export const NAV_ITEMS = [
     icon: Users2,
     group: "null",
     allowedRoles: ["ADMIN", "ACCOUNTANT", "PRINCIPAL"],
-  }
+  },
+
+  {
+    label: "Classes",
+    path: "/classes",
+    icon: GraduationCap,
+    group: "null",
+    allowedRoles: ["ADMIN"],
+  },
 ];
 
 export const getNavItemsForRole = (role) => {

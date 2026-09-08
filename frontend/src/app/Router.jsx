@@ -16,6 +16,7 @@ import StudentsPage from "../pages/StudentPage";
 import StudentDetailsPage from "../pages/StudentDetailsPage";
 import StudentEditPage from "../pages/StudentEditPage";
 import StudentAddPage from "../pages/StudentAddPage";
+import ClassesPage from "../pages/ClassesPage";
 
 const Router = () => {
   return (
@@ -31,6 +32,12 @@ const Router = () => {
               {/* ADMIN */}
               <Route element={<RoleRoute allowedRoles={["ADMIN"]} />}>
                 <Route path="/users" element={<UsersPage />} />
+              </Route>
+
+              <Route element={<RoleRoute allowedRoles={["ADMIN"]} />}>
+                <Route path="/classes" element={<ClassesPage />} />
+               
+              
               </Route>
 
               <Route
