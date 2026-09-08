@@ -1,7 +1,17 @@
 import React from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import { ArrowLeft, User, GraduationCap, Users, Pencil } from "lucide-react";
-import { useStudent } from "../features/students/student.hooks";
+import {
+  ArrowLeft,
+  User,
+  GraduationCap,
+  Users,
+  Pencil,
+  Power,
+} from "lucide-react";
+import {
+  useStudent,
+  useUpdateStudentStatus,
+} from "../features/students/student.hooks";
 import formatDate from "../utils/formatDate";
 
 // Small reusable field for label + value pairs inside a section card
@@ -34,6 +44,7 @@ const SectionCard = ({ icon: Icon, title, children }) => (
 const StudentDetailsPage = () => {
   const { studentId } = useParams();
   const navigate = useNavigate();
+
   const {
     data: student,
     isLoading,
@@ -41,6 +52,8 @@ const StudentDetailsPage = () => {
     error,
     refetch,
   } = useStudent(studentId);
+
+  const updateStatusMutation = useUpdateStudentStatus();
 
   if (isLoading) {
     return (
@@ -53,23 +66,19 @@ const StudentDetailsPage = () => {
 
         <div className="bg-white border border-slate-200 rounded-xl shadow-sm px-5 py-5">
           <div className="h-4 w-40 bg-slate-200 rounded mb-5" />
-
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
             <div>
               <div className="h-3 w-24 bg-slate-200 rounded mb-2" />
               <div className="h-4 w-32 bg-slate-200 rounded" />
             </div>
-
             <div>
               <div className="h-3 w-16 bg-slate-200 rounded mb-2" />
               <div className="h-4 w-24 bg-slate-200 rounded" />
             </div>
-
             <div>
               <div className="h-3 w-20 bg-slate-200 rounded mb-2" />
               <div className="h-4 w-28 bg-slate-200 rounded" />
             </div>
-
             <div>
               <div className="h-3 w-20 bg-slate-200 rounded mb-2" />
               <div className="h-4 w-40 bg-slate-200 rounded" />
@@ -79,13 +88,11 @@ const StudentDetailsPage = () => {
 
         <div className="bg-white border border-slate-200 rounded-xl shadow-sm px-5 py-5">
           <div className="h-4 w-44 bg-slate-200 rounded mb-5" />
-
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
             <div>
               <div className="h-3 w-16 bg-slate-200 rounded mb-2" />
               <div className="h-4 w-32 bg-slate-200 rounded" />
             </div>
-
             <div>
               <div className="h-3 w-20 bg-slate-200 rounded mb-2" />
               <div className="h-4 w-24 bg-slate-200 rounded" />
@@ -103,12 +110,10 @@ const StudentDetailsPage = () => {
           <p className="text-sm font-semibold text-slate-800">
             Failed to load student details
           </p>
-
           <p className="text-sm text-slate-500 mt-1">
             {error?.message ||
               "Something went wrong while loading the student."}
           </p>
-
           <button
             type="button"
             onClick={() => refetch()}
@@ -122,6 +127,13 @@ const StudentDetailsPage = () => {
   }
 
   const isActive = student?.status === "ACTIVE";
+
+  const handleToggleStatus = () => {
+    updateStatusMutation.mutate({
+      studentId,
+      status: isActive ? "INACTIVE" : "ACTIVE",
+    });
+  };
 
   return (
     <div className="max-w-4xl mx-auto py-6 px-4 space-y-4">
@@ -156,14 +168,36 @@ const StudentDetailsPage = () => {
             </p>
           </div>
 
-          <button
-            type="button"
-            onClick={() => navigate(`/students/${studentId}/edit`)}
-            className="inline-flex items-center gap-1.5 px-3 py-2 text-sm font-medium text-slate-700 bg-slate-100 rounded-lg hover:bg-slate-200 transition-colors"
-          >
-            <Pencil className="w-4 h-4" />
-            <span>Edit Student</span>
-          </button>
+          <div className="flex items-center gap-2">
+            <button
+              type="button"
+              disabled={updateStatusMutation.isPending}
+              onClick={handleToggleStatus}
+              className={`inline-flex items-center gap-1.5 px-3 py-2 text-sm font-medium rounded-lg transition-colors disabled:opacity-50 ${
+                isActive
+                  ? "bg-rose-50 text-rose-600 hover:bg-rose-100 border border-rose-200"
+                  : "bg-emerald-50 text-emerald-700 hover:bg-emerald-100 border border-emerald-200"
+              }`}
+            >
+              <Power className="w-4 h-4" />
+              <span>
+                {updateStatusMutation.isPending
+                  ? "Updating..."
+                  : isActive
+                    ? "Deactivate Student"
+                    : "Activate Student"}
+              </span>
+            </button>
+
+            <button
+              type="button"
+              onClick={() => navigate(`/students/${studentId}/edit`)}
+              className="inline-flex items-center gap-1.5 px-3 py-2 text-sm font-medium text-slate-700 bg-slate-100 border border-slate-200 rounded-lg hover:bg-slate-200 transition-colors"
+            >
+              <Pencil className="w-4 h-4" />
+              <span>Edit Student</span>
+            </button>
+          </div>
         </div>
       </div>
 
