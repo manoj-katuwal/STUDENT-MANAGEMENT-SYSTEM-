@@ -11,6 +11,7 @@ import {
   createClass,
   updateClass,
   updateClassStatus,
+  getClassStats,
 } from "./class.api";
 
 export const useClasses = (params = {}) => {
@@ -72,5 +73,13 @@ export const useUpdateClassStatus = () => {
         queryKey: ["classes"],
       });
     },
+  });
+};
+
+
+export const useClassStats = () => {
+  return useQuery({
+    queryKey: ["class-stats"],
+    queryFn: getClassStats,
   });
 };

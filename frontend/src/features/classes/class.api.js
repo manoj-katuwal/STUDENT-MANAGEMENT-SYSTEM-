@@ -36,3 +36,9 @@ export const updateClassStatus = async (classId, status) => {
 
   return response.data.data;
 };
+
+export const getClassStats = async () => {
+  const response = await apiClient.get("/classes/stats");
+
+  return response.data.data;
+};
