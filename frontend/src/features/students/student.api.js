@@ -44,11 +44,16 @@ export const updateStudentStatus = async (studentId, status) => {
 };
 
 export const exportStudentsCsv = async (params = {}) => {
+  const cleanParams = Object.fromEntries(
+    Object.entries(params).filter(
+      ([_, value]) => value !== undefined && value !== null && value !== "",
+    ),
+  );
+
   const response = await apiClient.get("/students/export/csv", {
-    params,
+    params: cleanParams,
     responseType: "blob",
   });
 
   return response.data;
 };
-

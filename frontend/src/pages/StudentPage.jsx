@@ -47,11 +47,22 @@ const StudentsPage = () => {
   };
 
   const handleExportCsv = async () => {
+    console.log("🚀 [Export CSV] Starting export with params:", {
+      search: debouncedSearch,
+      classId,
+      sectionId,
+    });
+
     try {
       const blob = await exportStudentsMutation.mutateAsync({
         search: debouncedSearch,
         classId,
         sectionId,
+      });
+
+      console.log("📦 [Export CSV] Blob received successfully:", {
+        size: `${(blob.size / 1024).toFixed(2)} KB`,
+        type: blob.type,
       });
 
       const url = window.URL.createObjectURL(blob);
@@ -65,8 +76,9 @@ const StudentsPage = () => {
       link.remove();
 
       window.URL.revokeObjectURL(url);
+      console.log("✅ [Export CSV] Download initiated and completed!");
     } catch (error) {
-      console.error("Failed to export students:", error);
+      console.error("❌ [Export CSV] Failed to export students:", error);
     }
   };
 

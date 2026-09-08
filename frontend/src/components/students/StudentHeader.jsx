@@ -2,7 +2,7 @@ import React from "react";
 import { Upload, Plus } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 
-const StudentHeader = ({ onExport, isExporting }) => {
+const StudentHeader = ({ totalStudents = 0, onExport, isExporting }) => {
   const navigate = useNavigate();
   return (
     <div className="bg-white border border-slate-200 rounded-xl shadow-sm px-5 py-4 md:px-6 md:py-5">
@@ -14,7 +14,7 @@ const StudentHeader = ({ onExport, isExporting }) => {
               Students
             </h1>
             <span className="inline-flex items-center bg-indigo-50 text-indigo-600 text-[11px] font-semibold px-2.5 py-1 rounded-full border border-indigo-100">
-              1,248 total enrolled
+              {totalStudents.toLocaleString()} total enrolled
             </span>
           </div>
           <p className="text-sm text-slate-500 max-w-md">
