@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { ArrowLeft, User, GraduationCap, Users } from "lucide-react";
+import { ArrowLeft, User, GraduationCap, Users, Loader2 } from "lucide-react";
 import { useCreateStudent } from "../features/students/student.hooks";
 
 // Local — same pattern as StudentDetailsPage / StudentEditPage
@@ -42,6 +42,7 @@ const disabledSelectErrorClass =
 const StudentAddPage = () => {
   const navigate = useNavigate();
   const createStudentMutation = useCreateStudent();
+
   const [formData, setFormData] = useState({
     name: "",
     admissionNumber: "",
@@ -65,7 +66,6 @@ const StudentAddPage = () => {
       [field]: e.target.value,
     }));
 
-    // User ले नयाँ भ्यालु टाइप गर्दा error हत्छ
     if (errors[field]) {
       setErrors((prev) => ({
         ...prev,
@@ -108,6 +108,7 @@ const StudentAddPage = () => {
 
     return newErrors;
   };
+
   const handleSubmit = async (event) => {
     event.preventDefault();
 
@@ -139,7 +140,6 @@ const StudentAddPage = () => {
 
     try {
       const student = await createStudentMutation.mutateAsync(payload);
-
       navigate(`/students/${student._id}`);
     } catch (error) {
       setSubmitError(
@@ -166,6 +166,13 @@ const StudentAddPage = () => {
           Add Student
         </h1>
       </div>
+
+      {/* API / Server Error Alert Display */}
+      {submitError && (
+        <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-xl text-sm font-medium">
+          {submitError}
+        </div>
+      )}
 
       <form onSubmit={handleSubmit} className="space-y-4">
         {/* Personal Information */}
@@ -297,15 +304,24 @@ const StudentAddPage = () => {
           <button
             type="button"
             onClick={() => navigate("/students")}
-            className="px-4 py-2 border border-slate-200 bg-white hover:bg-slate-50 text-slate-700 text-sm font-medium rounded-lg shadow-sm transition-colors"
+            disabled={createStudentMutation.isPending}
+            className="px-4 py-2 border border-slate-200 bg-white hover:bg-slate-50 text-slate-700 text-sm font-medium rounded-lg shadow-sm transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
           >
             Cancel
           </button>
           <button
             type="submit"
-            className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium rounded-lg shadow-sm transition-colors"
+            disabled={createStudentMutation.isPending}
+            className="inline-flex items-center justify-center gap-2 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium rounded-lg shadow-sm transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
           >
-            Create Student
+            {createStudentMutation.isPending ? (
+              <>
+                <Loader2 className="w-4 h-4 animate-spin" />
+                <span>Creating...</span>
+              </>
+            ) : (
+              <span>Create Student</span>
+            )}
           </button>
         </div>
       </form>
