@@ -43,3 +43,12 @@ export const updateStudentStatus = async (studentId, status) => {
   return response.data.data;
 };
 
+export const exportStudentsCsv = async (params = {}) => {
+  const response = await apiClient.get("/students/export/csv", {
+    params,
+    responseType: "blob",
+  });
+
+  return response.data;
+};
+

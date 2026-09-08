@@ -6,6 +6,7 @@ import {
 } from "@tanstack/react-query";
 import {
   createStudent,
+  exportStudentsCsv,
   getStudentById,
   getStudents,
   getStudentStats,
@@ -99,5 +100,12 @@ export const useUpdateStudentStatus = () => {
         queryKey: ["student-stats"],
       });
     },
+  });
+};
+
+
+export const useExportStudentsCsv = () => {
+  return useMutation({
+    mutationFn: exportStudentsCsv,
   });
 };

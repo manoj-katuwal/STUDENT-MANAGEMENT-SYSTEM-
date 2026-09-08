@@ -129,6 +129,14 @@ const StudentDetailsPage = () => {
   const isActive = student?.status === "ACTIVE";
 
   const handleToggleStatus = () => {
+    const nextStatus = student.status === "ACTIVE" ? "INACTIVE" : "ACTIVE";
+
+    if (
+      nextStatus === "INACTIVE" &&
+      !window.confirm("Are you sure you want to deactivate this student?")
+    ) {
+      return;
+    }
     updateStatusMutation.mutate({
       studentId,
       status: isActive ? "INACTIVE" : "ACTIVE",
