@@ -1,11 +1,25 @@
-import React from 'react'
+import { useState } from "react";
+import useDebounce from "../hooks/useDebounce";
+import { useClasses } from "../features/classes/class.hooks";
+import ClassContextBar from "../components/classes/ClassContextBar";
+// import { useClasses } from "../features/classes/class.hooks";
+// import useDebounce from "../hooks/useDebounce";
 
 const ClassesPage = () => {
-  return (
-    <div>
-      Classes Page
-    </div>
-  )
-}
+  const [search, setSearch] = useState("");
+  const [currentPage, setCurrentPage] = useState(1);
 
-export default ClassesPage
+  const debouncedSearch = useDebounce(search, 700);
+
+  const { data, isLoading, isError, error, refetch } = useClasses({
+    page: currentPage,
+    limit: 10,
+    search: debouncedSearch,
+  });
+
+  return <div className="min-h-full p-6 lg:p-8 space-y-6">
+    <ClassContextBar />
+  </div>;
+};
+
+export default ClassesPage;
