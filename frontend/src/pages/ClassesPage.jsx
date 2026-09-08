@@ -4,6 +4,7 @@ import { useClasses } from "../features/classes/class.hooks";
 import ClassContextBar from "../components/classes/ClassContextBar";
 import ClassesHeader from "../components/classes/ClassHeader";
 import { useNavigate } from "react-router-dom";
+import ClassStats from "../components/classes/ClassStats";
 
 const ClassesPage = () => {
   const navigate = useNavigate();
@@ -22,6 +23,7 @@ const ClassesPage = () => {
     <div className="min-h-full p-6 lg:p-8 space-y-6">
       <ClassContextBar onAdd={() => navigate("/classes/new")} />
       <ClassesHeader />
+      <ClassStats />
     </div>
   );
 };
