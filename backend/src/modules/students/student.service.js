@@ -6,12 +6,80 @@ import {
   findStudentByAdmissionNumber,
   findStudentById,
   findStudents,
+  findStudentsForExport,
   getStudentStats,
   updateStudent,
 } from "./student.repository.js";
 
 import { findClassById } from "../classes/class.repository.js";
 import { findSectionById } from "../section/section.repository.js";
+
+const escapeCsvValue = (value) => {
+  if (value === null || value === undefined) {
+    return "";
+  }
+
+  const stringValue = String(value);
+
+  if (
+    stringValue.includes(",") ||
+    stringValue.includes('"') ||
+    stringValue.includes("\n") ||
+    stringValue.includes("\r")
+  ) {
+    return `"${stringValue.replace(/"/g, '""')}"`;
+  }
+
+  return stringValue;
+};
+
+const studentToCsvRow = (student) => {
+  return [
+    student.admissionNumber,
+    student.name,
+    student.classId?.name,
+    student.classId?.code,
+    student.sectionId?.name,
+    student.dateOfBirth
+      ? new Date(student.dateOfBirth).toISOString().slice(0, 10)
+      : "",
+    student.gender,
+    student.phone,
+    student.address,
+    student.guardian?.name,
+    student.guardian?.relationship,
+    student.guardian?.phone,
+    student.status,
+    student.createdAt ? new Date(student.createdAt).toISOString() : "",
+  ]
+    .map(escapeCsvValue)
+    .join(",");
+};
+
+const generateStudentsCsv = (students) => {
+  const headers = [
+    "Admission Number",
+    "Name",
+    "Class",
+    "Class Code",
+    "Section",
+    "Date of Birth",
+    "Gender",
+    "Phone",
+    "Address",
+    "Guardian Name",
+    "Guardian Relationship",
+    "Guardian Phone",
+    "Status",
+    "Created At",
+  ];
+
+  const rows = students.map(studentToCsvRow);
+
+  return [headers.join(","), ...rows].join("\r\n");
+};
+
+
 
 const validateAcademicAssignment = async (classId, sectionId) => {
   if (!classId) {
@@ -137,26 +205,11 @@ export const updateStudentStatusService = async (studentId, status) => {
   return updatedStudent;
 };
 
-export const getStudentsService = async (
-  page = 1,
-  limit = 10,
+const buildStudentFilter = ({
   search = "",
   classId = "",
   sectionId = "",
-) => {
-  if (sectionId) {
-    const section = await findSectionById(sectionId);
-
-    if (!section) {
-      throw new AppError("Section not found", 404);
-    }
-
-    if (classId && section.classId.toString() !== classId.toString()) {
-      throw new AppError("Section does not belong to the selected class", 400);
-    }
-  }
-  const skip = (page - 1) * limit;
-
+} = {}) => {
   const filter = {};
 
   if (search) {
@@ -184,6 +237,35 @@ export const getStudentsService = async (
     filter.sectionId = sectionId;
   }
 
+  return filter;
+};
+
+export const getStudentsService = async (
+  page = 1,
+  limit = 10,
+  search = "",
+  classId = "",
+  sectionId = "",
+) => {
+  if (sectionId) {
+    const section = await findSectionById(sectionId);
+
+    if (!section) {
+      throw new AppError("Section not found", 404);
+    }
+
+    if (classId && section.classId.toString() !== classId.toString()) {
+      throw new AppError("Section does not belong to the selected class", 400);
+    }
+  }
+  const skip = (page - 1) * limit;
+
+  const filter = buildStudentFilter({
+    search,
+    classId,
+    sectionId,
+  });
+
   const [students, total] = await Promise.all([
     findStudents({
       filter,
@@ -208,4 +290,32 @@ export const getStudentsService = async (
 
 export const getStudentStatsService = async () => {
   return await getStudentStats();
+};
+
+export const getStudentsForExportService = async ({
+  search = "",
+  classId = "",
+  sectionId = "",
+} = {}) => {
+  if (sectionId) {
+    const section = await findSectionById(sectionId);
+
+    if (!section) {
+      throw new AppError("Section not found", 404);
+    }
+
+    if (classId && section.classId.toString() !== classId.toString()) {
+      throw new AppError("Section does not belong to the selected class", 400);
+    }
+  }
+
+  const filter = buildStudentFilter({
+    search,
+    classId,
+    sectionId,
+  });
+
+  const students = await findStudentsForExport(filter);
+
+  return generateStudentsCsv(students);
 };

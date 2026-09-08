@@ -73,3 +73,11 @@ export const getStudentStats = async () => {
     recentlyAdded,
   };
 };
+
+export const findStudentsForExport = async (filter = {}) => {
+  return await Student.find(filter)
+    .populate("classId", "name code")
+    .populate("sectionId", "name")
+    .sort({ createdAt: -1 })
+    .lean();
+};

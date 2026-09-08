@@ -3,6 +3,7 @@ import { successResponse } from "../../shared/utils/response/apiResponse.js";
 import {
   createStudentService,
   getStudentByIdService,
+  getStudentsForExportService,
   getStudentsService,
   getStudentStatsService,
   updateStudentService,
@@ -27,7 +28,13 @@ export const getStudentsController = asyncHandler(async (req, res) => {
   const classId = req.query.classId?.trim() || "";
   const sectionId = req.query.sectionId?.trim() || "";
 
-  const result = await getStudentsService(page, limit, search, classId, sectionId);
+  const result = await getStudentsService(
+    page,
+    limit,
+    search,
+    classId,
+    sectionId,
+  );
 
   return successResponse({
     res,
@@ -83,4 +90,17 @@ export const getStudentStatsController = asyncHandler(async (req, res) => {
     message: "Student stats fetched successfully",
     data: result,
   });
+});
+
+export const getStudentsCsvController = asyncHandler(async (req, res) => {
+  const csv = await getStudentsForExportService({
+    search: req.query.search,
+    classId: req.query.classId,
+    sectionId: req.query.sectionId,
+  });
+
+  res.setHeader("Content-Type", "text/csv; charset=utf-8");
+  res.setHeader("Content-Disposition", 'attachment; filename="students.csv"');
+
+  return res.status(200).send(csv);
 });

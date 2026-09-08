@@ -4,6 +4,7 @@ import {
   createStudentController,
   getStudentByIdController,
   getStudentsController,
+  getStudentsCsvController,
   getStudentStatsController,
   updateStudentController,
   updateStudentStatusController,
@@ -13,6 +14,7 @@ import authorize from "../../middleware/authorize.js";
 import validate from "../../middleware/validate.js";
 import {
   createStudentSchema,
+  exportStudentsQuerySchema,
   listStudentsQuerySchema,
   updateStudentSchema,
   updateStudentStatusSchema,
@@ -37,6 +39,14 @@ router.get(
   authorize("ADMIN"),
   getStudentStatsController,
 );
+router.get(
+  "/export/csv",
+  authenticate,
+  authorize("ADMIN"),
+  validateQuery(exportStudentsQuerySchema),
+  getStudentsCsvController,
+);
+
 router.get(
   "/:id",
   authenticate,
