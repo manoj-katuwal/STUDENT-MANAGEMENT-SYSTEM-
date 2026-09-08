@@ -35,3 +35,11 @@ export const createStudent = async (data) => {
   return response.data.data;
 };
 
+export const updateStudentStatus = async (studentId, status) => {
+  const response = await apiClient.patch(`/students/${studentId}/status`, {
+    status,
+  });
+
+  return response.data.data;
+};
+

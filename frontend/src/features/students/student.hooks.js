@@ -10,6 +10,7 @@ import {
   getStudents,
   getStudentStats,
   updateStudent,
+  updateStudentStatus,
 } from "./student.api";
 
 export const useStudents = (params = {}) => {
@@ -65,6 +66,31 @@ export const useCreateStudent = () => {
     mutationFn: createStudent,
 
     onSuccess: () => {
+      queryClient.invalidateQueries({
+        queryKey: ["students"],
+      });
+
+      queryClient.invalidateQueries({
+        queryKey: ["student-stats"],
+      });
+    },
+  });
+};
+
+
+export const useUpdateStudentStatus = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: ({ studentId, status }) =>
+      updateStudentStatus(studentId, status),
+
+    onSuccess: (updatedStudent, variables) => {
+      queryClient.setQueryData(
+        ["student", variables.studentId],
+        updatedStudent,
+      );
+
       queryClient.invalidateQueries({
         queryKey: ["students"],
       });
