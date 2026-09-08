@@ -15,21 +15,28 @@ const SectionCard = ({ icon: Icon, title, children }) => (
   </div>
 );
 
-const FormField = ({ label, required = false, children }) => (
+const FormField = ({ label, required = false, children, error }) => (
   <div>
     <label className="block text-sm font-medium text-slate-700 mb-1">
       {label}
       {required && <span className="text-red-500 ml-0.5">*</span>}
     </label>
     {children}
+    {error && <p className="mt-1 text-xs text-red-600">{error}</p>}
   </div>
 );
 
 const inputClass =
   "w-full px-3 py-2 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors";
 
+const inputErrorClass =
+  "w-full px-3 py-2 border border-red-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent transition-colors";
+
 const disabledSelectClass =
   "w-full px-3 py-2 border border-slate-200 rounded-lg text-sm bg-slate-50 text-slate-400 cursor-not-allowed";
+
+const disabledSelectErrorClass =
+  "w-full px-3 py-2 border border-red-300 rounded-lg text-sm bg-slate-50 text-slate-400 cursor-not-allowed";
 
 const StudentAddPage = () => {
   const navigate = useNavigate();
@@ -48,16 +55,70 @@ const StudentAddPage = () => {
     guardianPhone: "",
   });
 
+  const [errors, setErrors] = useState({});
+  const [submitError, setSubmitError] = useState("");
+
   const handleChange = (field) => (e) => {
     setFormData((prev) => ({
       ...prev,
       [field]: e.target.value,
     }));
+
+    // User ले नयाँ भ्यालु टाइप गर्दा error हत्छ
+    if (errors[field]) {
+      setErrors((prev) => ({
+        ...prev,
+        [field]: null,
+      }));
+    }
+  };
+
+  const validateForm = () => {
+    const newErrors = {};
+
+    if (!formData.name.trim()) {
+      newErrors.name = "Student name is required";
+    } else if (formData.name.trim().length < 2) {
+      newErrors.name = "Student name must be at least 2 characters";
+    }
+
+    if (!formData.admissionNumber.trim()) {
+      newErrors.admissionNumber = "Admission number is required";
+    } else if (formData.admissionNumber.trim().length < 3) {
+      newErrors.admissionNumber =
+        "Admission number must be at least 3 characters";
+    }
+
+    if (formData.phone && !/^[0-9]{10}$/.test(formData.phone)) {
+      newErrors.phone = "Phone number must be exactly 10 digits";
+    }
+
+    if (formData.guardianPhone && !/^[0-9]{10}$/.test(formData.guardianPhone)) {
+      newErrors.guardianPhone = "Phone number must be exactly 10 digits";
+    }
+
+    if (!formData.classId) {
+      newErrors.classId = "Class is required";
+    }
+
+    if (!formData.sectionId) {
+      newErrors.sectionId = "Section is required";
+    }
+
+    return newErrors;
   };
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    // No API call yet — wiring comes in a later step
+    setSubmitError("");
+
+    const validationErrors = validateForm();
+    if (Object.keys(validationErrors).length > 0) {
+      setErrors(validationErrors);
+      return;
+    }
+
+    // Direct submit functionality handles API wiring here in next steps
   };
 
   return (
@@ -80,21 +141,25 @@ const StudentAddPage = () => {
       <form onSubmit={handleSubmit} className="space-y-4">
         {/* Personal Information */}
         <SectionCard icon={User} title="Personal Information">
-          <FormField label="Student Name" required>
+          <FormField label="Student Name" required error={errors.name}>
             <input
               type="text"
               value={formData.name}
               onChange={handleChange("name")}
-              className={inputClass}
+              className={errors.name ? inputErrorClass : inputClass}
             />
           </FormField>
 
-          <FormField label="Admission Number" required>
+          <FormField
+            label="Admission Number"
+            required
+            error={errors.admissionNumber}
+          >
             <input
               type="text"
               value={formData.admissionNumber}
               onChange={handleChange("admissionNumber")}
-              className={inputClass}
+              className={errors.admissionNumber ? inputErrorClass : inputClass}
             />
           </FormField>
 
@@ -120,12 +185,12 @@ const StudentAddPage = () => {
             </select>
           </FormField>
 
-          <FormField label="Phone">
+          <FormField label="Phone" error={errors.phone}>
             <input
               type="text"
               value={formData.phone}
               onChange={handleChange("phone")}
-              className={inputClass}
+              className={errors.phone ? inputErrorClass : inputClass}
             />
           </FormField>
 
@@ -141,21 +206,27 @@ const StudentAddPage = () => {
 
         {/* Academic Information */}
         <SectionCard icon={GraduationCap} title="Academic Information">
-          <FormField label="Class" required>
+          <FormField label="Class" required error={errors.classId}>
             <select
               value={formData.classId}
               disabled
-              className={disabledSelectClass}
+              className={
+                errors.classId ? disabledSelectErrorClass : disabledSelectClass
+              }
             >
               <option value="">Class Module coming soon</option>
             </select>
           </FormField>
 
-          <FormField label="Section" required>
+          <FormField label="Section" required error={errors.sectionId}>
             <select
               value={formData.sectionId}
               disabled
-              className={disabledSelectClass}
+              className={
+                errors.sectionId
+                  ? disabledSelectErrorClass
+                  : disabledSelectClass
+              }
             >
               <option value="">Section Module coming soon</option>
             </select>
@@ -182,12 +253,12 @@ const StudentAddPage = () => {
             />
           </FormField>
 
-          <FormField label="Guardian Phone">
+          <FormField label="Guardian Phone" error={errors.guardianPhone}>
             <input
               type="text"
               value={formData.guardianPhone}
               onChange={handleChange("guardianPhone")}
-              className={inputClass}
+              className={errors.guardianPhone ? inputErrorClass : inputClass}
             />
           </FormField>
         </SectionCard>
