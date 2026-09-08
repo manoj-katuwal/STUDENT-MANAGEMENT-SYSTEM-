@@ -2,10 +2,11 @@ import { useState } from "react";
 import useDebounce from "../hooks/useDebounce";
 import { useClasses } from "../features/classes/class.hooks";
 import ClassContextBar from "../components/classes/ClassContextBar";
-// import { useClasses } from "../features/classes/class.hooks";
-// import useDebounce from "../hooks/useDebounce";
+import ClassesHeader from "../components/classes/ClassHeader";
+import { useNavigate } from "react-router-dom";
 
 const ClassesPage = () => {
+  const navigate = useNavigate();
   const [search, setSearch] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
 
@@ -17,9 +18,12 @@ const ClassesPage = () => {
     search: debouncedSearch,
   });
 
-  return <div className="min-h-full p-6 lg:p-8 space-y-6">
-    <ClassContextBar />
-  </div>;
+  return (
+    <div className="min-h-full p-6 lg:p-8 space-y-6">
+      <ClassContextBar onAdd={() => navigate("/classes/new")} />
+      <ClassesHeader />
+    </div>
+  );
 };
 
 export default ClassesPage;
