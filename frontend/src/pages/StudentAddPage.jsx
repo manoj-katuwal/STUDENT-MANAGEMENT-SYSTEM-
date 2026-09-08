@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { ArrowLeft, User, GraduationCap, Users } from "lucide-react";
+import { useCreateStudent } from "../features/students/student.hooks";
 
 // Local — same pattern as StudentDetailsPage / StudentEditPage
 const SectionCard = ({ icon: Icon, title, children }) => (
@@ -40,7 +41,7 @@ const disabledSelectErrorClass =
 
 const StudentAddPage = () => {
   const navigate = useNavigate();
-
+  const createStudentMutation = useCreateStudent();
   const [formData, setFormData] = useState({
     name: "",
     admissionNumber: "",
@@ -107,18 +108,46 @@ const StudentAddPage = () => {
 
     return newErrors;
   };
-
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    setSubmitError("");
+  const handleSubmit = async (event) => {
+    event.preventDefault();
 
     const validationErrors = validateForm();
+
     if (Object.keys(validationErrors).length > 0) {
       setErrors(validationErrors);
       return;
     }
 
-    // Direct submit functionality handles API wiring here in next steps
+    setErrors({});
+    setSubmitError("");
+
+    const payload = {
+      name: formData.name.trim(),
+      admissionNumber: formData.admissionNumber.trim(),
+      dateOfBirth: formData.dateOfBirth || null,
+      gender: formData.gender || null,
+      phone: formData.phone || null,
+      address: formData.address.trim() || null,
+      classId: formData.classId,
+      sectionId: formData.sectionId,
+      guardian: {
+        name: formData.guardianName.trim() || null,
+        relationship: formData.guardianRelationship.trim() || null,
+        phone: formData.guardianPhone || null,
+      },
+    };
+
+    try {
+      const student = await createStudentMutation.mutateAsync(payload);
+
+      navigate(`/students/${student._id}`);
+    } catch (error) {
+      setSubmitError(
+        error?.response?.data?.message ||
+          error?.message ||
+          "Failed to create student",
+      );
+    }
   };
 
   return (

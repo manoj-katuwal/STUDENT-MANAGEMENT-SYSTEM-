@@ -1,4 +1,9 @@
-import { keepPreviousData, useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import {
+  keepPreviousData,
+  useQuery,
+  useMutation,
+  useQueryClient,
+} from "@tanstack/react-query";
 import {
   createStudent,
   getStudentById,
@@ -30,8 +35,6 @@ export const useStudent = (studentId) => {
   });
 };
 
-
-
 export const useUpdateStudent = () => {
   const queryClient = useQueryClient();
 
@@ -54,7 +57,6 @@ export const useUpdateStudent = () => {
     },
   });
 };
-
 
 export const useCreateStudent = () => {
   const queryClient = useQueryClient();
