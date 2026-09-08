@@ -75,7 +75,7 @@ export const listStudentsQuerySchema = Joi.object({
 });
 
 export const exportStudentsQuerySchema = Joi.object({
-  search: Joi.string().trim().allow(""),
-  classId: Joi.string().hex().length(24).allow(""),
-  sectionId: Joi.string().hex().length(24).allow(""),
+  search: Joi.string().trim().allow("", null).optional(),
+  classId: Joi.string().trim().allow("", null).optional(),
+  sectionId: Joi.string().trim().allow("", null).optional(),
 });

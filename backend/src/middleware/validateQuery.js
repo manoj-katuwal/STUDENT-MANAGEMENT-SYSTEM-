@@ -18,7 +18,14 @@ const validateQuery = (schema) => {
       });
     }
 
-    req.query = value;
+    if (value && typeof req.query === "object") {
+      Object.keys(req.query).forEach((key) => {
+        if (!(key in value)) {
+          delete req.query[key];
+        }
+      });
+      Object.assign(req.query, value);
+    }
 
     next();
   };

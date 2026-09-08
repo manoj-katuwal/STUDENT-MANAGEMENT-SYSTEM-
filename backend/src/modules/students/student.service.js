@@ -33,24 +33,33 @@ const escapeCsvValue = (value) => {
   return stringValue;
 };
 
+const formatDateSafe = (dateVal, dateOnly = false) => {
+  if (!dateVal) return "";
+  try {
+    const d = new Date(dateVal);
+    if (isNaN(d.getTime())) return "";
+    return dateOnly ? d.toISOString().slice(0, 10) : d.toISOString();
+  } catch {
+    return "";
+  }
+};
+
 const studentToCsvRow = (student) => {
   return [
-    student.admissionNumber,
-    student.name,
-    student.classId?.name,
-    student.classId?.code,
-    student.sectionId?.name,
-    student.dateOfBirth
-      ? new Date(student.dateOfBirth).toISOString().slice(0, 10)
-      : "",
-    student.gender,
-    student.phone,
-    student.address,
-    student.guardian?.name,
-    student.guardian?.relationship,
-    student.guardian?.phone,
-    student.status,
-    student.createdAt ? new Date(student.createdAt).toISOString() : "",
+    student.admissionNumber || "",
+    student.name || "",
+    student.classId?.name || "",
+    student.classId?.code || "",
+    student.sectionId?.name || "",
+    formatDateSafe(student.dateOfBirth, true),
+    student.gender || "",
+    student.phone || "",
+    student.address || "",
+    student.guardian?.name || "",
+    student.guardian?.relationship || "",
+    student.guardian?.phone || "",
+    student.status || "",
+    formatDateSafe(student.createdAt, false),
   ]
     .map(escapeCsvValue)
     .join(",");
@@ -78,8 +87,6 @@ const generateStudentsCsv = (students) => {
 
   return [headers.join(","), ...rows].join("\r\n");
 };
-
-
 
 const validateAcademicAssignment = async (classId, sectionId) => {
   if (!classId) {
@@ -211,30 +218,33 @@ const buildStudentFilter = ({
   sectionId = "",
 } = {}) => {
   const filter = {};
+  const cleanSearch = typeof search === "string" ? search.trim() : "";
+  const cleanClassId = typeof classId === "string" ? classId.trim() : "";
+  const cleanSectionId = typeof sectionId === "string" ? sectionId.trim() : "";
 
-  if (search) {
+  if (cleanSearch) {
     filter.$or = [
       {
         name: {
-          $regex: search,
+          $regex: cleanSearch,
           $options: "i",
         },
       },
       {
         admissionNumber: {
-          $regex: search,
+          $regex: cleanSearch,
           $options: "i",
         },
       },
     ];
   }
 
-  if (classId) {
-    filter.classId = classId;
+  if (cleanClassId) {
+    filter.classId = cleanClassId;
   }
 
-  if (sectionId) {
-    filter.sectionId = sectionId;
+  if (cleanSectionId) {
+    filter.sectionId = cleanSectionId;
   }
 
   return filter;
@@ -247,23 +257,30 @@ export const getStudentsService = async (
   classId = "",
   sectionId = "",
 ) => {
-  if (sectionId) {
-    const section = await findSectionById(sectionId);
+  const cleanClassId = typeof classId === "string" ? classId.trim() : "";
+  const cleanSectionId = typeof sectionId === "string" ? sectionId.trim() : "";
+  const cleanSearch = typeof search === "string" ? search.trim() : "";
+
+  if (cleanSectionId) {
+    const section = await findSectionById(cleanSectionId);
 
     if (!section) {
       throw new AppError("Section not found", 404);
     }
 
-    if (classId && section.classId.toString() !== classId.toString()) {
+    if (
+      cleanClassId &&
+      section.classId.toString() !== cleanClassId.toString()
+    ) {
       throw new AppError("Section does not belong to the selected class", 400);
     }
   }
   const skip = (page - 1) * limit;
 
   const filter = buildStudentFilter({
-    search,
-    classId,
-    sectionId,
+    search: cleanSearch,
+    classId: cleanClassId,
+    sectionId: cleanSectionId,
   });
 
   const [students, total] = await Promise.all([
@@ -297,22 +314,29 @@ export const getStudentsForExportService = async ({
   classId = "",
   sectionId = "",
 } = {}) => {
-  if (sectionId) {
-    const section = await findSectionById(sectionId);
+  const cleanClassId = typeof classId === "string" ? classId.trim() : "";
+  const cleanSectionId = typeof sectionId === "string" ? sectionId.trim() : "";
+  const cleanSearch = typeof search === "string" ? search.trim() : "";
+
+  if (cleanSectionId) {
+    const section = await findSectionById(cleanSectionId);
 
     if (!section) {
       throw new AppError("Section not found", 404);
     }
 
-    if (classId && section.classId.toString() !== classId.toString()) {
+    if (
+      cleanClassId &&
+      section.classId.toString() !== cleanClassId.toString()
+    ) {
       throw new AppError("Section does not belong to the selected class", 400);
     }
   }
 
   const filter = buildStudentFilter({
-    search,
-    classId,
-    sectionId,
+    search: cleanSearch,
+    classId: cleanClassId,
+    sectionId: cleanSectionId,
   });
 
   const students = await findStudentsForExport(filter);
