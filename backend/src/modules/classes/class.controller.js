@@ -4,6 +4,7 @@ import {
   createClassService,
   getClassByIdService,
   getClassesService,
+  getClassStatsService,
   updateClassService,
   updateClassStatusService,
 } from "./class.service.js";
@@ -69,5 +70,16 @@ export const updateClassStatusController = asyncHandler(async (req, res) => {
       classRecord.status === "ACTIVE" ? "activated" : "deactivated"
     } successfully`,
     data: classRecord,
+  });
+});
+
+export const getClassStatsController = asyncHandler(async (req, res) => {
+  const stats = await getClassStatsService();
+
+  return successResponse({
+    res,
+    statusCode: 200,
+    message: "Class statistics fetched successfully",
+    data: stats,
   });
 });

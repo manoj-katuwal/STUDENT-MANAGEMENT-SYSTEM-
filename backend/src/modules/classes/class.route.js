@@ -2,11 +2,17 @@ import express from "express";
 import authenticate from "../../middleware/authenticate.js";
 import authorize from "../../middleware/authorize.js";
 import validate from "../../middleware/validate.js";
-import { createClassSchema, listClassesQuerySchema, updateClassSchema, updateClassStatusSchema } from "./class.validation.js";
+import {
+  createClassSchema,
+  listClassesQuerySchema,
+  updateClassSchema,
+  updateClassStatusSchema,
+} from "./class.validation.js";
 import {
   createClassController,
   getClassByIdController,
   getClassesController,
+  getClassStatsController,
   updateClassController,
   updateClassStatusController,
 } from "./class.controller.js";
@@ -22,6 +28,8 @@ router.post(
   createClassController,
 );
 router.get("/", authenticate, authorize("ADMIN"), getClassesController);
+router.get("/stats", authenticate, authorize("ADMIN"), getClassStatsController);
+
 router.get("/:id", authenticate, authorize("ADMIN"), getClassByIdController);
 router.patch(
   "/:id",

@@ -8,6 +8,7 @@ import {
   updateClass,
   updateClassStatus,
   countClasses,
+  getClassStats,
 } from "./class.repository.js";
 
 export const createClassService = async (classData) => {
@@ -116,4 +117,10 @@ export const updateClassStatusService = async (classId, status) => {
   }
 
   return await updateClassStatus(classId, status);
+};
+
+export const getClassStatsService = async () => {
+  const stats = await getClassStats();
+
+  return stats;
 };
