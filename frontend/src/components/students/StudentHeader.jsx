@@ -2,7 +2,7 @@ import React from "react";
 import { Upload, Plus } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 
-const StudentHeader = () => {
+const StudentHeader = ({ onExport, isExporting }) => {
   const navigate = useNavigate();
   return (
     <div className="bg-white border border-slate-200 rounded-xl shadow-sm px-5 py-4 md:px-6 md:py-5">
@@ -25,9 +25,13 @@ const StudentHeader = () => {
 
         {/* Right side: Export & Add Student Buttons */}
         <div className="flex items-center gap-2.5 shrink-0">
-          <button className="inline-flex items-center gap-1.5 px-3.5 py-2 border border-slate-200 bg-white hover:bg-slate-50 active:bg-slate-100 text-slate-700 text-sm font-medium rounded-lg shadow-sm transition-colors cursor-pointer">
+          <button
+            className="inline-flex items-center gap-1.5 px-3.5 py-2 border border-slate-200 bg-white hover:bg-slate-50 active:bg-slate-100 text-slate-700 text-sm font-medium rounded-lg shadow-sm transition-colors cursor-pointer"
+            onClick={onExport}
+            disabled={isExporting}
+          >
             <Upload className="w-3.5 h-3.5 text-slate-500" />
-            <span>Export CSV</span>
+            {isExporting ? <span>Exporting...</span> : <span>Export CSV</span>}
           </button>
 
           <button

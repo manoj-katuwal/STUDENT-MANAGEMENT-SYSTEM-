@@ -1,4 +1,5 @@
 import {
+  useExportStudentsCsv,
   useStudents,
   useStudentStats,
 } from "../features/students/student.hooks";
@@ -16,6 +17,7 @@ const StudentsPage = () => {
   const [classId, setClassId] = useState("");
   const [sectionId, setSectionId] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
+  const exportStudentsMutation = useExportStudentsCsv();
   const debouncedSearch = useDebounce(search, 700);
 
   const { data, isLoading, isError, error } = useStudents({
@@ -44,13 +46,41 @@ const StudentsPage = () => {
     setCurrentPage(1);
   };
 
+  const handleExportCsv = async () => {
+    try {
+      const blob = await exportStudentsMutation.mutateAsync({
+        search: debouncedSearch,
+        classId,
+        sectionId,
+      });
+
+      const url = window.URL.createObjectURL(blob);
+
+      const link = document.createElement("a");
+      link.href = url;
+      link.download = "students.csv";
+
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
+
+      window.URL.revokeObjectURL(url);
+    } catch (error) {
+      console.error("Failed to export students:", error);
+    }
+  };
+
   const totalStudents =
     statsData?.totalStudents ?? data?.pagination?.total ?? 0;
 
   return (
     <div className="min-h-full p-6 lg:p-8 space-y-6">
       <StudentContextBar />
-      <StudentHeader totalStudents={totalStudents} />
+      <StudentHeader
+        totalStudents={totalStudents}
+        onExport={handleExportCsv}
+        isExporting={exportStudentsMutation.isPending}
+      />
       <StudentStats data={statsData} isLoading={isStatsLoading} />
       <StudentFilters
         search={search}
