@@ -1,6 +1,10 @@
 import { useState } from "react";
 import useDebounce from "../hooks/useDebounce";
-import { useClasses, useClassStats } from "../features/classes/class.hooks";
+import {
+  useClasses,
+  useClassStats,
+  useUpdateClassStatus,
+} from "../features/classes/class.hooks";
 import ClassContextBar from "../components/classes/ClassContextBar";
 import ClassesHeader from "../components/classes/ClassHeader";
 import { useNavigate } from "react-router-dom";
@@ -21,6 +25,7 @@ const ClassesPage = () => {
     page: currentPage,
     limit: 10,
     search: debouncedSearch,
+    status: selectedStatus || undefined,
   });
 
   const {
@@ -29,6 +34,25 @@ const ClassesPage = () => {
     isError: statsError,
     refetch: statsRefetch,
   } = useClassStats();
+
+  const updateStatusMutation = useUpdateClassStatus();
+
+  const handleToggleStatus = (classRecord) => {
+    const isCurrentlyActive = classRecord.status === "ACTIVE";
+    const nextStatus = isCurrentlyActive ? "INACTIVE" : "ACTIVE";
+    const confirmMessage = isCurrentlyActive
+      ? `Are you sure you want to deactivate "${classRecord.name}"?`
+      : `Are you sure you want to activate "${classRecord.name}"?`;
+
+    if (!window.confirm(confirmMessage)) {
+      return;
+    }
+
+    updateStatusMutation.mutate({
+      classId: classRecord._id,
+      status: nextStatus,
+    });
+  };
 
   return (
     <div className="min-h-full p-6 lg:p-8 space-y-6">
@@ -64,9 +88,7 @@ const ClassesPage = () => {
         onRetry={refetch}
         onView={(classRecord) => navigate(`/classes/${classRecord._id}`)}
         onEdit={(classRecord) => navigate(`/classes/${classRecord._id}/edit`)}
-        onToggleStatus={(classRecord) => {
-          // TODO: implement toggle status
-        }}
+        onToggleStatus={handleToggleStatus}
       />
       <ClassPagination
         pagination={data?.pagination}

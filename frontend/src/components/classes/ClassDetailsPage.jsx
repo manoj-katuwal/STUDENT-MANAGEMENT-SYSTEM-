@@ -190,6 +190,13 @@ const ClassDetailsPage = () => {
         </div>
       </div>
 
+      {updateStatusMutation.isError && (
+        <div className="rounded-xl border border-rose-200 bg-rose-50 px-4 py-3 text-sm text-rose-700">
+          {updateStatusMutation.error?.response?.data?.message ||
+            "Failed to update class status. Please try again."}
+        </div>
+      )}
+
       {/* Basic Class Information Card */}
       <SectionCard icon={BookOpen} title="Class Information">
         <DetailField label="Class Name" value={classRecord?.name} />

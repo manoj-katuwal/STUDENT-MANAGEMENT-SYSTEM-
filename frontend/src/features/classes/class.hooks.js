@@ -40,6 +40,10 @@ export const useCreateClass = () => {
       queryClient.invalidateQueries({
         queryKey: ["classes"],
       });
+
+      queryClient.invalidateQueries({
+        queryKey: ["class-stats"],
+      });
     },
   });
 };
@@ -72,10 +76,13 @@ export const useUpdateClassStatus = () => {
       queryClient.invalidateQueries({
         queryKey: ["classes"],
       });
+
+      queryClient.invalidateQueries({
+        queryKey: ["class-stats"],
+      });
     },
   });
 };
-
 
 export const useClassStats = () => {
   return useQuery({
