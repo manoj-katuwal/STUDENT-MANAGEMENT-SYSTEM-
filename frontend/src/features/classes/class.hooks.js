@@ -9,6 +9,7 @@ import {
   getClasses,
   getClassById,
   createClass,
+  exportClassesCsv,
   updateClass,
   updateClassStatus,
   getClassStats,
@@ -88,5 +89,11 @@ export const useClassStats = () => {
   return useQuery({
     queryKey: ["class-stats"],
     queryFn: getClassStats,
+  });
+};
+
+export const useExportClassesCsv = () => {
+  return useMutation({
+    mutationFn: exportClassesCsv,
   });
 };

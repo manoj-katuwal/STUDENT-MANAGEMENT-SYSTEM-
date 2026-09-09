@@ -3,6 +3,7 @@ import useDebounce from "../hooks/useDebounce";
 import {
   useClasses,
   useClassStats,
+  useExportClassesCsv,
   useUpdateClassStatus,
 } from "../features/classes/class.hooks";
 import ClassContextBar from "../components/classes/ClassContextBar";
@@ -37,7 +38,24 @@ const ClassesPage = () => {
   } = useClassStats();
 
   const updateStatusMutation = useUpdateClassStatus();
+  const exportClassesMutation = useExportClassesCsv();
   const [selectedClassForStatus, setSelectedClassForStatus] = useState(null);
+
+  const handleExportCsv = async () => {
+    const blob = await exportClassesMutation.mutateAsync({
+      search: debouncedSearch,
+      status: selectedStatus,
+    });
+
+    const url = window.URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = "classes.csv";
+    document.body.appendChild(link);
+    link.click();
+    link.remove();
+    window.URL.revokeObjectURL(url);
+  };
 
   const handleToggleStatus = (classRecord) => {
     setSelectedClassForStatus(classRecord);
@@ -70,6 +88,8 @@ const ClassesPage = () => {
       <ClassesHeader
         totalClasses={totalClasses}
         onAdd={() => navigate("/classes/new")}
+        onExport={handleExportCsv}
+        isExporting={exportClassesMutation.isPending}
       />
       <ClassStats
         stats={statsData}

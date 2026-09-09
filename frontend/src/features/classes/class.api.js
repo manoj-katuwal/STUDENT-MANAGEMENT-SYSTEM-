@@ -42,3 +42,18 @@ export const getClassStats = async () => {
 
   return response.data.data;
 };
+
+export const exportClassesCsv = async (params = {}) => {
+  const cleanParams = Object.fromEntries(
+    Object.entries(params).filter(
+      ([_, value]) => value !== undefined && value !== null && value !== "",
+    ),
+  );
+
+  const response = await apiClient.get("/classes/export/csv", {
+    params: cleanParams,
+    responseType: "blob",
+  });
+
+  return response.data;
+};
