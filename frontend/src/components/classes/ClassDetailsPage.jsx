@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import {
   ArrowLeft,
@@ -14,6 +14,7 @@ import {
   useUpdateClassStatus,
 } from "../../features/classes/class.hooks";
 import formatDate from "../../utils/formatDate";
+import ConfirmModal from "../common/ConfirmModal";
 
 // Reusable detail field component
 const DetailField = ({ label, value }) => (
@@ -107,21 +108,26 @@ const ClassDetailsPage = () => {
   }
 
   const isActive = classRecord?.status === "ACTIVE";
+  const [isConfirmOpen, setIsConfirmOpen] = useState(false);
 
   const handleToggleStatus = () => {
+    setIsConfirmOpen(true);
+  };
+
+  const handleConfirmStatusChange = () => {
     const nextStatus = isActive ? "INACTIVE" : "ACTIVE";
 
-    if (
-      nextStatus === "INACTIVE" &&
-      !window.confirm("Are you sure you want to deactivate this class?")
-    ) {
-      return;
-    }
-
-    updateStatusMutation.mutate({
-      classId,
-      status: nextStatus,
-    });
+    updateStatusMutation.mutate(
+      {
+        classId,
+        status: nextStatus,
+      },
+      {
+        onSettled: () => {
+          setIsConfirmOpen(false);
+        },
+      },
+    );
   };
 
   return (
@@ -229,6 +235,20 @@ const ClassDetailsPage = () => {
           value={isActive ? "Active Class" : "Inactive Class"}
         />
       </SectionCard>
+
+      <ConfirmModal
+        open={isConfirmOpen}
+        title={isActive ? "Deactivate Class" : "Activate Class"}
+        message={
+          isActive
+            ? `Are you sure you want to deactivate "${classRecord?.name}"? Students and fees associated with this class may be affected.`
+            : `Are you sure you want to activate "${classRecord?.name}"? It will become active and accessible across the system.`
+        }
+        confirmText={isActive ? "Deactivate" : "Activate"}
+        isLoading={updateStatusMutation.isPending}
+        onConfirm={handleConfirmStatusChange}
+        onCancel={() => setIsConfirmOpen(false)}
+      />
     </div>
   );
 };

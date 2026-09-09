@@ -12,6 +12,7 @@ import ClassStats from "../components/classes/ClassStats";
 import ClassFilters from "../components/classes/ClassFilters";
 import ClassTable from "../components/classes/ClassTable";
 import ClassPagination from "../components/classes/ClassPagination";
+import ConfirmModal from "../components/common/ConfirmModal";
 
 const ClassesPage = () => {
   const navigate = useNavigate();
@@ -36,22 +37,29 @@ const ClassesPage = () => {
   } = useClassStats();
 
   const updateStatusMutation = useUpdateClassStatus();
+  const [selectedClassForStatus, setSelectedClassForStatus] = useState(null);
 
   const handleToggleStatus = (classRecord) => {
-    const isCurrentlyActive = classRecord.status === "ACTIVE";
-    const nextStatus = isCurrentlyActive ? "INACTIVE" : "ACTIVE";
-    const confirmMessage = isCurrentlyActive
-      ? `Are you sure you want to deactivate "${classRecord.name}"?`
-      : `Are you sure you want to activate "${classRecord.name}"?`;
+    setSelectedClassForStatus(classRecord);
+  };
 
-    if (!window.confirm(confirmMessage)) {
-      return;
-    }
+  const handleConfirmStatusChange = () => {
+    if (!selectedClassForStatus) return;
 
-    updateStatusMutation.mutate({
-      classId: classRecord._id,
-      status: nextStatus,
-    });
+    const nextStatus =
+      selectedClassForStatus.status === "ACTIVE" ? "INACTIVE" : "ACTIVE";
+
+    updateStatusMutation.mutate(
+      {
+        classId: selectedClassForStatus._id,
+        status: nextStatus,
+      },
+      {
+        onSettled: () => {
+          setSelectedClassForStatus(null);
+        },
+      },
+    );
   };
 
   const totalClasses = statsData?.totalClasses ?? data?.pagination?.total ?? 0;
@@ -98,6 +106,28 @@ const ClassesPage = () => {
       <ClassPagination
         pagination={data?.pagination}
         onPageChange={(newPage) => setCurrentPage(newPage)}
+      />
+
+      <ConfirmModal
+        open={Boolean(selectedClassForStatus)}
+        title={
+          selectedClassForStatus?.status === "ACTIVE"
+            ? "Deactivate Class"
+            : "Activate Class"
+        }
+        message={
+          selectedClassForStatus?.status === "ACTIVE"
+            ? `Are you sure you want to deactivate "${selectedClassForStatus?.name}"? Students and fees associated with this class may be affected.`
+            : `Are you sure you want to activate "${selectedClassForStatus?.name}"? It will become active and accessible across the system.`
+        }
+        confirmText={
+          selectedClassForStatus?.status === "ACTIVE"
+            ? "Deactivate"
+            : "Activate"
+        }
+        isLoading={updateStatusMutation.isPending}
+        onConfirm={handleConfirmStatusChange}
+        onCancel={() => setSelectedClassForStatus(null)}
       />
     </div>
   );
