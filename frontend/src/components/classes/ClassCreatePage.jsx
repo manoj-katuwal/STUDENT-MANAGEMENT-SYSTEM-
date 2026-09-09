@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { ArrowLeft, BookPlus, Plus } from "lucide-react";
 import { useNavigate } from "react-router-dom";
+import { useCreateClass } from "../../features/classes/class.hooks";
 
 const ClassCreatePage = () => {
   const navigate = useNavigate();
@@ -9,6 +10,8 @@ const ClassCreatePage = () => {
     name: "",
     code: "",
   });
+
+  const createClassMutation = useCreateClass();
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -22,10 +25,17 @@ const ClassCreatePage = () => {
   const handleSubmit = (e) => {
     e.preventDefault();
 
-    console.log("Create class:", {
-      name: formData.name.trim(),
-      code: formData.code.trim().toUpperCase(),
-    });
+    createClassMutation.mutate(
+      {
+        name: formData.name.trim(),
+        code: formData.code.trim().toUpperCase(),
+      },
+      {
+        onSuccess: () => {
+          navigate("/classes");
+        },
+      },
+    );
   };
 
   return (
@@ -54,6 +64,13 @@ const ClassCreatePage = () => {
             Create a new academic class record in the system.
           </p>
         </div>
+
+        {createClassMutation.isError && (
+          <div className="mx-6 mt-6 rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
+            {createClassMutation.error?.response?.data?.message ||
+              "Failed to create class. Please try again."}
+          </div>
+        )}
 
         {/* Form Body */}
         <form onSubmit={handleSubmit}>
@@ -117,10 +134,14 @@ const ClassCreatePage = () => {
 
             <button
               type="submit"
+              disabled={createClassMutation.isPending}
               className="inline-flex items-center gap-1.5 rounded-lg bg-slate-900 px-4 py-2 text-sm font-medium text-white transition hover:bg-slate-800"
             >
               <Plus className="h-4 w-4" />
-              <span>Create Class</span>
+              <span>
+                {" "}
+                {createClassMutation.isPending ? "Creating..." : "Create Class"}
+              </span>
             </button>
           </div>
         </form>
