@@ -7,6 +7,7 @@ import { useNavigate } from "react-router-dom";
 import ClassStats from "../components/classes/ClassStats";
 import ClassFilters from "../components/classes/ClassFilters";
 import ClassTable from "../components/classes/ClassTable";
+import ClassPagination from "../components/classes/ClassPagination";
 
 const ClassesPage = () => {
   const navigate = useNavigate();
@@ -56,18 +57,20 @@ const ClassesPage = () => {
           setCurrentPage(1);
         }}
       />
-
       <ClassTable
-        classes={data?.classes || []}
+        classes={data?.classes ?? []}
         isLoading={isLoading}
         isError={isError}
-        error={error}
         onRetry={refetch}
         onView={(classRecord) => navigate(`/classes/${classRecord._id}`)}
         onEdit={(classRecord) => navigate(`/classes/${classRecord._id}/edit`)}
         onToggleStatus={(classRecord) => {
-          // Implementation for toggling class status
+          // TODO: implement toggle status
         }}
+      />
+      <ClassPagination
+        pagination={data?.pagination}
+        onPageChange={(newPage) => setCurrentPage(newPage)}
       />
     </div>
   );
