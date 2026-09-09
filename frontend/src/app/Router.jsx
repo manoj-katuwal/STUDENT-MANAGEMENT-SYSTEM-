@@ -18,6 +18,7 @@ import StudentEditPage from "../pages/StudentEditPage";
 import StudentAddPage from "../pages/StudentAddPage";
 import ClassesPage from "../pages/ClassesPage";
 import ClassDetailsPage from "../components/classes/ClassDetailsPage";
+import ClassEditPage from "../components/classes/ClassEditPage";
 
 const Router = () => {
   return (
@@ -40,6 +41,10 @@ const Router = () => {
                 <Route
                   path="/classes/:classId"
                   element={<ClassDetailsPage />}
+                />
+                <Route
+                  path="/classes/:classId/edit"
+                  element={<ClassEditPage />}
                 />
               </Route>
 
