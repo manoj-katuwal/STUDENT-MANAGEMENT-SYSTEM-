@@ -29,7 +29,12 @@ export const createClassService = async (classData) => {
   return classRecord;
 };
 
-export const getClassesService = async (page = 1, limit = 10, search = "") => {
+export const getClassesService = async (
+  page = 1,
+  limit = 10,
+  search = "",
+  status = "",
+) => {
   const skip = (page - 1) * limit;
 
   const filter = {};
@@ -49,6 +54,10 @@ export const getClassesService = async (page = 1, limit = 10, search = "") => {
         },
       },
     ];
+  }
+
+  if (status) {
+    filter.status = status;
   }
 
   const [classes, total] = await Promise.all([

@@ -24,8 +24,9 @@ export const getClassesController = asyncHandler(async (req, res) => {
   const page = Number(req.query.page) || 1;
   const limit = Number(req.query.limit) || 10;
   const search = req.query.search?.trim() || "";
+  const status = req.query.status?.trim() || "";
 
-  const result = await getClassesService(page, limit, search);
+  const result = await getClassesService(page, limit, search, status);
 
   return successResponse({
     res,
