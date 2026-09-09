@@ -39,6 +39,7 @@ const Router = () => {
 
               <Route element={<RoleRoute allowedRoles={["ADMIN"]} />}>
                 <Route path="/classes" element={<ClassesPage />} />
+                <Route path="/classes/new" element={<ClassCreatePage />} />
                 <Route
                   path="/classes/:classId"
                   element={<ClassDetailsPage />}
@@ -47,7 +48,6 @@ const Router = () => {
                   path="/classes/:classId/edit"
                   element={<ClassEditPage />}
                 />
-                <Route path="/classes/new" element={<ClassCreatePage />} />
               </Route>
 
               <Route

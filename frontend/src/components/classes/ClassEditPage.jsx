@@ -3,6 +3,7 @@ import { ArrowLeft, BookOpen, Save, XCircle } from "lucide-react";
 import { useNavigate, useParams } from "react-router-dom";
 
 import { useClass, useUpdateClass } from "../../features/classes/class.hooks";
+import { validateClassForm } from "../../features/classes/class.validation";
 
 const ClassEditPage = () => {
   const navigate = useNavigate();
@@ -22,6 +23,9 @@ const ClassEditPage = () => {
     code: "",
   });
 
+  const [errors, setErrors] = useState({});
+  const [touched, setTouched] = useState({});
+
   useEffect(() => {
     if (classRecord) {
       setFormData({
@@ -33,14 +37,41 @@ const ClassEditPage = () => {
 
   const handleChange = (e) => {
     const { name, value } = e.target;
+    const formattedValue = name === "code" ? value.toUpperCase() : value;
+
     setFormData((prev) => ({
       ...prev,
-      [name]: value,
+      [name]: formattedValue,
+    }));
+
+    if (errors[name]) {
+      setErrors((prev) => ({
+        ...prev,
+        [name]: "",
+      }));
+    }
+  };
+
+  const handleBlur = (e) => {
+    const { name } = e.target;
+    setTouched((prev) => ({ ...prev, [name]: true }));
+    const formErrors = validateClassForm(formData);
+    setErrors((prev) => ({
+      ...prev,
+      [name]: formErrors[name] || "",
     }));
   };
 
   const handleSubmit = (e) => {
     e.preventDefault();
+
+    setTouched({ name: true, code: true });
+    const validationErrors = validateClassForm(formData);
+
+    if (Object.keys(validationErrors).length > 0) {
+      setErrors(validationErrors);
+      return;
+    }
 
     updateClassMutation.mutate(
       {
@@ -53,6 +84,14 @@ const ClassEditPage = () => {
       {
         onSuccess: () => {
           navigate(`/classes/${classId}`);
+        },
+        onError: (err) => {
+          const apiMessage = err?.response?.data?.message || "";
+          if (apiMessage.toLowerCase().includes("name already exists")) {
+            setErrors((prev) => ({ ...prev, name: apiMessage }));
+          } else if (apiMessage.toLowerCase().includes("code already exists")) {
+            setErrors((prev) => ({ ...prev, code: apiMessage }));
+          }
         },
       },
     );
@@ -155,46 +194,72 @@ const ClassEditPage = () => {
           </div>
         )}
 
-        <form onSubmit={handleSubmit}>
+        <form onSubmit={handleSubmit} noValidate>
           <div className="space-y-5 p-6">
             {/* Class Name Input */}
             <div>
-              <label
-                htmlFor="name"
-                className="mb-1.5 block text-xs font-semibold uppercase tracking-wide text-slate-600"
-              >
-                Class Name <span className="text-rose-500">*</span>
-              </label>
+              <div className="flex items-center justify-between mb-1.5">
+                <label
+                  htmlFor="name"
+                  className="block text-xs font-semibold uppercase tracking-wide text-slate-600"
+                >
+                  Class Name <span className="text-rose-500">*</span>
+                </label>
+                <span className="text-[11px] text-slate-400">
+                  {formData.name.length}/50
+                </span>
+              </div>
               <input
                 id="name"
                 name="name"
                 type="text"
-                required
                 value={formData.name}
                 onChange={handleChange}
+                onBlur={handleBlur}
                 placeholder="e.g. Class 10"
-                className="w-full rounded-lg border border-slate-200 px-3.5 py-2.5 text-sm font-medium text-slate-800 transition placeholder:font-normal placeholder:text-slate-400 focus:border-slate-400 focus:outline-none focus:ring-2 focus:ring-slate-100"
+                maxLength={50}
+                className={`w-full rounded-lg border px-3.5 py-2.5 text-sm font-medium text-slate-800 transition placeholder:font-normal placeholder:text-slate-400 focus:outline-none focus:ring-2 ${
+                  errors.name
+                    ? "border-rose-400 focus:border-rose-500 focus:ring-rose-100 bg-rose-50/20"
+                    : "border-slate-200 focus:border-slate-400 focus:ring-slate-100"
+                }`}
               />
+              {errors.name && (
+                <p className="mt-1.5 text-xs text-rose-600">{errors.name}</p>
+              )}
             </div>
 
             {/* Class Code Input */}
             <div>
-              <label
-                htmlFor="code"
-                className="mb-1.5 block text-xs font-semibold uppercase tracking-wide text-slate-600"
-              >
-                Class Code <span className="text-rose-500">*</span>
-              </label>
+              <div className="flex items-center justify-between mb-1.5">
+                <label
+                  htmlFor="code"
+                  className="block text-xs font-semibold uppercase tracking-wide text-slate-600"
+                >
+                  Class Code <span className="text-rose-500">*</span>
+                </label>
+                <span className="text-[11px] text-slate-400">
+                  {formData.code.length}/20
+                </span>
+              </div>
               <input
                 id="code"
                 name="code"
                 type="text"
-                required
                 value={formData.code}
                 onChange={handleChange}
+                onBlur={handleBlur}
                 placeholder="e.g. CLS10"
-                className="w-full rounded-lg border border-slate-200 px-3.5 py-2.5 font-mono text-sm font-medium uppercase text-slate-800 transition placeholder:font-sans placeholder:font-normal placeholder:text-slate-400 focus:border-slate-400 focus:outline-none focus:ring-2 focus:ring-slate-100"
+                maxLength={20}
+                className={`w-full rounded-lg border px-3.5 py-2.5 font-mono text-sm font-medium uppercase text-slate-800 transition placeholder:font-sans placeholder:font-normal placeholder:text-slate-400 focus:outline-none focus:ring-2 ${
+                  errors.code
+                    ? "border-rose-400 focus:border-rose-500 focus:ring-rose-100 bg-rose-50/20"
+                    : "border-slate-200 focus:border-slate-400 focus:ring-slate-100"
+                }`}
               />
+              {errors.code && (
+                <p className="mt-1.5 text-xs text-rose-600">{errors.code}</p>
+              )}
             </div>
           </div>
 
