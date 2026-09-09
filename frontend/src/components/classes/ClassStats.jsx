@@ -5,9 +5,31 @@ import {
   PauseCircle,
   TrendingUp,
   Info,
+  AlertTriangle,
 } from "lucide-react";
+import ClassStatsSkeleton from "./ClassStatsSkeleton";
+const ClassStats = ({ stats, isLoading, isError, refetch }) => {
+  if (isLoading) {
+    return <ClassStatsSkeleton />;
+  }
 
-const ClassStats = ({ stats }) => {
+  if (isError) {
+    return (
+      <div className="flex items-center justify-center py-8 space-x-2 text-red-600">
+        <AlertTriangle className="h-5 w-5" />
+        <span>Failed to load class statistics.</span>
+        {refetch && (
+          <button
+            onClick={() => refetch()}
+            className="ml-2 rounded bg-red-600 px-2 py-1 text-xs text-white hover:bg-red-700"
+          >
+            Retry
+          </button>
+        )}
+      </div>
+    );
+  }
+
   const total = stats?.totalClasses ?? 0;
   const active = stats?.activeClasses ?? 0;
   const inactive = stats?.inactiveClasses ?? 0;
@@ -22,7 +44,7 @@ const ClassStats = ({ stats }) => {
       icon: GraduationCap,
       iconBg: "bg-indigo-50",
       iconColor: "text-indigo-600",
-      hoverBar: "bg-indigo-500", // Hover हुँदा आउने रङ
+      hoverBar: "bg-indigo-500", // Hover color
       footer: (
         <div className="flex items-center gap-1.5 text-xs font-medium text-emerald-600">
           <TrendingUp className="h-3.5 w-3.5" />
@@ -36,7 +58,7 @@ const ClassStats = ({ stats }) => {
       icon: CheckCircle2,
       iconBg: "bg-emerald-50",
       iconColor: "text-emerald-600",
-      hoverBar: "bg-emerald-500", // Hover हुँदा आउने रङ
+      hoverBar: "bg-emerald-500",
       footer: (
         <div className="flex items-center justify-between gap-2 text-xs font-medium text-emerald-600">
           <span>{activePercentage}% in session</span>
@@ -55,7 +77,7 @@ const ClassStats = ({ stats }) => {
       icon: PauseCircle,
       iconBg: "bg-indigo-50/70",
       iconColor: "text-indigo-600",
-      hoverBar: "bg-slate-500", // Hover हुँदा आउने रङ
+      hoverBar: "bg-slate-500",
       footer: (
         <div className="flex items-center gap-1.5 text-xs font-medium text-slate-500">
           <Info className="h-3.5 w-3.5 text-slate-400" />
@@ -83,7 +105,6 @@ const ClassStats = ({ stats }) => {
                     {value}
                   </p>
                 </div>
-
                 <div
                   className={`rounded-xl ${iconBg} p-2.5 transition-transform duration-200 group-hover:scale-105`}
                 >
@@ -91,10 +112,8 @@ const ClassStats = ({ stats }) => {
                 </div>
               </div>
             </div>
-
             <div className="mt-4 pt-2">{footer}</div>
-
-            {/* Bottom Hover Line (Left-to-Right Expansion) */}
+            {/* Bottom Hover Line */}
             <div
               className={`absolute bottom-0 left-0 h-0.5 w-0 transition-all duration-300 group-hover:w-full ${hoverBar}`}
             />
