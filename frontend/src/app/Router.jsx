@@ -17,6 +17,7 @@ import StudentDetailsPage from "../pages/StudentDetailsPage";
 import StudentEditPage from "../pages/StudentEditPage";
 import StudentAddPage from "../pages/StudentAddPage";
 import ClassesPage from "../pages/ClassesPage";
+import ClassDetailsPage from "../components/classes/ClassDetailsPage";
 
 const Router = () => {
   return (
@@ -36,8 +37,10 @@ const Router = () => {
 
               <Route element={<RoleRoute allowedRoles={["ADMIN"]} />}>
                 <Route path="/classes" element={<ClassesPage />} />
-               
-              
+                <Route
+                  path="/classes/:classId"
+                  element={<ClassDetailsPage />}
+                />
               </Route>
 
               <Route
