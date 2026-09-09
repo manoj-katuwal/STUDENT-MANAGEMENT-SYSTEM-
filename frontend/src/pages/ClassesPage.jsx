@@ -54,10 +54,15 @@ const ClassesPage = () => {
     });
   };
 
+  const totalClasses = statsData?.totalClasses ?? data?.pagination?.total ?? 0;
+
   return (
     <div className="min-h-full p-6 lg:p-8 space-y-6">
       <ClassContextBar onAdd={() => navigate("/classes/new")} />
-      <ClassesHeader />
+      <ClassesHeader
+        totalClasses={totalClasses}
+        onAdd={() => navigate("/classes/new")}
+      />
       <ClassStats
         stats={statsData}
         isLoading={statsLoading}

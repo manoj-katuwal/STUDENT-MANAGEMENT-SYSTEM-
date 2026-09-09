@@ -1,6 +1,6 @@
 import { Upload, Plus } from "lucide-react";
 
-const ClassesHeader = ({onAdd}) => {
+const ClassesHeader = ({ onAdd, totalClasses = 0 }) => {
   return (
     <div className="bg-white border border-slate-200 rounded-xl shadow-sm px-5 py-4 md:px-6 md:py-5">
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
@@ -11,7 +11,8 @@ const ClassesHeader = ({onAdd}) => {
               Classes
             </h1>
             <span className="inline-flex items-center bg-indigo-50 text-indigo-600 text-[11px] font-semibold px-2.5 py-1 rounded-full border border-indigo-100">
-              18 total classes
+              {totalClasses}{" "}
+              {totalClasses === 1 ? "total class" : "total classes"}
             </span>
           </div>
           <p className="text-sm text-slate-500 max-w-md">
