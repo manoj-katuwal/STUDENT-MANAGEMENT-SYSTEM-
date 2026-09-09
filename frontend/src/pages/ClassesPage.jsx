@@ -23,7 +23,7 @@ const ClassesPage = () => {
 
   const debouncedSearch = useDebounce(search, 700);
 
-  const { data, isLoading, isError, error, refetch } = useClasses({
+  const { data, isLoading, isError, refetch } = useClasses({
     page: currentPage,
     limit: 10,
     search: debouncedSearch,
