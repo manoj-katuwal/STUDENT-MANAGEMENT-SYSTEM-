@@ -1,10 +1,7 @@
-import React from "react";
-
 const ClassStatsSkeleton = () => {
-  // Real layout jstai 3 ota cards dekhauna Array(3) use gareko
   return (
-    <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
-      {Array.from({ length: 3 }).map((_, index) => (
+    <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
+      {Array.from({ length: 4 }).map((_, index) => (
         <div
           key={index}
           className="relative flex flex-col justify-between overflow-hidden rounded-2xl border border-slate-100 bg-white p-5 shadow-sm animate-pulse"

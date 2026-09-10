@@ -1,8 +1,8 @@
-import React from "react";
 import {
   GraduationCap,
   CheckCircle2,
   PauseCircle,
+  UserPlus,
   TrendingUp,
   Info,
   AlertTriangle,
@@ -33,6 +33,7 @@ const ClassStats = ({ stats, isLoading, isError, refetch }) => {
   const total = stats?.totalClasses ?? 0;
   const active = stats?.activeClasses ?? 0;
   const inactive = stats?.inactiveClasses ?? 0;
+  const recentlyAdded = stats?.recentlyAdded ?? 0;
 
   // Calculate percentage for active classes progress bar
   const activePercentage = total > 0 ? ((active / total) * 100).toFixed(1) : 0;
@@ -48,7 +49,7 @@ const ClassStats = ({ stats, isLoading, isError, refetch }) => {
       footer: (
         <div className="flex items-center gap-1.5 text-xs font-medium text-emerald-600">
           <TrendingUp className="h-3.5 w-3.5" />
-          <span>+{stats?.addedThisYear ?? 2} this academic year</span>
+          <span>{recentlyAdded} added in the past 30 days</span>
         </div>
       ),
     },
@@ -85,10 +86,24 @@ const ClassStats = ({ stats, isLoading, isError, refetch }) => {
         </div>
       ),
     },
+    {
+      label: "RECENTLY ADDED",
+      value: recentlyAdded,
+      icon: UserPlus,
+      iconBg: "bg-blue-50",
+      iconColor: "text-blue-600",
+      hoverBar: "bg-blue-500",
+      footer: (
+        <div className="flex items-center gap-1.5 text-xs font-medium text-slate-500">
+          <Info className="h-3.5 w-3.5 text-slate-400" />
+          <span>Classes created in the past 30 days</span>
+        </div>
+      ),
+    },
   ];
 
   return (
-    <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+    <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
       {statCards.map(
         ({ label, value, icon: Icon, iconBg, iconColor, hoverBar, footer }) => (
           <div
