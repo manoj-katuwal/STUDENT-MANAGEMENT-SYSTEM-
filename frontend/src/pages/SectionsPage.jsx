@@ -8,6 +8,8 @@ import { useNavigate } from "react-router-dom";
 import SectionContextBar from "../components/sections/SectionContextBar";
 import SectionHeader from "../components/sections/SectionHeader";
 import SectionStats from "../components/sections/SectionStats";
+import { useClasses } from "../features/classes/class.hooks";
+import SectionFilters from "../components/sections/SectionFilters";
 
 const SectionsPage = () => {
   const navigate = useNavigate();
@@ -32,6 +34,11 @@ const SectionsPage = () => {
     refetch: refetchStats,
   } = useSectionStats();
 
+  const { data: classesData } = useClasses({
+    page: 1,
+    limit: 100,
+  });
+
   return (
     <div className="min-h-full p-6 lg:p-8 space-y-6">
       <SectionContextBar />
@@ -44,6 +51,24 @@ const SectionsPage = () => {
         loading={statsLoading}
         error={statsError}
         onRetry={refetchStats}
+      />
+      <SectionFilters
+        search={search}
+        onSearchChange={(value) => {
+          setSearch(value);
+          setCurrentPage(1);
+        }}
+        selectedClassId={selectedClassId}
+        onClassChange={(value) => {
+          setSelectedClassId(value);
+          setCurrentPage(1);
+        }}
+        classes={classesData?.classes || []}
+        onReset={() => {
+          setSearch("");
+          setSelectedClassId("");
+          setCurrentPage(1);
+        }}
       />
     </div>
   );
