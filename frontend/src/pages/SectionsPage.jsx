@@ -45,6 +45,9 @@ const SectionsPage = () => {
     <div className="min-h-full p-6 lg:p-8 space-y-6">
       <SectionContextBar />
       <SectionHeader
+        totalSections={
+          statsData?.totalSections ?? data?.pagination?.total ?? 0
+        }
         onAdd={() => navigate("/sections/new")}
         onExport={() => {}}
       />

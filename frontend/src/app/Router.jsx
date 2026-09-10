@@ -22,6 +22,7 @@ import ClassEditPage from "../components/classes/ClassEditPage";
 import ClassCreatePage from "../components/classes/ClassCreatePage";
 import SectionsPage from "../pages/SectionsPage";
 import SectionDetailsPage from "../components/sections/SectionDetailsPage";
+import SectionCreatePage from "../components/sections/SectionCreatePage";
 
 const Router = () => {
   return (
@@ -58,6 +59,7 @@ const Router = () => {
                   path="/sections/:sectionId"
                   element={<SectionDetailsPage />}
                 />
+                <Route path="/sections/new" element={<SectionCreatePage />} />
               </Route>
 
               <Route
