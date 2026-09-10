@@ -79,7 +79,7 @@ const SectionDetailsPage = () => {
         </p>
         <button
           type="button"
-          onClick={() => navigate(-1)}
+          onClick={() => navigate("/sections")}
           className="mt-4 inline-flex items-center gap-2 rounded-xl bg-slate-900 px-4 py-2 text-xs font-medium text-white shadow-xs hover:bg-slate-800 cursor-pointer"
         >
           <ArrowLeft className="h-3.5 w-3.5" />
@@ -144,7 +144,7 @@ const SectionDetailsPage = () => {
       <div>
         <button
           type="button"
-          onClick={() => navigate(-1)}
+          onClick={() => navigate("/sections")}
           className="inline-flex items-center gap-2 text-xs font-semibold text-slate-500 hover:text-slate-900 transition-colors mb-4 cursor-pointer"
         >
           <ArrowLeft className="h-4 w-4" />

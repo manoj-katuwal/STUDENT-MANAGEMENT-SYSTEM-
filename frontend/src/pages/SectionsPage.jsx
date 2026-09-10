@@ -82,6 +82,7 @@ const SectionsPage = () => {
         isError={isError}
         onRetry={refetch}
         onView={(section) => navigate(`/sections/${section._id}`)}
+        onEdit={(section) => navigate(`/sections/${section._id}/edit`)}
       />
 
       <SectionPagination

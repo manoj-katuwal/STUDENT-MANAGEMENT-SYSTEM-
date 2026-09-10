@@ -23,6 +23,7 @@ import ClassCreatePage from "../components/classes/ClassCreatePage";
 import SectionsPage from "../pages/SectionsPage";
 import SectionDetailsPage from "../components/sections/SectionDetailsPage";
 import SectionCreatePage from "../components/sections/SectionCreatePage";
+import SectionEditPage from "../components/sections/SectionEditPage";
 
 const Router = () => {
   return (
@@ -55,11 +56,15 @@ const Router = () => {
 
               <Route element={<RoleRoute allowedRoles={["ADMIN"]} />}>
                 <Route path="/sections" element={<SectionsPage />} />
+                <Route path="/sections/new" element={<SectionCreatePage />} />
+                <Route
+                  path="/sections/:sectionId/edit"
+                  element={<SectionEditPage />}
+                />
                 <Route
                   path="/sections/:sectionId"
                   element={<SectionDetailsPage />}
                 />
-                <Route path="/sections/new" element={<SectionCreatePage />} />
               </Route>
 
               <Route
