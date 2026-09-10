@@ -2,6 +2,7 @@ import { useState } from "react";
 import {
   useSections,
   useSectionStats,
+  useUpdateSectionStatus,
 } from "../features/sections/section.hook";
 import useDebounce from "../hooks/useDebounce";
 import { useNavigate } from "react-router-dom";
@@ -36,6 +37,8 @@ const SectionsPage = () => {
     refetch: refetchStats,
   } = useSectionStats();
 
+  const updateSectionStatusMutation = useUpdateSectionStatus();
+
   const { data: classesData } = useClasses({
     page: 1,
     limit: 100,
@@ -45,9 +48,7 @@ const SectionsPage = () => {
     <div className="min-h-full p-6 lg:p-8 space-y-6">
       <SectionContextBar />
       <SectionHeader
-        totalSections={
-          statsData?.totalSections ?? data?.pagination?.total ?? 0
-        }
+        totalSections={statsData?.totalSections ?? data?.pagination?.total ?? 0}
         onAdd={() => navigate("/sections/new")}
         onExport={() => {}}
       />
@@ -83,6 +84,12 @@ const SectionsPage = () => {
         onRetry={refetch}
         onView={(section) => navigate(`/sections/${section._id}`)}
         onEdit={(section) => navigate(`/sections/${section._id}/edit`)}
+        onToggleStatus={(section) => {
+          updateSectionStatusMutation.mutate({
+            sectionId: section._id,
+            status: section.status === "ACTIVE" ? "INACTIVE" : "ACTIVE",
+          });
+        }}
       />
 
       <SectionPagination

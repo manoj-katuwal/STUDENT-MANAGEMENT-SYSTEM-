@@ -10,20 +10,45 @@ import {
   AlertCircle,
   RefreshCw,
   Info,
-  Pencil, // Added Pencil Icon
+  Pencil,
+  Power, // Power Icon for Status Toggle
+  Loader2,
 } from "lucide-react";
-import { useSection } from "../../features/sections/section.hook";
+import {
+  useSection,
+  useUpdateSectionStatus,
+} from "../../features/sections/section.hook";
 
 const SectionDetailsPage = () => {
   const { sectionId } = useParams();
   const navigate = useNavigate();
 
   const { data: section, isLoading, isError, refetch } = useSection(sectionId);
+  const updateSectionStatusMutation = useUpdateSectionStatus();
 
-  // Edit action handler
   const handleEdit = () => {
-    // Navigate to edit route or trigger edit modal state
     navigate(`/sections/${sectionId}/edit`);
+  };
+
+  // Toggle Section Active/Inactive Status
+  const handleToggleStatus = async () => {
+    if (!section) return;
+
+    const newStatus = section.status === "ACTIVE" ? "INACTIVE" : "ACTIVE";
+    const actionLabel = newStatus === "INACTIVE" ? "deactivate" : "activate";
+
+    if (
+      window.confirm(`Are you sure you want to ${actionLabel} this section?`)
+    ) {
+      try {
+        await updateSectionStatusMutation.mutateAsync({
+          sectionId,
+          status: newStatus,
+        });
+      } catch (error) {
+        console.error(`Failed to ${actionLabel} section:`, error);
+      }
+    }
   };
 
   // Loading State with Skeleton
@@ -54,7 +79,7 @@ const SectionDetailsPage = () => {
           <button
             type="button"
             onClick={refetch}
-            className="mt-4 inline-flex items-center gap-2 rounded-xl bg-white px-4 py-2 text-xs font-semibold text-red-700 shadow-xs ring-1 ring-inset ring-red-200 transition-all hover:bg-red-50 cursor-pointer"
+            className="mt-4 inline-flex cursor-pointer items-center gap-2 rounded-xl bg-white px-4 py-2 text-xs font-semibold text-red-700 shadow-xs ring-1 ring-inset ring-red-200 transition-all hover:bg-red-50"
           >
             <RefreshCw className="h-3.5 w-3.5" />
             <span>Try Again</span>
@@ -80,7 +105,7 @@ const SectionDetailsPage = () => {
         <button
           type="button"
           onClick={() => navigate("/sections")}
-          className="mt-4 inline-flex items-center gap-2 rounded-xl bg-slate-900 px-4 py-2 text-xs font-medium text-white shadow-xs hover:bg-slate-800 cursor-pointer"
+          className="mt-4 inline-flex cursor-pointer items-center gap-2 rounded-xl bg-slate-900 px-4 py-2 text-xs font-medium text-white shadow-xs hover:bg-slate-800"
         >
           <ArrowLeft className="h-3.5 w-3.5" />
           <span>Go Back</span>
@@ -90,6 +115,7 @@ const SectionDetailsPage = () => {
   }
 
   const isActive = section.status === "ACTIVE";
+  const isUpdating = updateSectionStatusMutation.isPending;
 
   const details = [
     {
@@ -145,15 +171,15 @@ const SectionDetailsPage = () => {
         <button
           type="button"
           onClick={() => navigate("/sections")}
-          className="inline-flex items-center gap-2 text-xs font-semibold text-slate-500 hover:text-slate-900 transition-colors mb-4 cursor-pointer"
+          className="mb-4 inline-flex cursor-pointer items-center gap-2 text-xs font-semibold text-slate-500 transition-colors hover:text-slate-900"
         >
           <ArrowLeft className="h-4 w-4" />
           <span>Back to Sections</span>
         </button>
 
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 rounded-2xl border border-slate-200/80 bg-white p-6 shadow-xs">
+        <div className="flex flex-col justify-between gap-4 rounded-2xl border border-slate-200/80 bg-white p-6 shadow-xs sm:flex-row sm:items-center">
           <div className="flex items-center gap-4">
-            <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-indigo-50 font-bold text-lg text-indigo-600 border border-indigo-100">
+            <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl border border-indigo-100 bg-indigo-50 text-lg font-bold text-indigo-600">
               {section.name ? section.name.charAt(0).toUpperCase() : "S"}
             </div>
             <div>
@@ -165,12 +191,12 @@ const SectionDetailsPage = () => {
                   className={`inline-flex items-center gap-1.5 rounded-full px-2.5 py-0.5 text-xs font-semibold ${
                     isActive
                       ? "bg-emerald-50 text-emerald-700 ring-1 ring-inset ring-emerald-600/20"
-                      : "bg-slate-100 text-slate-600 ring-1 ring-inset ring-slate-500/10"
+                      : "bg-amber-50 text-amber-700 ring-1 ring-inset ring-amber-600/20"
                   }`}
                 >
                   <span
                     className={`h-1.5 w-1.5 rounded-full ${
-                      isActive ? "bg-emerald-500" : "bg-slate-400"
+                      isActive ? "bg-emerald-500" : "bg-amber-500"
                     }`}
                   />
                   {section.status}
@@ -184,10 +210,32 @@ const SectionDetailsPage = () => {
 
           {/* Action Buttons */}
           <div className="flex items-center gap-3">
+            {/* Dynamic Activate/Deactivate Button */}
+            <button
+              type="button"
+              onClick={handleToggleStatus}
+              disabled={isUpdating}
+              className={`inline-flex cursor-pointer items-center gap-2 rounded-xl px-4 py-2.5 text-xs font-semibold shadow-xs transition-all disabled:cursor-not-allowed disabled:opacity-60 ${
+                isActive
+                  ? "border border-amber-200 bg-amber-50 text-amber-800 hover:bg-amber-100"
+                  : "border border-emerald-200 bg-emerald-50 text-emerald-800 hover:bg-emerald-100"
+              }`}
+            >
+              {isUpdating ? (
+                <Loader2 className="h-3.5 w-3.5 animate-spin" />
+              ) : (
+                <Power className="h-3.5 w-3.5" />
+              )}
+              <span>
+                {isActive ? "Deactivate Section" : "Activate Section"}
+              </span>
+            </button>
+
+            {/* Edit Button */}
             <button
               type="button"
               onClick={handleEdit}
-              className="inline-flex items-center gap-2 rounded-xl bg-indigo-600 px-4 py-2.5 text-xs font-semibold text-white shadow-xs hover:bg-indigo-700 transition-all cursor-pointer focus:outline-none focus:ring-2 focus:ring-indigo-500/20"
+              className="inline-flex cursor-pointer items-center gap-2 rounded-xl bg-indigo-600 px-4 py-2.5 text-xs font-semibold text-white shadow-xs transition-all hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500/20"
             >
               <Pencil className="h-3.5 w-3.5" />
               <span>Edit Section</span>
@@ -198,7 +246,7 @@ const SectionDetailsPage = () => {
 
       {/* Details Grid */}
       <div className="rounded-2xl border border-slate-200/80 bg-white p-6 shadow-xs">
-        <h2 className="text-xs font-bold uppercase tracking-wider text-slate-400 mb-6">
+        <h2 className="mb-6 text-xs font-bold uppercase tracking-wider text-slate-400">
           Academic Overview
         </h2>
 
@@ -222,7 +270,7 @@ const SectionDetailsPage = () => {
                       className={`inline-flex items-center gap-1.5 rounded-full px-2.5 py-0.5 text-xs font-semibold ${
                         isActive
                           ? "bg-emerald-50 text-emerald-700 ring-1 ring-inset ring-emerald-600/20"
-                          : "bg-slate-100 text-slate-600 ring-1 ring-inset ring-slate-500/10"
+                          : "bg-amber-50 text-amber-700 ring-1 ring-inset ring-amber-600/20"
                       }`}
                     >
                       {item.value}
