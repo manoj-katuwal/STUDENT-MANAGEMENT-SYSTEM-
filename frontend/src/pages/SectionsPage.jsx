@@ -6,6 +6,7 @@ import {
 import useDebounce from "../hooks/useDebounce";
 import { useNavigate } from "react-router-dom";
 import SectionContextBar from "../components/sections/SectionContextBar";
+import SectionHeader from "../components/sections/SectionHeader";
 
 const SectionsPage = () => {
   const navigate = useNavigate();
@@ -30,9 +31,12 @@ const SectionsPage = () => {
     refetch: refetchStats,
   } = useSectionStats();
 
-  return <div className="min-h-full p-6 lg:p-8 space-y-6">
-    <SectionContextBar />
-  </div>;
+  return (
+    <div className="min-h-full p-6 lg:p-8 space-y-6">
+      <SectionContextBar />
+      <SectionHeader onAdd={() => navigate("/sections/new")} onExport={() => {}} />
+    </div>
+  );
 };
 
 export default SectionsPage;
