@@ -4,6 +4,7 @@ import {
   createSectionController,
   getSectionByIdController,
   getSectionsController,
+  getSectionStatsController,
   updateSectionController,
   updateSectionStatusController,
 } from "./section.controller.js";
@@ -34,6 +35,13 @@ router.get(
   authorize("ADMIN"),
   validateQuery(listSectionsQuerySchema),
   getSectionsController,
+);
+
+router.get(
+  "/stats",
+  authenticate,
+  authorize("ADMIN"),
+  getSectionStatsController,
 );
 router.get("/:id", authenticate, authorize("ADMIN"), getSectionByIdController);
 router.patch(

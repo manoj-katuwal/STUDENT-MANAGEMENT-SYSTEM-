@@ -4,6 +4,7 @@ import {
   findSectionById,
   findSectionByNameAndClass,
   findSections,
+  getSectionStats,
   updateSection,
   updateSectionStatus,
 } from "./section.repository.js";
@@ -130,4 +131,10 @@ export const updateSectionStatusService = async (sectionId, status) => {
   }
 
   return await updateSectionStatus(sectionId, status);
+};
+
+export const getSectionStatsService = async () => {
+  const stats = await getSectionStats();
+
+  return stats;
 };

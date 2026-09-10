@@ -44,3 +44,28 @@ export const updateSectionStatus = async (sectionId, status) => {
     },
   );
 };
+
+export const getSectionStats = async () => {
+  const thirtyDaysAgo = new Date();
+
+  thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
+
+  const [totalSections, activeSections, inactiveSections, recentlyAdded] =
+    await Promise.all([
+      Section.countDocuments(),
+      Section.countDocuments({ status: "ACTIVE" }),
+      Section.countDocuments({ status: "INACTIVE" }),
+      Section.countDocuments({
+        createdAt: {
+          $gte: thirtyDaysAgo,
+        },
+      }),
+    ]);
+
+  return {
+    totalSections,
+    activeSections,
+    inactiveSections,
+    recentlyAdded,
+  };
+};
