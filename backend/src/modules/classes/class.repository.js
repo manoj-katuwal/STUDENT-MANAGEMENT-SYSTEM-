@@ -46,16 +46,27 @@ export const updateClassStatus = async (classId, status) => {
 };
 
 export const getClassStats = async () => {
-  const [totalClasses, activeClasses, inactiveClasses] = await Promise.all([
-    Class.countDocuments(),
-    Class.countDocuments({ status: "ACTIVE" }),
-    Class.countDocuments({ status: "INACTIVE" }),
-  ]);
+  const thirtyDaysAgo = new Date();
+
+  thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
+
+  const [totalClasses, activeClasses, inactiveClasses, recentlyAdded] =
+    await Promise.all([
+      Class.countDocuments(),
+      Class.countDocuments({ status: "ACTIVE" }),
+      Class.countDocuments({ status: "INACTIVE" }),
+      Class.countDocuments({
+        createdAt: {
+          $gte: thirtyDaysAgo,
+        },
+      }),
+    ]);
 
   return {
     totalClasses,
     activeClasses,
     inactiveClasses,
+    recentlyAdded,
   };
 };
 
