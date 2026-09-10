@@ -20,3 +20,23 @@ export const getSectionById = async (sectionId) => {
 
   return response.data.data;
 };
+
+export const createSection = async (data) => {
+  const response = await apiClient.post("/sections", data);
+
+  return response.data.data;
+};
+
+export const updateSection = async (sectionId, data) => {
+  const response = await apiClient.patch(`/sections/${sectionId}`, data);
+
+  return response.data.data;
+};
+
+export const updateSectionStatus = async (sectionId, status) => {
+  const response = await apiClient.patch(`/sections/${sectionId}/status`, {
+    status,
+  });
+
+  return response.data.data;
+};

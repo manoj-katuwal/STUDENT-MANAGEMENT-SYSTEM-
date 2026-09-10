@@ -6,6 +6,7 @@ import {
   Wallet,
   Users2,
   GraduationCap,
+  Layers3,
 } from "lucide-react";
 
 export const NAV_ITEMS = [
@@ -62,6 +63,14 @@ export const NAV_ITEMS = [
     path: "/classes",
     icon: GraduationCap,
     group: "null",
+    allowedRoles: ["ADMIN"],
+  },
+
+  {
+    label: "Sections",
+    path: "/sections",
+    icon: Layers3,
+    group: null,
     allowedRoles: ["ADMIN"],
   },
 ];
