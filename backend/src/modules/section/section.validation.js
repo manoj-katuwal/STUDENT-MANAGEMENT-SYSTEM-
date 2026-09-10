@@ -15,3 +15,10 @@ export const updateSectionSchema = Joi.object({
 export const updateSectionStatusSchema = Joi.object({
   status: Joi.string().valid("ACTIVE", "INACTIVE").required(),
 });
+
+export const listSectionsQuerySchema = Joi.object({
+  page: Joi.number().integer().min(1).default(1),
+  limit: Joi.number().integer().min(1).max(100).default(10),
+  search: Joi.string().trim().allow("").default(""),
+  classId: Joi.string().hex().length(24).allow("").default(""),
+});
