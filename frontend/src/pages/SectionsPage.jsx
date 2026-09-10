@@ -1,9 +1,11 @@
 import { useState } from "react";
-import { useSections, useSectionStats } from "../features/sections/section.hook";
+import {
+  useSections,
+  useSectionStats,
+} from "../features/sections/section.hook";
 import useDebounce from "../hooks/useDebounce";
 import { useNavigate } from "react-router-dom";
-
-
+import SectionContextBar from "../components/sections/SectionContextBar";
 
 const SectionsPage = () => {
   const navigate = useNavigate();
@@ -13,7 +15,6 @@ const SectionsPage = () => {
   const [selectedClassId, setSelectedClassId] = useState("");
 
   const debouncedSearch = useDebounce(search, 700);
-  
 
   const { data, isLoading, isError, error, refetch } = useSections({
     page: currentPage,
@@ -29,7 +30,9 @@ const SectionsPage = () => {
     refetch: refetchStats,
   } = useSectionStats();
 
-  return <div>Sections Page</div>;
+  return <div className="min-h-full p-6 lg:p-8 space-y-6">
+    <SectionContextBar />
+  </div>;
 };
 
 export default SectionsPage;
