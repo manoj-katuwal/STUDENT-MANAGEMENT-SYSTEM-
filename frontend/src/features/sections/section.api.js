@@ -40,3 +40,18 @@ export const updateSectionStatus = async (sectionId, status) => {
 
   return response.data.data;
 };
+
+export const exportSectionsCsv = async (params = {}) => {
+  const cleanParams = Object.fromEntries(
+    Object.entries(params).filter(
+      ([, value]) => value !== undefined && value !== null && value !== "",
+    ),
+  );
+
+  const response = await apiClient.get("/sections/export/csv", {
+    params: cleanParams,
+    responseType: "blob",
+  });
+
+  return response.data;
+};

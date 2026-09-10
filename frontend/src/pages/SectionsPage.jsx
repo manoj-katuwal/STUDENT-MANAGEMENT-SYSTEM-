@@ -3,6 +3,7 @@ import {
   useSections,
   useSectionStats,
   useUpdateSectionStatus,
+  useExportSectionsCsv,
 } from "../features/sections/section.hook";
 import useDebounce from "../hooks/useDebounce";
 import { useNavigate } from "react-router-dom";
@@ -40,11 +41,28 @@ const SectionsPage = () => {
   } = useSectionStats();
 
   const updateSectionStatusMutation = useUpdateSectionStatus();
+  const exportSectionsMutation = useExportSectionsCsv();
 
   const { data: classesData } = useClasses({
     page: 1,
     limit: 100,
   });
+
+  const handleExportCsv = async () => {
+    const blob = await exportSectionsMutation.mutateAsync({
+      search: debouncedSearch,
+      classId: selectedClassId,
+    });
+
+    const url = window.URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = "sections.csv";
+    document.body.appendChild(link);
+    link.click();
+    link.remove();
+    window.URL.revokeObjectURL(url);
+  };
 
   return (
     <div className="min-h-full p-6 lg:p-8 space-y-6">
@@ -52,7 +70,8 @@ const SectionsPage = () => {
       <SectionHeader
         totalSections={statsData?.totalSections ?? data?.pagination?.total ?? 0}
         onAdd={() => navigate("/sections/new")}
-        onExport={() => {}}
+        onExport={handleExportCsv}
+        isExporting={exportSectionsMutation.isPending}
       />
       <SectionStats
         stats={statsData}

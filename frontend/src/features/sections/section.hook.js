@@ -5,7 +5,15 @@ import {
   useQueryClient,
 } from "@tanstack/react-query";
 
-import { getSections, getSectionStats, getSectionById, createSection, updateSectionStatus, updateSection } from "./section.api";
+import {
+  createSection,
+  exportSectionsCsv,
+  getSectionById,
+  getSections,
+  getSectionStats,
+  updateSection,
+  updateSectionStatus,
+} from "./section.api";
 
 export const useSections = (params = {}) => {
   return useQuery({
@@ -74,5 +82,11 @@ export const useUpdateSectionStatus = () => {
       queryClient.invalidateQueries({ queryKey: ["sections"] });
       queryClient.invalidateQueries({ queryKey: ["section-stats"] });
     },
+  });
+};
+
+export const useExportSectionsCsv = () => {
+  return useMutation({
+    mutationFn: exportSectionsCsv,
   });
 };
