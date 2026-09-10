@@ -11,6 +11,7 @@ import SectionStats from "../components/sections/SectionStats";
 import { useClasses } from "../features/classes/class.hooks";
 import SectionFilters from "../components/sections/SectionFilters";
 import SectionTable from "../components/sections/SectionTable";
+import SectionPagination from "../components/sections/SectionPagination";
 
 const SectionsPage = () => {
   const navigate = useNavigate();
@@ -77,6 +78,12 @@ const SectionsPage = () => {
         isLoading={isLoading}
         isError={isError}
         onRetry={refetch}
+      />
+
+      <SectionPagination
+        page={data?.pagination?.page || 1}
+        totalPages={data?.pagination?.totalPages || 1}
+        onPageChange={setCurrentPage}
       />
     </div>
   );
