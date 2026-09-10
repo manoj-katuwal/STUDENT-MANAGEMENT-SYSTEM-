@@ -4,6 +4,7 @@ import {
   findSectionById,
   findSectionByNameAndClass,
   findSections,
+  findSectionsForExport,
   getSectionStats,
   updateSection,
   updateSectionStatus,
@@ -137,4 +138,39 @@ export const getSectionStatsService = async () => {
   const stats = await getSectionStats();
 
   return stats;
+};
+
+const escapeCsvValue = (value) => {
+  if (value === null || value === undefined) return "";
+
+  const stringValue = String(value);
+  return /[",\r\n]/.test(stringValue)
+    ? `"${stringValue.replace(/"/g, '""')}"`
+    : stringValue;
+};
+
+export const getSectionsForExportService = async ({
+  search = "",
+  classId = "",
+} = {}) => {
+  const filter = {};
+  const cleanSearch = typeof search === "string" ? search.trim() : "";
+  const cleanClassId = typeof classId === "string" ? classId.trim() : "";
+
+  if (cleanSearch) filter.name = { $regex: cleanSearch, $options: "i" };
+  if (cleanClassId) filter.classId = cleanClassId;
+
+  const sections = await findSectionsForExport(filter);
+  const headers = ["Section Name", "Class", "Class Code", "Status", "Created At"];
+  const rows = sections.map((section) =>
+    [
+      section.name,
+      section.classId?.name,
+      section.classId?.code,
+      section.status,
+      section.createdAt ? new Date(section.createdAt).toISOString() : "",
+    ].map(escapeCsvValue).join(","),
+  );
+
+  return [headers.join(","), ...rows].join("\r\n");
 };

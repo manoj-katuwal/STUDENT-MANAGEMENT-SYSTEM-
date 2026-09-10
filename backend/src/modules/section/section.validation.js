@@ -22,3 +22,8 @@ export const listSectionsQuerySchema = Joi.object({
   search: Joi.string().trim().allow("").default(""),
   classId: Joi.string().hex().length(24).allow("").default(""),
 });
+
+export const exportSectionsQuerySchema = Joi.object({
+  search: Joi.string().trim().allow("").default(""),
+  classId: Joi.string().hex().length(24).allow("").default(""),
+});

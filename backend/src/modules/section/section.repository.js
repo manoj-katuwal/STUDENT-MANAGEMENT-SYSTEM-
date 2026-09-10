@@ -5,14 +5,14 @@ export const createSection = async (sectionData) => {
 };
 
 export const findSectionById = async (sectionId) => {
-  return await Section.findById(sectionId);
+  return await Section.findById(sectionId).populate("classId", "name code");
 };
 
 export const findSectionByNameAndClass = async (name, classId) => {
   return await Section.findOne({
     name,
     classId,
-  });
+  }).populate("classId", "name code");
 };
 
 export const findSections = async (filter = {}, skip = 0, limit = 10) => {
@@ -25,6 +25,12 @@ export const findSections = async (filter = {}, skip = 0, limit = 10) => {
 
 export const countSections = async (filter = {}) => {
   return await Section.countDocuments(filter);
+};
+
+export const findSectionsForExport = async (filter = {}) => {
+  return await Section.find(filter)
+    .populate("classId", "name code")
+    .sort({ createdAt: -1 });
 };
 
 export const updateSection = async (sectionId, updateData) => {

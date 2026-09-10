@@ -5,12 +5,14 @@ import {
   getSectionByIdController,
   getSectionsController,
   getSectionStatsController,
+  getSectionsCsvController,
   updateSectionController,
   updateSectionStatusController,
 } from "./section.controller.js";
 
 import {
   createSectionSchema,
+  exportSectionsQuerySchema,
   listSectionsQuerySchema,
   updateSectionSchema,
   updateSectionStatusSchema,
@@ -42,6 +44,13 @@ router.get(
   authenticate,
   authorize("ADMIN"),
   getSectionStatsController,
+);
+router.get(
+  "/export/csv",
+  authenticate,
+  authorize("ADMIN"),
+  validateQuery(exportSectionsQuerySchema),
+  getSectionsCsvController,
 );
 router.get("/:id", authenticate, authorize("ADMIN"), getSectionByIdController);
 router.patch(

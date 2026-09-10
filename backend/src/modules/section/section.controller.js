@@ -6,6 +6,7 @@ import {
   getSectionByIdService,
   getSectionsService,
   getSectionStatsService,
+  getSectionsForExportService,
   updateSectionService,
   updateSectionStatusService,
 } from "./section.service.js";
@@ -85,4 +86,16 @@ export const getSectionStatsController = asyncHandler(async (req, res) => {
     message: "Section statistics fetched successfully",
     data: stats,
   });
+});
+
+export const getSectionsCsvController = asyncHandler(async (req, res) => {
+  const csv = await getSectionsForExportService({
+    search: req.query.search,
+    classId: req.query.classId,
+  });
+
+  res.setHeader("Content-Type", "text/csv; charset=utf-8");
+  res.setHeader("Content-Disposition", 'attachment; filename="sections.csv"');
+
+  return res.status(200).send(csv);
 });
