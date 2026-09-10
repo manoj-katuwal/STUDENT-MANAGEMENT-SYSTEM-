@@ -78,6 +78,7 @@ const SectionsPage = () => {
         isLoading={isLoading}
         isError={isError}
         onRetry={refetch}
+        onView={(section) => navigate(`/sections/${section._id}`)}
       />
 
       <SectionPagination
