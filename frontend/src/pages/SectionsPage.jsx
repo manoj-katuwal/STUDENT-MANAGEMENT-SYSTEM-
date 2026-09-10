@@ -13,6 +13,7 @@ import { useClasses } from "../features/classes/class.hooks";
 import SectionFilters from "../components/sections/SectionFilters";
 import SectionTable from "../components/sections/SectionTable";
 import SectionPagination from "../components/sections/SectionPagination";
+import ConfirmModal from "../components/common/ConfirmModal";
 
 const SectionsPage = () => {
   const navigate = useNavigate();
@@ -20,6 +21,7 @@ const SectionsPage = () => {
   const [search, setSearch] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
   const [selectedClassId, setSelectedClassId] = useState("");
+  const [statusTarget, setStatusTarget] = useState(null);
 
   const debouncedSearch = useDebounce(search, 700);
 
@@ -85,10 +87,7 @@ const SectionsPage = () => {
         onView={(section) => navigate(`/sections/${section._id}`)}
         onEdit={(section) => navigate(`/sections/${section._id}/edit`)}
         onToggleStatus={(section) => {
-          updateSectionStatusMutation.mutate({
-            sectionId: section._id,
-            status: section.status === "ACTIVE" ? "INACTIVE" : "ACTIVE",
-          });
+          setStatusTarget(section);
         }}
       />
 
@@ -97,6 +96,41 @@ const SectionsPage = () => {
         totalPages={data?.pagination?.totalPages || 1}
         onPageChange={setCurrentPage}
       />
+
+      {statusTarget && (
+        <ConfirmModal
+          open={Boolean(statusTarget)}
+          title={
+            statusTarget.status === "ACTIVE"
+              ? "Deactivate Section"
+              : "Activate Section"
+          }
+          message={
+            statusTarget.status === "ACTIVE"
+              ? `Are you sure you want to deactivate section "${statusTarget.name}"?`
+              : `Are you sure you want to activate section "${statusTarget.name}"?`
+          }
+          confirmText={
+            statusTarget.status === "ACTIVE" ? "Deactivate" : "Activate"
+          }
+          onCancel={() => setStatusTarget(null)}
+          onConfirm={() => {
+            updateSectionStatusMutation.mutate(
+              {
+                sectionId: statusTarget._id,
+                status:
+                  statusTarget.status === "ACTIVE" ? "INACTIVE" : "ACTIVE",
+              },
+              {
+                onSuccess: () => {
+                  setStatusTarget(null);
+                },
+              },
+            );
+          }}
+          loading={updateSectionStatusMutation.isPending}
+        />
+      )}
     </div>
   );
 };
