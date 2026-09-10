@@ -4,6 +4,7 @@ import authorize from "../../middleware/authorize.js";
 import validate from "../../middleware/validate.js";
 import {
   createClassSchema,
+  exportClassesQuerySchema,
   listClassesQuerySchema,
   updateClassSchema,
   updateClassStatusSchema,
@@ -11,6 +12,7 @@ import {
 import {
   createClassController,
   getClassByIdController,
+  getClassesCsvController,
   getClassesController,
   getClassStatsController,
   updateClassController,
@@ -29,6 +31,14 @@ router.post(
 );
 router.get("/", authenticate, authorize("ADMIN"), getClassesController);
 router.get("/stats", authenticate, authorize("ADMIN"), getClassStatsController);
+
+router.get(
+  "/export/csv",
+  authenticate,
+  authorize("ADMIN"),
+  validateQuery(exportClassesQuerySchema),
+  getClassesCsvController,
+);
 
 router.get("/:id", authenticate, authorize("ADMIN"), getClassByIdController);
 router.patch(

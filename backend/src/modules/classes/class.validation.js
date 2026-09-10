@@ -24,5 +24,10 @@ export const listClassesQuerySchema = Joi.object({
   status: Joi.string().trim().valid("ACTIVE", "INACTIVE").allow("").default(""),
 });
 
+export const exportClassesQuerySchema = Joi.object({
+  search: Joi.string().trim().allow("").default(""),
+  status: Joi.string().trim().valid("ACTIVE", "INACTIVE").allow("").default(""),
+});
+
 
 

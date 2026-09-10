@@ -58,3 +58,7 @@ export const getClassStats = async () => {
     inactiveClasses,
   };
 };
+
+export const findClassesForExport = async (filter = {}) => {
+  return await Class.find(filter).sort({ createdAt: -1 });
+};

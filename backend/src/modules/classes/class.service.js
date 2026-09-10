@@ -9,6 +9,7 @@ import {
   updateClassStatus,
   countClasses,
   getClassStats,
+  findClassesForExport,
 } from "./class.repository.js";
 
 export const createClassService = async (classData) => {
@@ -132,4 +133,95 @@ export const getClassStatsService = async () => {
   const stats = await getClassStats();
 
   return stats;
+};
+
+const escapeCsvValue = (value) => {
+  if (value === null || value === undefined) {
+    return "";
+  }
+
+  const stringValue = String(value);
+
+  if (
+    stringValue.includes(",") ||
+    stringValue.includes('"') ||
+    stringValue.includes("\n") ||
+    stringValue.includes("\r")
+  ) {
+    return `"${stringValue.replace(/"/g, '""')}"`;
+  }
+
+  return stringValue;
+};
+
+const formatDateSafe = (dateVal) => {
+  if (!dateVal) return "";
+  try {
+    const d = new Date(dateVal);
+    if (isNaN(d.getTime())) return "";
+    return d.toISOString();
+  } catch {
+    return "";
+  }
+};
+
+const classToCsvRow = (classRecord) => {
+  return [
+    classRecord.name || "",
+    classRecord.code || "",
+    classRecord.status || "",
+    formatDateSafe(classRecord.createdAt),
+    formatDateSafe(classRecord.updatedAt),
+  ]
+    .map(escapeCsvValue)
+    .join(",");
+};
+
+const generateClassesCsv = (classes) => {
+  const headers = [
+    "Class Name",
+    "Class Code",
+    "Status",
+    "Created At",
+    "Updated At",
+  ];
+
+  const rows = classes.map(classToCsvRow);
+
+  return [headers.join(","), ...rows].join("\r\n");
+};
+
+export const getClassesForExportService = async ({
+  search = "",
+  status = "",
+} = {}) => {
+  const cleanSearch = typeof search === "string" ? search.trim() : "";
+  const cleanStatus = typeof status === "string" ? status.trim() : "";
+
+  const filter = {};
+
+  if (cleanSearch) {
+    filter.$or = [
+      {
+        name: {
+          $regex: cleanSearch,
+          $options: "i",
+        },
+      },
+      {
+        code: {
+          $regex: cleanSearch,
+          $options: "i",
+        },
+      },
+    ];
+  }
+
+  if (cleanStatus) {
+    filter.status = cleanStatus;
+  }
+
+  const classes = await findClassesForExport(filter);
+
+  return generateClassesCsv(classes);
 };
