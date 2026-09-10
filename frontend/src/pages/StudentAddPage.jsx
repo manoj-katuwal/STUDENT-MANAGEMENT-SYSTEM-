@@ -2,6 +2,8 @@ import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { ArrowLeft, User, GraduationCap, Users, Loader2 } from "lucide-react";
 import { useCreateStudent } from "../features/students/student.hooks";
+import { useClasses } from "../features/classes/class.hooks";
+import { useSections } from "../features/sections/section.hook";
 
 // Local — same pattern as StudentDetailsPage / StudentEditPage
 const SectionCard = ({ icon: Icon, title, children }) => (
@@ -42,6 +44,11 @@ const disabledSelectErrorClass =
 const StudentAddPage = () => {
   const navigate = useNavigate();
   const createStudentMutation = useCreateStudent();
+  const { data: classesData, isLoading: classesLoading } = useClasses({
+    page: 1,
+    limit: 100,
+    status: "ACTIVE",
+  });
 
   const [formData, setFormData] = useState({
     name: "",
@@ -60,6 +67,17 @@ const StudentAddPage = () => {
   const [errors, setErrors] = useState({});
   const [submitError, setSubmitError] = useState("");
 
+  const { data: sectionsData, isLoading: sectionsLoading } = useSections({
+    page: 1,
+    limit: 100,
+    classId: formData.classId,
+  });
+
+  const activeClasses = classesData?.classes ?? [];
+  const activeSections = (sectionsData?.sections ?? []).filter(
+    (section) => section.status === "ACTIVE",
+  );
+
   const handleChange = (field) => (e) => {
     setFormData((prev) => ({
       ...prev,
@@ -72,6 +90,21 @@ const StudentAddPage = () => {
         [field]: null,
       }));
     }
+  };
+
+  const handleClassChange = (e) => {
+    const classId = e.target.value;
+
+    setFormData((prev) => ({
+      ...prev,
+      classId,
+      sectionId: "",
+    }));
+    setErrors((prev) => ({
+      ...prev,
+      classId: null,
+      sectionId: null,
+    }));
   };
 
   const validateForm = () => {
@@ -245,26 +278,40 @@ const StudentAddPage = () => {
           <FormField label="Class" required error={errors.classId}>
             <select
               value={formData.classId}
-              disabled
-              className={
-                errors.classId ? disabledSelectErrorClass : disabledSelectClass
-              }
+              onChange={handleClassChange}
+              disabled={classesLoading}
+              className={errors.classId ? inputErrorClass : inputClass}
             >
-              <option value="">Class Module coming soon</option>
+              <option value="">
+                {classesLoading ? "Loading classes..." : "Select a class"}
+              </option>
+              {activeClasses.map((classRecord) => (
+                <option key={classRecord._id} value={classRecord._id}>
+                  {classRecord.name} ({classRecord.code})
+                </option>
+              ))}
             </select>
           </FormField>
 
           <FormField label="Section" required error={errors.sectionId}>
             <select
               value={formData.sectionId}
-              disabled
-              className={
-                errors.sectionId
-                  ? disabledSelectErrorClass
-                  : disabledSelectClass
-              }
+              onChange={handleChange("sectionId")}
+              disabled={!formData.classId || sectionsLoading}
+              className={errors.sectionId ? inputErrorClass : inputClass}
             >
-              <option value="">Section Module coming soon</option>
+              <option value="">
+                {!formData.classId
+                  ? "Select a class first"
+                  : sectionsLoading
+                    ? "Loading sections..."
+                    : "Select a section"}
+              </option>
+              {activeSections.map((section) => (
+                <option key={section._id} value={section._id}>
+                  {section.name}
+                </option>
+              ))}
             </select>
           </FormField>
         </SectionCard>
