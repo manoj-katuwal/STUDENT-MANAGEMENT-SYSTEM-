@@ -10,6 +10,7 @@ import SectionHeader from "../components/sections/SectionHeader";
 import SectionStats from "../components/sections/SectionStats";
 import { useClasses } from "../features/classes/class.hooks";
 import SectionFilters from "../components/sections/SectionFilters";
+import SectionTable from "../components/sections/SectionTable";
 
 const SectionsPage = () => {
   const navigate = useNavigate();
@@ -69,6 +70,13 @@ const SectionsPage = () => {
           setSelectedClassId("");
           setCurrentPage(1);
         }}
+      />
+
+      <SectionTable
+        sections={data?.sections || []}
+        isLoading={isLoading}
+        isError={isError}
+        onRetry={refetch}
       />
     </div>
   );
