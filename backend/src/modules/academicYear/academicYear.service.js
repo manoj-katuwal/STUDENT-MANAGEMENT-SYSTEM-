@@ -26,8 +26,9 @@ const switchCurrentAcademicYear = async (academicYearId, updateData = {}) => {
 
 export const createAcademicYearService = async (academicYearData) => {
   const { name, startDate, endDate, isCurrent } = academicYearData;
+  const normalizedName = name?.trim();
 
-  if (!name) {
+  if (!normalizedName) {
     throw new AppError("Academic year name is required", 400);
   }
 
@@ -35,11 +36,18 @@ export const createAcademicYearService = async (academicYearData) => {
     throw new AppError("Start date and end date are required", 400);
   }
 
-  if (new Date(startDate) >= new Date(endDate)) {
+  const parsedStartDate = new Date(startDate);
+  const parsedEndDate = new Date(endDate);
+
+  if (
+    Number.isNaN(parsedStartDate.getTime()) ||
+    Number.isNaN(parsedEndDate.getTime()) ||
+    parsedStartDate >= parsedEndDate
+  ) {
     throw new AppError("Start date must be before end date", 400);
   }
 
-  const existingAcademicYear = await findAcademicYearByName(name);
+  const existingAcademicYear = await findAcademicYearByName(normalizedName);
 
   if (existingAcademicYear) {
     throw new AppError("Academic year with this name already exists", 400);
@@ -56,7 +64,7 @@ export const createAcademicYearService = async (academicYearData) => {
     }
   }
 
-  return await createAcademicYear(academicYearData);
+  return await createAcademicYear({ ...academicYearData, name: normalizedName });
 };
 
 export const getAcademicYearByIdService = async (academicYearId) => {
