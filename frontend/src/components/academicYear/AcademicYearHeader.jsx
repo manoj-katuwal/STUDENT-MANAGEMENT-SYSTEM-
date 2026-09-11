@@ -1,6 +1,6 @@
 import { Upload, Plus } from "lucide-react";
 
-const AcademicYearHeader = () => {
+const AcademicYearHeader = ({ onAdd }) => {
   return (
     <div className="bg-white border border-slate-200 rounded-xl shadow-sm px-5 py-4 md:px-6 md:py-5">
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
@@ -31,6 +31,7 @@ const AcademicYearHeader = () => {
 
           <button
             type="button"
+            onClick={onAdd}
             className="inline-flex items-center gap-1.5 px-3.5 py-2 bg-blue-600 hover:bg-blue-700 active:bg-blue-800 text-white text-sm font-medium rounded-lg shadow-sm transition-colors cursor-pointer"
           >
             <Plus className="w-4 h-4" />
