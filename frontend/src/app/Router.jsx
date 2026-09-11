@@ -1,4 +1,3 @@
-import React from "react";
 import { BrowserRouter, Route, Routes } from "react-router-dom";
 import HomePage from "../pages/HomePage";
 import LoginPage from "../pages/LoginPage";
@@ -15,14 +14,11 @@ import AppLayout from "../components/layout/AppLayout";
 import StudentsPage from "../pages/StudentPage";
 import StudentDetailsPage from "../pages/StudentDetailsPage";
 import StudentEditPage from "../pages/StudentEditPage";
-import StudentAddPage from "../pages/StudentAddPage";
 import ClassesPage from "../pages/ClassesPage";
 import ClassDetailsPage from "../components/classes/ClassDetailsPage";
 import ClassEditPage from "../components/classes/ClassEditPage";
-import ClassCreatePage from "../components/classes/ClassCreatePage";
 import SectionsPage from "../pages/SectionsPage";
 import SectionDetailsPage from "../components/sections/SectionDetailsPage";
-import SectionCreatePage from "../components/sections/SectionCreatePage";
 import SectionEditPage from "../components/sections/SectionEditPage";
 import AcademicYearPage from "../pages/AcademicYearPage";
 
@@ -44,7 +40,6 @@ const Router = () => {
 
               <Route element={<RoleRoute allowedRoles={["ADMIN"]} />}>
                 <Route path="/classes" element={<ClassesPage />} />
-                <Route path="/classes/new" element={<ClassCreatePage />} />
                 <Route
                   path="/classes/:classId"
                   element={<ClassDetailsPage />}
@@ -57,7 +52,6 @@ const Router = () => {
 
               <Route element={<RoleRoute allowedRoles={["ADMIN"]} />}>
                 <Route path="/sections" element={<SectionsPage />} />
-                <Route path="/sections/new" element={<SectionCreatePage />} />
                 <Route
                   path="/sections/:sectionId/edit"
                   element={<SectionEditPage />}
@@ -87,7 +81,6 @@ const Router = () => {
                   path="/students/:studentId/edit"
                   element={<StudentEditPage />}
                 />
-                <Route path="/students/new" element={<StudentAddPage />} />
               </Route>
               {/* ADMIN AND ACCOUNTANT  */}
               <Route

@@ -15,6 +15,7 @@ import SectionFilters from "../components/sections/SectionFilters";
 import SectionTable from "../components/sections/SectionTable";
 import SectionPagination from "../components/sections/SectionPagination";
 import ConfirmModal from "../components/common/ConfirmModal";
+import CreateSectionModal from "../components/sections/CreateSectionModal";
 
 const SectionsPage = () => {
   const navigate = useNavigate();
@@ -23,10 +24,11 @@ const SectionsPage = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [selectedClassId, setSelectedClassId] = useState("");
   const [statusTarget, setStatusTarget] = useState(null);
+  const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
 
   const debouncedSearch = useDebounce(search, 700);
 
-  const { data, isLoading, isError, error, refetch } = useSections({
+  const { data, isLoading, isError, refetch } = useSections({
     page: currentPage,
     limit: 10,
     search: debouncedSearch,
@@ -69,7 +71,7 @@ const SectionsPage = () => {
       <SectionContextBar />
       <SectionHeader
         totalSections={statsData?.totalSections ?? data?.pagination?.total ?? 0}
-        onAdd={() => navigate("/sections/new")}
+        onAdd={() => setIsCreateModalOpen(true)}
         onExport={handleExportCsv}
         isExporting={exportSectionsMutation.isPending}
       />
@@ -150,6 +152,10 @@ const SectionsPage = () => {
           loading={updateSectionStatusMutation.isPending}
         />
       )}
+      <CreateSectionModal
+        open={isCreateModalOpen}
+        onClose={() => setIsCreateModalOpen(false)}
+      />
     </div>
   );
 };

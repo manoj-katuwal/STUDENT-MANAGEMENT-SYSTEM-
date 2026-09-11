@@ -1,10 +1,10 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import { ArrowLeft, BookPlus, Plus } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useCreateClass } from "../../features/classes/class.hooks";
 import { validateClassForm } from "../../features/classes/class.validation";
 
-const ClassCreatePage = () => {
+const ClassCreatePage = ({ onCreated, onCancel, embedded = false }) => {
   const navigate = useNavigate();
 
   const [formData, setFormData] = useState({
@@ -13,7 +13,6 @@ const ClassCreatePage = () => {
   });
 
   const [errors, setErrors] = useState({});
-  const [touched, setTouched] = useState({});
 
   const createClassMutation = useCreateClass();
 
@@ -36,7 +35,6 @@ const ClassCreatePage = () => {
 
   const handleBlur = (e) => {
     const { name } = e.target;
-    setTouched((prev) => ({ ...prev, [name]: true }));
     const formErrors = validateClassForm(formData);
     setErrors((prev) => ({
       ...prev,
@@ -47,7 +45,6 @@ const ClassCreatePage = () => {
   const handleSubmit = (e) => {
     e.preventDefault();
 
-    setTouched({ name: true, code: true });
     const validationErrors = validateClassForm(formData);
 
     if (Object.keys(validationErrors).length > 0) {
@@ -62,6 +59,11 @@ const ClassCreatePage = () => {
       },
       {
         onSuccess: () => {
+          if (onCreated) {
+            onCreated();
+            return;
+          }
+
           navigate("/classes");
         },
         onError: (err) => {
@@ -80,16 +82,16 @@ const ClassCreatePage = () => {
     createClassMutation.isPending || createClassMutation.isLoading;
 
   return (
-    <div className="mx-auto max-w-2xl space-y-4 px-4 py-6">
+    <div className={embedded ? "" : "mx-auto max-w-2xl space-y-4 px-4 py-6"}>
       {/* Back Button */}
-      <button
+      {!embedded && <button
         type="button"
-        onClick={() => navigate("/classes")}
+        onClick={() => (onCancel ? onCancel() : navigate("/classes"))}
         className="inline-flex items-center gap-1.5 text-sm font-medium text-slate-500 transition-colors hover:text-slate-800"
       >
         <ArrowLeft className="h-4 w-4" />
         <span>Back to Classes</span>
-      </button>
+      </button>}
 
       {/* Main Card */}
       <div className="overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm">
@@ -189,7 +191,7 @@ const ClassCreatePage = () => {
           <div className="flex items-center justify-end gap-3 border-t border-slate-100 bg-slate-50/50 px-6 py-3.5">
             <button
               type="button"
-              onClick={() => navigate("/classes")}
+              onClick={() => (onCancel ? onCancel() : navigate("/classes"))}
               className="rounded-lg border border-slate-200 bg-white px-4 py-2 text-sm font-medium text-slate-600 transition hover:bg-slate-50"
             >
               Cancel

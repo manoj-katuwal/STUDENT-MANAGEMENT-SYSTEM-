@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { ArrowLeft, User, GraduationCap, Users, Loader2 } from "lucide-react";
 import { useCreateStudent } from "../features/students/student.hooks";
@@ -35,13 +35,7 @@ const inputClass =
 const inputErrorClass =
   "w-full px-3 py-2 border border-red-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent transition-colors";
 
-const disabledSelectClass =
-  "w-full px-3 py-2 border border-slate-200 rounded-lg text-sm bg-slate-50 text-slate-400 cursor-not-allowed";
-
-const disabledSelectErrorClass =
-  "w-full px-3 py-2 border border-red-300 rounded-lg text-sm bg-slate-50 text-slate-400 cursor-not-allowed";
-
-const StudentAddPage = () => {
+const StudentAddPage = ({ onCreated, onCancel, embedded = false }) => {
   const navigate = useNavigate();
   const createStudentMutation = useCreateStudent();
   const { data: classesData, isLoading: classesLoading } = useClasses({
@@ -173,7 +167,11 @@ const StudentAddPage = () => {
 
     try {
       const student = await createStudentMutation.mutateAsync(payload);
-      navigate(`/students/${student._id}`);
+      if (onCreated) {
+        onCreated(student);
+      } else {
+        navigate(`/students/${student._id}`);
+      }
     } catch (error) {
       setSubmitError(
         error?.response?.data?.message ||
@@ -184,12 +182,12 @@ const StudentAddPage = () => {
   };
 
   return (
-    <div className="max-w-4xl mx-auto py-6 px-4 space-y-4">
+    <div className={embedded ? "space-y-4" : "max-w-4xl mx-auto py-6 px-4 space-y-4"}>
       {/* Header */}
-      <div className="bg-white border border-slate-200 rounded-xl shadow-sm px-5 py-4">
+      {!embedded && <div className="bg-white border border-slate-200 rounded-xl shadow-sm px-5 py-4">
         <button
           type="button"
-          onClick={() => navigate("/students")}
+          onClick={() => (onCancel ? onCancel() : navigate("/students"))}
           className="inline-flex items-center gap-1.5 text-sm font-medium text-slate-500 hover:text-slate-800 transition-colors mb-3"
         >
           <ArrowLeft className="w-4 h-4" />
@@ -198,7 +196,7 @@ const StudentAddPage = () => {
         <h1 className="text-xl font-bold text-slate-900 tracking-tight">
           Add Student
         </h1>
-      </div>
+      </div>}
 
       {/* API / Server Error Alert Display */}
       {submitError && (
@@ -350,7 +348,7 @@ const StudentAddPage = () => {
         <div className="flex items-center justify-end gap-3 pt-2">
           <button
             type="button"
-            onClick={() => navigate("/students")}
+            onClick={() => (onCancel ? onCancel() : navigate("/students"))}
             disabled={createStudentMutation.isPending}
             className="px-4 py-2 border border-slate-200 bg-white hover:bg-slate-50 text-slate-700 text-sm font-medium rounded-lg shadow-sm transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
           >

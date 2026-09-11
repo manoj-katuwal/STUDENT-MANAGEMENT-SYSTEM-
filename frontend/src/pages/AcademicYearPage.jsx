@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import { useState } from "react";
 
 import AcademicYearPageContextBar from "../components/academicYear/AcademicYearContextBar";
 import AcademicYearHeader from "../components/academicYear/AcademicYearHeader";

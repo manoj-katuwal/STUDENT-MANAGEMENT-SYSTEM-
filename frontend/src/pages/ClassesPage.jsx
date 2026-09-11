@@ -14,6 +14,7 @@ import ClassFilters from "../components/classes/ClassFilters";
 import ClassTable from "../components/classes/ClassTable";
 import ClassPagination from "../components/classes/ClassPagination";
 import ConfirmModal from "../components/common/ConfirmModal";
+import CreateClassModal from "../components/classes/CreateClassModal";
 
 const ClassesPage = () => {
   const navigate = useNavigate();
@@ -40,6 +41,7 @@ const ClassesPage = () => {
   const updateStatusMutation = useUpdateClassStatus();
   const exportClassesMutation = useExportClassesCsv();
   const [selectedClassForStatus, setSelectedClassForStatus] = useState(null);
+  const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
 
   const handleExportCsv = async () => {
     const blob = await exportClassesMutation.mutateAsync({
@@ -84,10 +86,10 @@ const ClassesPage = () => {
 
   return (
     <div className="min-h-full p-6 lg:p-8 space-y-6">
-      <ClassContextBar onAdd={() => navigate("/classes/new")} />
+      <ClassContextBar onAdd={() => setIsCreateModalOpen(true)} />
       <ClassesHeader
         totalClasses={totalClasses}
-        onAdd={() => navigate("/classes/new")}
+        onAdd={() => setIsCreateModalOpen(true)}
         onExport={handleExportCsv}
         isExporting={exportClassesMutation.isPending}
       />
@@ -148,6 +150,10 @@ const ClassesPage = () => {
         isLoading={updateStatusMutation.isPending}
         onConfirm={handleConfirmStatusChange}
         onCancel={() => setSelectedClassForStatus(null)}
+      />
+      <CreateClassModal
+        open={isCreateModalOpen}
+        onClose={() => setIsCreateModalOpen(false)}
       />
     </div>
   );

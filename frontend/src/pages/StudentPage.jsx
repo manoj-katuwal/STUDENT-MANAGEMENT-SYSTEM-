@@ -11,12 +11,14 @@ import { useState } from "react";
 import useDebounce from "../hooks/useDebounce";
 import StudentTable from "../components/students/StudentTable";
 import StudentPagination from "../components/students/StudentPagination";
+import CreateStudentModal from "../components/students/CreateStudentModal";
 
 const StudentsPage = () => {
   const [search, setSearch] = useState("");
   const [classId, setClassId] = useState("");
   const [sectionId, setSectionId] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
+  const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
   const exportStudentsMutation = useExportStudentsCsv();
   const debouncedSearch = useDebounce(search, 700);
 
@@ -92,6 +94,7 @@ const StudentsPage = () => {
         totalStudents={totalStudents}
         onExport={handleExportCsv}
         isExporting={exportStudentsMutation.isPending}
+        onAdd={() => setIsCreateModalOpen(true)}
       />
       <StudentStats data={statsData} isLoading={isStatsLoading} />
       <StudentFilters
@@ -120,6 +123,10 @@ const StudentsPage = () => {
         onPageChange={setCurrentPage}
         limit={pagination?.limit || 10}
         total={pagination?.total || 0}
+      />
+      <CreateStudentModal
+        open={isCreateModalOpen}
+        onClose={() => setIsCreateModalOpen(false)}
       />
       {/* )} */}
     </div>

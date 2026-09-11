@@ -10,7 +10,7 @@ import { useClasses } from "../../features/classes/class.hooks";
 import { useCreateSection } from "../../features/sections/section.hook";
 import { useState } from "react";
 
-const SectionCreatePage = () => {
+const SectionCreatePage = ({ onCreated, onCancel, embedded = false }) => {
   const navigate = useNavigate();
 
   const { data: classesData, isLoading: classesLoading } = useClasses({
@@ -73,7 +73,11 @@ const SectionCreatePage = () => {
         classId: formData.classId,
       });
 
-      navigate("/sections");
+      if (onCreated) {
+        onCreated();
+      } else {
+        navigate("/sections");
+      }
     } catch (error) {
       console.error("Failed to create section:", error);
     }
@@ -82,12 +86,12 @@ const SectionCreatePage = () => {
   const classes = classesData?.classes || [];
 
   return (
-    <div className="mx-auto max-w-4xl space-y-6 p-6">
+    <div className={embedded ? "" : "mx-auto max-w-4xl space-y-6 p-6"}>
       {/* Header & Breadcrumb */}
-      <div>
+      {!embedded && <div>
         <button
           type="button"
-          onClick={() => navigate("/sections")}
+          onClick={() => (onCancel ? onCancel() : navigate("/sections"))}
           className="group mb-3 inline-flex items-center gap-2 text-xs font-semibold text-slate-500 transition-colors hover:text-slate-900 cursor-pointer"
         >
           <ArrowLeft className="h-4 w-4 transition-transform group-hover:-translate-x-0.5" />
@@ -107,7 +111,7 @@ const SectionCreatePage = () => {
             </p>
           </div>
         </div>
-      </div>
+      </div>}
 
       {/* Main Form Card */}
       <div className="rounded-2xl border border-slate-200/80 bg-white p-6 sm:p-8 shadow-xs">
@@ -220,7 +224,7 @@ const SectionCreatePage = () => {
           <div className="flex items-center justify-end gap-3 border-t border-slate-100 pt-6">
             <button
               type="button"
-              onClick={() => navigate("/sections")}
+              onClick={() => (onCancel ? onCancel() : navigate("/sections"))}
               className="rounded-xl border border-slate-200 bg-white px-5 py-2.5 text-xs font-semibold text-slate-600 shadow-xs transition-all hover:bg-slate-50 cursor-pointer"
             >
               Cancel
