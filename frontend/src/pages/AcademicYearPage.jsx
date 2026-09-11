@@ -7,10 +7,12 @@ import AcademicYearTable from "../components/academicYear/AcademicYearTable";
 import { useAcademicYears } from "../features/academicYear/academicYear.hooks";
 import AcademicYearPagination from "../components/academicYear/AcademicYearPagination";
 import CreateAcademicYearModal from "../components/academicYear/CreateAcademicYearModal";
+import EditAcademicYearModel from "../components/academicYear/EditAcademicYearModel";
 
 const AcademicYearPage = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
+  const [selectedAcademicYear, setSelectedAcademicYear] = useState(null);
   const { data, isLoading, isError, refetch } = useAcademicYears({
     page: currentPage,
     limit: 10,
@@ -26,6 +28,9 @@ const AcademicYearPage = () => {
         isLoading={isLoading}
         isError={isError}
         onRetry={refetch}
+        onEdit={(academicYear) => {
+          setSelectedAcademicYear(academicYear);
+        }}
       />
       <AcademicYearPagination
         pagination={data?.pagination}
@@ -35,6 +40,12 @@ const AcademicYearPage = () => {
       <CreateAcademicYearModal
         open={isCreateModalOpen}
         onClose={() => setIsCreateModalOpen(false)}
+      />
+
+      <EditAcademicYearModel
+        open={Boolean(selectedAcademicYear)}
+        academicYear={selectedAcademicYear}
+        onClose={() => setSelectedAcademicYear(null)}
       />
     </div>
   );
