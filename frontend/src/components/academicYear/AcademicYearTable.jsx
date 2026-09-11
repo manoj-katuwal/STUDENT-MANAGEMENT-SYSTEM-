@@ -1,4 +1,3 @@
-import React from "react";
 import {
   AlertCircle,
   Calendar,
@@ -7,6 +6,7 @@ import {
   Power,
   RefreshCw,
 } from "lucide-react";
+import formatDate from "../../utils/formatDate";
 
 const AcademicYearTable = ({
   academicYears = [],
@@ -145,7 +145,7 @@ const AcademicYearTable = ({
                   <td className="whitespace-nowrap px-6 py-4 text-xs font-medium text-slate-600">
                     <div className="flex items-center gap-1.5">
                       <Calendar className="h-3.5 w-3.5 text-slate-400" />
-                      <span>{year.startDate || "—"}</span>
+                      <span>{year.startDate ? formatDate(year.startDate) : "—"}</span>
                     </div>
                   </td>
 
@@ -153,7 +153,7 @@ const AcademicYearTable = ({
                   <td className="whitespace-nowrap px-6 py-4 text-xs font-medium text-slate-600">
                     <div className="flex items-center gap-1.5">
                       <Calendar className="h-3.5 w-3.5 text-slate-400" />
-                      <span>{year.endDate || "—"}</span>
+                      <span>{year.endDate ? formatDate(year.endDate) : "—"}</span>
                     </div>
                   </td>
 

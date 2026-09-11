@@ -114,6 +114,7 @@ const EditAcademicYearModal = ({ open, academicYear, onClose }) => {
               <input
                 type="date"
                 value={formData.startDate}
+                max={formData.endDate || undefined}
                 onChange={(e) =>
                   setFormData((prev) => ({
                     ...prev,
@@ -132,6 +133,7 @@ const EditAcademicYearModal = ({ open, academicYear, onClose }) => {
               <input
                 type="date"
                 value={formData.endDate}
+                min={formData.startDate || undefined}
                 onChange={(e) =>
                   setFormData((prev) => ({
                     ...prev,
