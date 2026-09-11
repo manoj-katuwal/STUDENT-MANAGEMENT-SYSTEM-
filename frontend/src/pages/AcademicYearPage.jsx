@@ -4,19 +4,38 @@ import AcademicYearPageContextBar from "../components/academicYear/AcademicYearC
 import AcademicYearHeader from "../components/academicYear/AcademicYearHeader";
 import AcademicYearStats from "../components/academicYear/AcademicYearStats";
 import AcademicYearTable from "../components/academicYear/AcademicYearTable";
-import { useAcademicYears } from "../features/academicYear/academicYear.hooks";
+import { useAcademicYears, useActivateAcademicYear, useDeactivateAcademicYear } from "../features/academicYear/academicYear.hooks";
 import AcademicYearPagination from "../components/academicYear/AcademicYearPagination";
 import CreateAcademicYearModal from "../components/academicYear/CreateAcademicYearModal";
 import EditAcademicYearModel from "../components/academicYear/EditAcademicYearModel";
+import ConfirmModal from "../components/common/ConfirmModal";
 
 const AcademicYearPage = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
   const [selectedAcademicYear, setSelectedAcademicYear] = useState(null);
+  const [statusTarget, setStatusTarget] = useState(null);
   const { data, isLoading, isError, refetch } = useAcademicYears({
     page: currentPage,
     limit: 10,
   });
+
+  const activateMutation = useActivateAcademicYear();
+  const deactivateMutation = useDeactivateAcademicYear();
+
+  const handleConfirmStatusChange = () => {
+    if (!statusTarget) return;
+
+    const mutation =
+      statusTarget.status === "ACTIVE" ? deactivateMutation : activateMutation;
+
+    mutation.mutate(statusTarget._id, {
+      onSuccess: () => setStatusTarget(null),
+    });
+  };
+
+  const isStatusChangePending =
+    activateMutation.isPending || deactivateMutation.isPending;
 
   return (
     <div className="min-h-full p-6 lg:p-8 space-y-6">
@@ -31,6 +50,7 @@ const AcademicYearPage = () => {
         onEdit={(academicYear) => {
           setSelectedAcademicYear(academicYear);
         }}
+        onToggleStatus={setStatusTarget}
       />
       <AcademicYearPagination
         pagination={data?.pagination}
@@ -47,6 +67,27 @@ const AcademicYearPage = () => {
         open={Boolean(selectedAcademicYear)}
         academicYear={selectedAcademicYear}
         onClose={() => setSelectedAcademicYear(null)}
+      />
+
+      <ConfirmModal
+        open={Boolean(statusTarget)}
+        title={
+          statusTarget?.status === "ACTIVE"
+            ? "Deactivate Academic Year"
+            : "Activate Academic Year"
+        }
+        message={
+          statusTarget?.status === "ACTIVE"
+            ? `Are you sure you want to deactivate "${statusTarget.name}"?`
+            : `Activate "${statusTarget?.name}" as the current academic year? The current academic year will be changed.`
+        }
+        confirmText={
+          statusTarget?.status === "ACTIVE" ? "Deactivate" : "Activate"
+        }
+        variant={statusTarget?.status === "ACTIVE" ? "warning" : "info"}
+        isLoading={isStatusChangePending}
+        onConfirm={handleConfirmStatusChange}
+        onCancel={() => setStatusTarget(null)}
       />
     </div>
   );

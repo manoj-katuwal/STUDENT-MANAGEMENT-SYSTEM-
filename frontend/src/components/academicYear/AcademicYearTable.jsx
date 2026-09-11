@@ -211,11 +211,18 @@ const AcademicYearTable = ({
                       <button
                         type="button"
                         onClick={() => onToggleStatus?.(year)}
-                        title={isActive ? "Deactivate" : "Activate"}
-                        className={`cursor-pointer rounded-lg p-2 transition-colors ${
+                        disabled={year.isCurrent}
+                        title={
+                          year.isCurrent
+                            ? "Current academic year cannot be deactivated"
+                            : isActive
+                              ? "Deactivate"
+                              : "Activate"
+                        }
+                        className={`rounded-lg p-2 transition-colors disabled:cursor-not-allowed disabled:opacity-40 ${
                           isActive
-                            ? "text-slate-400 hover:bg-amber-50 hover:text-amber-600"
-                            : "text-slate-400 hover:bg-emerald-50 hover:text-emerald-600"
+                            ? "cursor-pointer text-slate-400 hover:bg-amber-50 hover:text-amber-600"
+                            : "cursor-pointer text-slate-400 hover:bg-emerald-50 hover:text-emerald-600"
                         }`}
                       >
                         <Power className="h-4 w-4" />
