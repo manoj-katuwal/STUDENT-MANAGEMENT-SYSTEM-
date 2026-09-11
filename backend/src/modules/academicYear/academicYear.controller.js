@@ -1,5 +1,6 @@
 import asyncHandler from "../../shared/utils/asyncHandler.js";
 import { successResponse } from "../../shared/utils/response/apiResponse.js";
+import AppError from "../../shared/utils/error/AppError.js";
 import {
   activateAcademicYearService,
   createAcademicYearService,
@@ -8,6 +9,32 @@ import {
   getAcademicYearsService,
   updateAcademicYearService,
 } from "./academicYear.service.js";
+
+const getPositiveIntegerQueryParam = (
+  value,
+  defaultValue,
+  fieldName,
+  maximum,
+) => {
+  if (value === undefined) {
+    return defaultValue;
+  }
+
+  const parsedValue = Number(value);
+
+  if (
+    !Number.isSafeInteger(parsedValue) ||
+    parsedValue < 1 ||
+    parsedValue > maximum
+  ) {
+    throw new AppError(
+      `${fieldName} must be a whole number between 1 and ${maximum}`,
+      400,
+    );
+  }
+
+  return parsedValue;
+};
 
 export const createAcademicYearController = asyncHandler(async (req, res) => {
   const academicYear = await createAcademicYearService(req.body);
@@ -34,8 +61,8 @@ export const getAcademicYearByIdController = asyncHandler(async (req, res) => {
 });
 
 export const getAcademicYearsController = asyncHandler(async (req, res) => {
-  const page = Number(req.query.page) || 1;
-  const limit = Number(req.query.limit) || 10;
+  const page = getPositiveIntegerQueryParam(req.query.page, 1, "Page", 100000);
+  const limit = getPositiveIntegerQueryParam(req.query.limit, 10, "Limit", 100);
 
   const result = await getAcademicYearsService(page, limit);
 
