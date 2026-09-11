@@ -43,6 +43,7 @@ const AcademicYearPage = () => {
       />
 
       <EditAcademicYearModel
+        key={selectedAcademicYear?._id ?? "closed"}
         open={Boolean(selectedAcademicYear)}
         academicYear={selectedAcademicYear}
         onClose={() => setSelectedAcademicYear(null)}

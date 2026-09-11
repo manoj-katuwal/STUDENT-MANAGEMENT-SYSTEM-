@@ -1,28 +1,22 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { X } from "lucide-react";
 import { useUpdateAcademicYear } from "../../features/academicYear/academicYear.hooks";
+
+const getInitialFormData = (academicYear) => ({
+  name: academicYear?.name ?? "",
+  startDate: academicYear?.startDate
+    ? academicYear.startDate.slice(0, 10)
+    : "",
+  endDate: academicYear?.endDate ? academicYear.endDate.slice(0, 10) : "",
+  isCurrent: academicYear?.isCurrent ?? false,
+});
+
 const EditAcademicYearModal = ({ open, academicYear, onClose }) => {
-  const [formData, setFormData] = useState({
-    name: "",
-    startDate: "",
-    endDate: "",
-    isCurrent: false,
-  });
+  const [formData, setFormData] = useState(() =>
+    getInitialFormData(academicYear),
+  );
   const updateMutation = useUpdateAcademicYear();
   const [error, setError] = useState("");
-
-  useEffect(() => {
-    if (!academicYear) return;
-
-    setFormData({
-      name: academicYear.name ?? "",
-      startDate: academicYear.startDate
-        ? academicYear.startDate.slice(0, 10)
-        : "",
-      endDate: academicYear.endDate ? academicYear.endDate.slice(0, 10) : "",
-      isCurrent: academicYear.isCurrent ?? false,
-    });
-  }, [academicYear]);
   if (!open || !academicYear) {
     return null;
   }
