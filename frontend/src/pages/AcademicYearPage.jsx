@@ -3,6 +3,7 @@ import React from "react";
 import AcademicYearPageContextBar from "../components/academicYear/AcademicYearContextBar";
 import AcademicYearHeader from "../components/academicYear/AcademicYearHeader";
 import AcademicYearStats from "../components/academicYear/AcademicYearStats";
+import AcademicYearTable from "../components/academicYear/AcademicYearTable";
 
 const AcademicYearPage = () => {
   return (
@@ -10,6 +11,7 @@ const AcademicYearPage = () => {
       <AcademicYearPageContextBar />
       <AcademicYearHeader />
       <AcademicYearStats />
+      <AcademicYearTable />
     </div>
   );
 };
