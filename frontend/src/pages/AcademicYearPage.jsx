@@ -9,11 +9,13 @@ import AcademicYearPagination from "../components/academicYear/AcademicYearPagin
 import CreateAcademicYearModal from "../components/academicYear/CreateAcademicYearModal";
 import EditAcademicYearModel from "../components/academicYear/EditAcademicYearModel";
 import ConfirmModal from "../components/common/ConfirmModal";
+import ViewAcademicYearModal from "../components/academicYear/ViewAcademicYearModal";
 
 const AcademicYearPage = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
   const [selectedAcademicYear, setSelectedAcademicYear] = useState(null);
+  const [viewAcademicYear, setViewAcademicYear] = useState(null);
   const [statusTarget, setStatusTarget] = useState(null);
   const { data, isLoading, isError, refetch } = useAcademicYears({
     page: currentPage,
@@ -50,6 +52,7 @@ const AcademicYearPage = () => {
         onEdit={(academicYear) => {
           setSelectedAcademicYear(academicYear);
         }}
+        onView={setViewAcademicYear}
         onToggleStatus={setStatusTarget}
       />
       <AcademicYearPagination
@@ -67,6 +70,12 @@ const AcademicYearPage = () => {
         open={Boolean(selectedAcademicYear)}
         academicYear={selectedAcademicYear}
         onClose={() => setSelectedAcademicYear(null)}
+      />
+
+      <ViewAcademicYearModal
+        open={Boolean(viewAcademicYear)}
+        academicYear={viewAcademicYear}
+        onClose={() => setViewAcademicYear(null)}
       />
 
       <ConfirmModal
