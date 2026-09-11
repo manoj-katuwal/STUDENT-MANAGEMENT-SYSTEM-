@@ -7,6 +7,7 @@ import {
   Users2,
   GraduationCap,
   Layers3,
+  CalendarDays,
 } from "lucide-react";
 
 export const NAV_ITEMS = [
@@ -70,6 +71,14 @@ export const NAV_ITEMS = [
     label: "Sections",
     path: "/sections",
     icon: Layers3,
+    group: null,
+    allowedRoles: ["ADMIN"],
+  },
+
+  {
+    label: "Academic Years",
+    path: "/academic-years",
+    icon: CalendarDays,
     group: null,
     allowedRoles: ["ADMIN"],
   },

@@ -24,6 +24,7 @@ import SectionsPage from "../pages/SectionsPage";
 import SectionDetailsPage from "../components/sections/SectionDetailsPage";
 import SectionCreatePage from "../components/sections/SectionCreatePage";
 import SectionEditPage from "../components/sections/SectionEditPage";
+import AcademicYearPage from "../pages/AcademicYearPage";
 
 const Router = () => {
   return (
@@ -65,6 +66,9 @@ const Router = () => {
                   path="/sections/:sectionId"
                   element={<SectionDetailsPage />}
                 />
+              </Route>
+              <Route element={<RoleRoute allowedRoles={["ADMIN"]} />}>
+                <Route path="/academic-years" element={<AcademicYearPage />} />
               </Route>
 
               <Route
