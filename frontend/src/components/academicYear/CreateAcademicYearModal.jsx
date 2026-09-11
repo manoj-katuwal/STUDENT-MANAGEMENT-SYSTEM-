@@ -1,7 +1,9 @@
 import { useState } from "react";
 import { X } from "lucide-react";
+import { useCreateAcademicYear } from "../../features/academicYear/academicYear.hooks";
 
 const CreateAcademicYearModal = ({ open, onClose }) => {
+  const createAcademicYearMutation = useCreateAcademicYear();
   const [formData, setFormData] = useState({
     name: "",
     startDate: "",
@@ -18,6 +20,17 @@ const CreateAcademicYearModal = ({ open, onClose }) => {
       ...previous,
       [name]: type === "checkbox" ? checked : value,
     }));
+  };
+
+  const handleSubmit = (event) => {
+    event.preventDefault();
+
+    createAcademicYearMutation.mutate(formData, {
+      onSuccess: () => {
+        setFormData({ name: "", startDate: "", endDate: "", isCurrent: false });
+        onClose();
+      },
+    });
   };
 
   return (
@@ -44,8 +57,14 @@ const CreateAcademicYearModal = ({ open, onClose }) => {
           </button>
         </div>
 
+        <form onSubmit={handleSubmit}>
         {/* Form */}
         <div className="space-y-5 px-6 py-5">
+          {createAcademicYearMutation.isError && (
+            <p className="rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-700">
+              {createAcademicYearMutation.error?.response?.data?.message || "Failed to create academic year."}
+            </p>
+          )}
           <div>
             <label className="mb-1.5 block text-sm font-medium text-slate-700">
               Academic Year Name
@@ -117,18 +136,21 @@ const CreateAcademicYearModal = ({ open, onClose }) => {
           <button
             type="button"
             onClick={onClose}
+            disabled={createAcademicYearMutation.isPending}
             className="rounded-lg border border-slate-200 px-4 py-2.5 text-sm font-semibold text-slate-600 transition hover:bg-slate-50"
           >
             Cancel
           </button>
 
           <button
-            type="button"
-            className="rounded-lg bg-blue-600 px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-blue-700"
+            type="submit"
+            disabled={createAcademicYearMutation.isPending}
+            className="rounded-lg bg-blue-600 px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-50"
           >
-            Create Academic Year
+            {createAcademicYearMutation.isPending ? "Creating..." : "Create Academic Year"}
           </button>
         </div>
+        </form>
       </div>
     </div>
   );
