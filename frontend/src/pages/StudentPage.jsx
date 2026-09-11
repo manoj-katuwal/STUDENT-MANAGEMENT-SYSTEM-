@@ -3,6 +3,7 @@ import {
   useStudents,
   useStudentStats,
 } from "../features/students/student.hooks";
+import { useCurrentAcademicYear } from "../features/academicYear/academicYear.hooks";
 import StudentContextBar from "../components/students/StudentContextBar";
 import StudentHeader from "../components/students/StudentHeader";
 import StudentStats from "../components/students/StudentStats";
@@ -30,6 +31,8 @@ const StudentsPage = () => {
     limit: 10,
   });
   const { data: statsData, isLoading: isStatsLoading } = useStudentStats();
+  const { currentAcademicYear, isLoading: isAcademicYearLoading } =
+    useCurrentAcademicYear();
 
   const pagination = data?.pagination;
 
@@ -89,7 +92,11 @@ const StudentsPage = () => {
 
   return (
     <div className="min-h-full p-6 lg:p-8 space-y-6">
-      <StudentContextBar />
+      <StudentContextBar
+        currentAcademicYear={currentAcademicYear}
+        isLoading={isAcademicYearLoading}
+        totalStudents={totalStudents}
+      />
       <StudentHeader
         totalStudents={totalStudents}
         onExport={handleExportCsv}

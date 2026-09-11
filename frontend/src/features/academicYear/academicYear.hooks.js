@@ -15,6 +15,17 @@ export const useAcademicYears = (params = {}) => {
   });
 };
 
+export const useCurrentAcademicYear = () => {
+  const query = useAcademicYears({ page: 1, limit: 100 });
+
+  return {
+    ...query,
+    currentAcademicYear: query.data?.academicYears?.find(
+      (academicYear) => academicYear.isCurrent,
+    ),
+  };
+};
+
 export const useAcademicYear = (academicYearId) => {
   return useQuery({
     queryKey: ["academicYear", academicYearId],
