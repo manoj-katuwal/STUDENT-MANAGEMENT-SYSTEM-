@@ -1,34 +1,96 @@
 import React from "react";
-import { Calendar, Eye, Pencil, Power } from "lucide-react";
+import {
+  AlertCircle,
+  Calendar,
+  Eye,
+  Pencil,
+  Power,
+  RefreshCw,
+} from "lucide-react";
 
-const AcademicYearTable = () => {
-  const academicYears = [
-    {
-      id: 1,
-      name: "2082/83",
-      startDate: "2025-04-14",
-      endDate: "2026-04-13",
-      status: "ACTIVE",
-      isCurrent: true,
-    },
-    {
-      id: 2,
-      name: "2081/82",
-      startDate: "2024-04-14",
-      endDate: "2025-04-13",
-      status: "ACTIVE",
-      isCurrent: false,
-    },
-    {
-      id: 3,
-      name: "2080/81",
-      startDate: "2023-04-14",
-      endDate: "2024-04-13",
-      status: "INACTIVE",
-      isCurrent: false,
-    },
-  ];
+const AcademicYearTable = ({
+  academicYears = [],
+  isLoading = false,
+  isError = false,
+  onRetry,
+  onView,
+  onEdit,
+  onToggleStatus,
+}) => {
+  // 1. Loading Skeleton State
+  if (isLoading) {
+    return (
+      <div className="overflow-hidden rounded-2xl border border-slate-200/80 bg-white shadow-xs">
+        <div className="animate-pulse">
+          <div className="h-12 border-b border-slate-200/80 bg-slate-50/50" />
+          {[1, 2, 3, 4, 5].map((row) => (
+            <div
+              key={row}
+              className="grid grid-cols-6 items-center gap-4 border-b border-slate-100 px-6 py-4"
+            >
+              <div className="h-4.5 w-3/4 rounded bg-slate-200/70" />
+              <div className="h-4.5 w-24 rounded bg-slate-200/70" />
+              <div className="h-4.5 w-24 rounded bg-slate-200/70" />
+              <div className="h-6 w-20 rounded-full bg-slate-200/70" />
+              <div className="h-6 w-20 rounded-full bg-slate-200/70" />
+              <div className="ml-auto flex gap-2">
+                <div className="h-8 w-8 rounded-lg bg-slate-100" />
+                <div className="h-8 w-8 rounded-lg bg-slate-100" />
+                <div className="h-8 w-8 rounded-lg bg-slate-100" />
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+    );
+  }
 
+  // 2. Error State
+  if (isError) {
+    return (
+      <div className="rounded-2xl border border-red-200 bg-red-50/50 p-8 text-center shadow-xs">
+        <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-red-100 text-red-600">
+          <AlertCircle className="h-6 w-6" />
+        </div>
+        <h3 className="mt-3 text-base font-semibold text-slate-900">
+          Failed to load academic years
+        </h3>
+        <p className="mt-1 text-sm text-slate-500">
+          Something went wrong while fetching the academic years list. Please
+          try again.
+        </p>
+        {onRetry && (
+          <button
+            type="button"
+            onClick={onRetry}
+            className="mt-4 inline-flex cursor-pointer items-center gap-2 rounded-xl bg-white px-4 py-2 text-xs font-semibold text-red-700 shadow-xs ring-1 ring-inset ring-red-200 transition-all hover:bg-red-50"
+          >
+            <RefreshCw className="h-3.5 w-3.5" />
+            <span>Retry Loading</span>
+          </button>
+        )}
+      </div>
+    );
+  }
+
+  // 3. Empty State
+  if (academicYears.length === 0) {
+    return (
+      <div className="rounded-2xl border border-slate-200/80 bg-white px-6 py-14 text-center shadow-xs">
+        <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-2xl bg-slate-100 text-slate-400">
+          <Calendar className="h-6 w-6" />
+        </div>
+        <h3 className="mt-3 text-sm font-semibold text-slate-900">
+          No academic years found
+        </h3>
+        <p className="mt-1 text-xs text-slate-500">
+          Try adjusting your search or filters to find what you are looking for.
+        </p>
+      </div>
+    );
+  }
+
+  // 4. Main Table View
   return (
     <div className="overflow-hidden rounded-2xl border border-slate-200/80 bg-white shadow-xs">
       <div className="overflow-x-auto">
@@ -62,7 +124,7 @@ const AcademicYearTable = () => {
 
               return (
                 <tr
-                  key={year.id}
+                  key={year._id}
                   className="group transition-colors duration-150 hover:bg-slate-50/80"
                 >
                   {/* Academic Year Name */}
@@ -83,7 +145,7 @@ const AcademicYearTable = () => {
                   <td className="whitespace-nowrap px-6 py-4 text-xs font-medium text-slate-600">
                     <div className="flex items-center gap-1.5">
                       <Calendar className="h-3.5 w-3.5 text-slate-400" />
-                      <span>{year.startDate}</span>
+                      <span>{year.startDate || "—"}</span>
                     </div>
                   </td>
 
@@ -91,7 +153,7 @@ const AcademicYearTable = () => {
                   <td className="whitespace-nowrap px-6 py-4 text-xs font-medium text-slate-600">
                     <div className="flex items-center gap-1.5">
                       <Calendar className="h-3.5 w-3.5 text-slate-400" />
-                      <span>{year.endDate}</span>
+                      <span>{year.endDate || "—"}</span>
                     </div>
                   </td>
 
@@ -130,6 +192,7 @@ const AcademicYearTable = () => {
                     <div className="flex items-center justify-end gap-1">
                       <button
                         type="button"
+                        onClick={() => onView?.(year)}
                         title="View Details"
                         className="cursor-pointer rounded-lg p-2 text-slate-400 transition-colors hover:bg-indigo-50 hover:text-indigo-600"
                       >
@@ -138,6 +201,7 @@ const AcademicYearTable = () => {
 
                       <button
                         type="button"
+                        onClick={() => onEdit?.(year)}
                         title="Edit Academic Year"
                         className="cursor-pointer rounded-lg p-2 text-slate-400 transition-colors hover:bg-blue-50 hover:text-blue-600"
                       >
@@ -146,6 +210,7 @@ const AcademicYearTable = () => {
 
                       <button
                         type="button"
+                        onClick={() => onToggleStatus?.(year)}
                         title={isActive ? "Deactivate" : "Activate"}
                         className={`cursor-pointer rounded-lg p-2 transition-colors ${
                           isActive

@@ -3,9 +3,17 @@ import {
   createAcademicYear,
   deactivateAcademicYear,
   getAcademicYearById,
+  getAcademicYears,
   updateAcademicYear,
 } from "./academicYear.api";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+
+export const useAcademicYears = (params = {}) => {
+  return useQuery({
+    queryKey: ["academicYears", params],
+    queryFn: () => getAcademicYears(params),
+  });
+};
 
 export const useAcademicYear = (academicYearId) => {
   return useQuery({
