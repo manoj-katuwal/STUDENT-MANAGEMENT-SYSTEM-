@@ -6,6 +6,7 @@ import {
   deactivateFeeStructureService,
   getFeeStructureByIdService,
   getFeeStructuresService,
+  updateFeeStructureService,
 } from "./feeStructure.service.js";
 
 export const createFeeStructureController = asyncHandler(async (req, res) => {
@@ -85,6 +86,20 @@ export const activateFeeStructureController = asyncHandler(async (req, res) => {
     res,
     statusCode: 200,
     message: "Fee structure activated successfully",
+    data: feeStructure,
+  });
+});
+
+export const updateFeeStructureController = asyncHandler(async (req, res) => {
+  const feeStructure = await updateFeeStructureService(
+    req.params.feeStructureId,
+    req.body,
+  );
+
+  return successResponse({
+    res,
+    statusCode: 200,
+    message: "Fee structure updated successfully",
     data: feeStructure,
   });
 });

@@ -6,6 +6,7 @@ import {
   deactivateFeeStructureController,
   getFeeStructureByIdController,
   getFeeStructuresController,
+  updateFeeStructureController,
 } from "./feeStructure.controller.js";
 
 import authenticate from "../../middleware/authenticate.js";
@@ -27,6 +28,12 @@ router.get(
   authenticate,
   authorize("ADMIN"),
   getFeeStructureByIdController,
+);
+router.patch(
+  "/:feeStructureId",
+  authenticate,
+  authorize("ADMIN"),
+  updateFeeStructureController,
 );
 router.patch(
   "/:feeStructureId/deactivate",
