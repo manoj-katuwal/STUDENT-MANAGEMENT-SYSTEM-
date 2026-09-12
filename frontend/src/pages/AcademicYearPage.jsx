@@ -48,7 +48,12 @@ const AcademicYearPage = () => {
   return (
     <div className="min-h-full p-6 lg:p-8 space-y-6">
       <AcademicYearPageContextBar />
-      <AcademicYearHeader onAdd={() => setIsCreateModalOpen(true)} />
+      <AcademicYearHeader
+        onAdd={() => setIsCreateModalOpen(true)}
+        totalAcademicYears={
+          stats?.totalAcademicYears ?? data?.pagination?.total ?? 0
+        }
+      />
       <AcademicYearStats stats={stats} />
       <AcademicYearTable
         academicYears={data?.academicYears ?? []}
