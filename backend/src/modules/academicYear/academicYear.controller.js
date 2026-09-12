@@ -6,6 +6,7 @@ import {
   createAcademicYearService,
   deactivateAcademicYearService,
   getAcademicYearByIdService,
+  getAcademicYearStatsService,
   getAcademicYearsService,
   updateAcademicYearService,
 } from "./academicYear.service.js";
@@ -57,6 +58,17 @@ export const getAcademicYearByIdController = asyncHandler(async (req, res) => {
     statusCode: 200,
     message: "Academic year fetched successfully",
     data: academicYear,
+  });
+});
+
+export const getAcademicYearStatsController = asyncHandler(async (req, res) => {
+  const stats = await getAcademicYearStatsService();
+
+  return successResponse({
+    res,
+    statusCode: 200,
+    message: "Academic year statistics fetched successfully",
+    data: stats,
   });
 });
 

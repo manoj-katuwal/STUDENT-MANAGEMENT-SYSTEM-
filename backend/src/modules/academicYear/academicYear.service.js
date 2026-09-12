@@ -7,6 +7,7 @@ import {
   findAcademicYearByName,
   findAcademicYears,
   findCurrentAcademicYear,
+  getAcademicYearStats,
   updateAcademicYear,
 } from "./academicYear.repository.js";
 
@@ -102,6 +103,10 @@ export const getAcademicYearsService = async (page = 1, limit = 10) => {
       totalPages,
     },
   };
+};
+
+export const getAcademicYearStatsService = async () => {
+  return await getAcademicYearStats();
 };
 
 export const updateAcademicYearService = async (academicYearId, updateData) => {

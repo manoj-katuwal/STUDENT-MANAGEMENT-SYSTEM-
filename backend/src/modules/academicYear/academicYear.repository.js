@@ -48,6 +48,21 @@ export const countAcademicYears = async (filter = {}) => {
   return await AcademicYear.countDocuments(filter);
 };
 
+export const getAcademicYearStats = async () => {
+  const [totalAcademicYears, activeAcademicYears, currentAcademicYear] =
+    await Promise.all([
+      AcademicYear.countDocuments(),
+      AcademicYear.countDocuments({ status: "ACTIVE" }),
+      AcademicYear.findOne({ isCurrent: true }).select("name"),
+    ]);
+
+  return {
+    totalAcademicYears,
+    activeAcademicYears,
+    currentAcademicYear: currentAcademicYear?.name ?? null,
+  };
+};
+
 export const updateAcademicYear = async (
   academicYearId,
   updateData,

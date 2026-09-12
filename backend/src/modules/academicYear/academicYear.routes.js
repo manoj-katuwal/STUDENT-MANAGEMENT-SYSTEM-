@@ -5,6 +5,7 @@ import {
   createAcademicYearController,
   deactivateAcademicYearController,
   getAcademicYearByIdController,
+  getAcademicYearStatsController,
   getAcademicYearsController,
   updateAcademicYearController,
 } from "./academicYear.controller.js";
@@ -17,6 +18,13 @@ router.post(
   authenticate,
   authorize("ADMIN"),
   createAcademicYearController,
+);
+
+router.get(
+  "/stats",
+  authenticate,
+  authorize("ADMIN"),
+  getAcademicYearStatsController,
 );
 
 router.get(
