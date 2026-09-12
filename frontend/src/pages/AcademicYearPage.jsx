@@ -9,6 +9,7 @@ import {
   useAcademicYearStats,
   useActivateAcademicYear,
   useDeactivateAcademicYear,
+  useExportAcademicYearsCsv,
 } from "../features/academicYear/academicYear.hooks";
 import AcademicYearPagination from "../components/academicYear/AcademicYearPagination";
 import CreateAcademicYearModal from "../components/academicYear/CreateAcademicYearModal";
@@ -30,6 +31,20 @@ const AcademicYearPage = () => {
 
   const activateMutation = useActivateAcademicYear();
   const deactivateMutation = useDeactivateAcademicYear();
+  const exportAcademicYearsMutation = useExportAcademicYearsCsv();
+
+  const handleExportCsv = async () => {
+    const blob = await exportAcademicYearsMutation.mutateAsync();
+    const url = window.URL.createObjectURL(blob);
+    const link = document.createElement("a");
+
+    link.href = url;
+    link.download = "academic-years.csv";
+    document.body.appendChild(link);
+    link.click();
+    link.remove();
+    window.URL.revokeObjectURL(url);
+  };
 
   const handleConfirmStatusChange = () => {
     if (!statusTarget) return;
@@ -50,6 +65,8 @@ const AcademicYearPage = () => {
       <AcademicYearPageContextBar />
       <AcademicYearHeader
         onAdd={() => setIsCreateModalOpen(true)}
+        onExport={handleExportCsv}
+        isExporting={exportAcademicYearsMutation.isPending}
         totalAcademicYears={
           stats?.totalAcademicYears ?? data?.pagination?.total ?? 0
         }

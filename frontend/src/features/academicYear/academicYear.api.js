@@ -53,3 +53,11 @@ export const getAcademicYearStats = async () => {
 
   return response.data.data;
 };
+
+export const exportAcademicYearsCsv = async () => {
+  const response = await apiClient.get("/academic-years/export/csv", {
+    responseType: "blob",
+  });
+
+  return response.data;
+};

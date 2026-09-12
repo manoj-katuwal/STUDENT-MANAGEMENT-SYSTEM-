@@ -2,6 +2,7 @@ import {
     activateAcademicYear,
   createAcademicYear,
   deactivateAcademicYear,
+  exportAcademicYearsCsv,
   getAcademicYearById,
   getAcademicYearStats,
   getAcademicYears,
@@ -119,5 +120,11 @@ export const useAcademicYearStats = () => {
   return useQuery({
     queryKey: ["academic-year-stats"],
     queryFn: getAcademicYearStats,
+  });
+};
+
+export const useExportAcademicYearsCsv = () => {
+  return useMutation({
+    mutationFn: exportAcademicYearsCsv,
   });
 };
