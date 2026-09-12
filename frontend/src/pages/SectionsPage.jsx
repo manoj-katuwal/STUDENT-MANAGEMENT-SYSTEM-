@@ -5,6 +5,7 @@ import {
   useUpdateSectionStatus,
   useExportSectionsCsv,
 } from "../features/sections/section.hook";
+import { useCurrentAcademicYear } from "../features/academicYear/academicYear.hooks";
 import useDebounce from "../hooks/useDebounce";
 import { useNavigate } from "react-router-dom";
 import SectionContextBar from "../components/sections/SectionContextBar";
@@ -49,6 +50,9 @@ const SectionsPage = () => {
     page: 1,
     limit: 100,
   });
+  const { currentAcademicYear, isLoading: isAcademicYearLoading } =
+    useCurrentAcademicYear();
+  const totalSections = statsData?.totalSections ?? data?.pagination?.total ?? 0;
 
   const handleExportCsv = async () => {
     const blob = await exportSectionsMutation.mutateAsync({
@@ -68,9 +72,13 @@ const SectionsPage = () => {
 
   return (
     <div className="min-h-full p-6 lg:p-8 space-y-6">
-      <SectionContextBar />
+      <SectionContextBar
+        currentAcademicYear={currentAcademicYear}
+        isLoading={isAcademicYearLoading}
+        totalSections={totalSections}
+      />
       <SectionHeader
-        totalSections={statsData?.totalSections ?? data?.pagination?.total ?? 0}
+        totalSections={totalSections}
         onAdd={() => setIsCreateModalOpen(true)}
         onExport={handleExportCsv}
         isExporting={exportSectionsMutation.isPending}

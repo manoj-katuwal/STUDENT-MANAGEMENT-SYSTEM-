@@ -6,11 +6,15 @@ import {
   TrendingUp,
 } from "lucide-react";
 
-const AcademicYearStats = () => {
+const AcademicYearStats = ({ stats }) => {
+  const currentAcademicYear = stats?.currentAcademicYear ?? "No current year";
+  const totalAcademicYears = stats?.totalAcademicYears ?? 0;
+  const activeAcademicYears = stats?.activeAcademicYears ?? 0;
+
   const statCards = [
     {
       label: "CURRENT ACADEMIC YEAR",
-      value: "2082/83",
+      value: currentAcademicYear,
       icon: CalendarDays,
       iconBg: "bg-blue-50",
       iconColor: "text-blue-600",
@@ -26,7 +30,7 @@ const AcademicYearStats = () => {
     },
     {
       label: "TOTAL ACADEMIC YEARS",
-      value: 4,
+      value: totalAcademicYears,
       icon: History,
       iconBg: "bg-indigo-50",
       iconColor: "text-indigo-600",
@@ -40,7 +44,7 @@ const AcademicYearStats = () => {
     },
     {
       label: "ACTIVE YEARS",
-      value: 2,
+      value: activeAcademicYears,
       icon: CheckCircle2,
       iconBg: "bg-emerald-50",
       iconColor: "text-emerald-600",

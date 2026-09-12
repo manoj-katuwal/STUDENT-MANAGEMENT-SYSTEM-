@@ -4,7 +4,12 @@ import AcademicYearPageContextBar from "../components/academicYear/AcademicYearC
 import AcademicYearHeader from "../components/academicYear/AcademicYearHeader";
 import AcademicYearStats from "../components/academicYear/AcademicYearStats";
 import AcademicYearTable from "../components/academicYear/AcademicYearTable";
-import { useAcademicYears, useActivateAcademicYear, useDeactivateAcademicYear } from "../features/academicYear/academicYear.hooks";
+import {
+  useAcademicYears,
+  useAcademicYearStats,
+  useActivateAcademicYear,
+  useDeactivateAcademicYear,
+} from "../features/academicYear/academicYear.hooks";
 import AcademicYearPagination from "../components/academicYear/AcademicYearPagination";
 import CreateAcademicYearModal from "../components/academicYear/CreateAcademicYearModal";
 import EditAcademicYearModel from "../components/academicYear/EditAcademicYearModel";
@@ -21,6 +26,7 @@ const AcademicYearPage = () => {
     page: currentPage,
     limit: 10,
   });
+  const { data: stats } = useAcademicYearStats();
 
   const activateMutation = useActivateAcademicYear();
   const deactivateMutation = useDeactivateAcademicYear();
@@ -43,7 +49,7 @@ const AcademicYearPage = () => {
     <div className="min-h-full p-6 lg:p-8 space-y-6">
       <AcademicYearPageContextBar />
       <AcademicYearHeader onAdd={() => setIsCreateModalOpen(true)} />
-      <AcademicYearStats />
+      <AcademicYearStats stats={stats} />
       <AcademicYearTable
         academicYears={data?.academicYears ?? []}
         isLoading={isLoading}

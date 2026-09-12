@@ -3,6 +3,7 @@ import {
   createAcademicYear,
   deactivateAcademicYear,
   getAcademicYearById,
+  getAcademicYearStats,
   getAcademicYears,
   updateAcademicYear,
 } from "./academicYear.api";
@@ -43,6 +44,9 @@ export const useCreateAcademicYear = () => {
       queryClient.invalidateQueries({
         queryKey: ["academicYears"],
       });
+      queryClient.invalidateQueries({
+        queryKey: ["academic-year-stats"],
+      });
     },
   });
 };
@@ -57,6 +61,9 @@ export const useUpdateAcademicYear = () => {
     onSuccess: (_, variables) => {
       queryClient.invalidateQueries({
         queryKey: ["academicYears"],
+      });
+      queryClient.invalidateQueries({
+        queryKey: ["academic-year-stats"],
       });
 
       queryClient.invalidateQueries({
@@ -76,6 +83,9 @@ export const useActivateAcademicYear = () => {
       queryClient.invalidateQueries({
         queryKey: ["academicYears"],
       });
+      queryClient.invalidateQueries({
+        queryKey: ["academic-year-stats"],
+      });
 
       queryClient.invalidateQueries({
         queryKey: ["academicYear", academicYearId],
@@ -94,10 +104,20 @@ export const useDeactivateAcademicYear = () => {
       queryClient.invalidateQueries({
         queryKey: ["academicYears"],
       });
+      queryClient.invalidateQueries({
+        queryKey: ["academic-year-stats"],
+      });
 
       queryClient.invalidateQueries({
         queryKey: ["academicYear", academicYearId],
       });
     },
+  });
+};
+
+export const useAcademicYearStats = () => {
+  return useQuery({
+    queryKey: ["academic-year-stats"],
+    queryFn: getAcademicYearStats,
   });
 };

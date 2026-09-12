@@ -6,6 +6,7 @@ import {
   useExportClassesCsv,
   useUpdateClassStatus,
 } from "../features/classes/class.hooks";
+import { useCurrentAcademicYear } from "../features/academicYear/academicYear.hooks";
 import ClassContextBar from "../components/classes/ClassContextBar";
 import ClassesHeader from "../components/classes/ClassHeader";
 import { useNavigate } from "react-router-dom";
@@ -83,10 +84,16 @@ const ClassesPage = () => {
   };
 
   const totalClasses = statsData?.totalClasses ?? data?.pagination?.total ?? 0;
+  const { currentAcademicYear, isLoading: isAcademicYearLoading } =
+    useCurrentAcademicYear();
 
   return (
     <div className="min-h-full p-6 lg:p-8 space-y-6">
-      <ClassContextBar onAdd={() => setIsCreateModalOpen(true)} />
+      <ClassContextBar
+        currentAcademicYear={currentAcademicYear}
+        isLoading={isAcademicYearLoading}
+        totalClasses={totalClasses}
+      />
       <ClassesHeader
         totalClasses={totalClasses}
         onAdd={() => setIsCreateModalOpen(true)}

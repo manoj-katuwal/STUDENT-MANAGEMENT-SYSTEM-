@@ -47,3 +47,9 @@ export const deactivateAcademicYear = async (academicYearId) => {
 
   return response.data.data;
 };
+
+export const getAcademicYearStats = async () => {
+  const response = await apiClient.get("/academic-years/stats");
+
+  return response.data.data;
+};
