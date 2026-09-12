@@ -79,10 +79,23 @@ export const getAcademicYearByIdService = async (academicYearId) => {
   return academicYear;
 };
 
-export const getAcademicYearsService = async (page = 1, limit = 10) => {
+export const getAcademicYearsService = async (
+  page = 1,
+  limit = 10,
+  search = "",
+  status = "",
+) => {
   const skip = (page - 1) * limit;
 
   const filter = {};
+
+  if (search) {
+    filter.name = { $regex: search, $options: "i" };
+  }
+
+  if (status) {
+    filter.status = status;
+  }
 
   const [academicYears, total] = await Promise.all([
     findAcademicYears({
@@ -126,8 +139,23 @@ const formatDateForCsv = (value) => {
   return Number.isNaN(date.getTime()) ? "" : date.toISOString();
 };
 
-export const getAcademicYearsForExportService = async () => {
-  const academicYears = await findAcademicYearsForExport();
+export const getAcademicYearsForExportService = async ({
+  search = "",
+  status = "",
+} = {}) => {
+  const filter = {};
+  const cleanSearch = typeof search === "string" ? search.trim() : "";
+  const cleanStatus = typeof status === "string" ? status.trim() : "";
+
+  if (cleanSearch) {
+    filter.name = { $regex: cleanSearch, $options: "i" };
+  }
+
+  if (cleanStatus) {
+    filter.status = cleanStatus;
+  }
+
+  const academicYears = await findAcademicYearsForExport(filter);
   const headers = [
     "Academic Year",
     "Start Date",

@@ -44,8 +44,8 @@ export const findAcademicYears = async ({
     .limit(limit);
 };
 
-export const findAcademicYearsForExport = async () => {
-  return await AcademicYear.find({}).sort({ startDate: -1 });
+export const findAcademicYearsForExport = async (filter = {}) => {
+  return await AcademicYear.find(filter).sort({ startDate: -1 });
 };
 
 export const countAcademicYears = async (filter = {}) => {

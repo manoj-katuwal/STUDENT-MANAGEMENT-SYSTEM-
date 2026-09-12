@@ -38,6 +38,17 @@ const getPositiveIntegerQueryParam = (
   return parsedValue;
 };
 
+const getAcademicYearFilterParams = (query) => {
+  const search = query.search?.trim() || "";
+  const status = query.status?.trim() || "";
+
+  if (status && !["ACTIVE", "INACTIVE"].includes(status)) {
+    throw new AppError("Status must be ACTIVE or INACTIVE", 400);
+  }
+
+  return { search, status };
+};
+
 export const createAcademicYearController = asyncHandler(async (req, res) => {
   const academicYear = await createAcademicYearService(req.body);
 
@@ -74,7 +85,11 @@ export const getAcademicYearStatsController = asyncHandler(async (req, res) => {
 });
 
 export const getAcademicYearsCsvController = asyncHandler(async (req, res) => {
-  const csv = await getAcademicYearsForExportService();
+  const { search, status } = getAcademicYearFilterParams(req.query);
+  const csv = await getAcademicYearsForExportService({
+    search,
+    status,
+  });
 
   res.setHeader("Content-Type", "text/csv; charset=utf-8");
   res.setHeader(
@@ -88,8 +103,9 @@ export const getAcademicYearsCsvController = asyncHandler(async (req, res) => {
 export const getAcademicYearsController = asyncHandler(async (req, res) => {
   const page = getPositiveIntegerQueryParam(req.query.page, 1, "Page", 100000);
   const limit = getPositiveIntegerQueryParam(req.query.limit, 10, "Limit", 100);
+  const { search, status } = getAcademicYearFilterParams(req.query);
 
-  const result = await getAcademicYearsService(page, limit);
+  const result = await getAcademicYearsService(page, limit, search, status);
 
   return successResponse({
     res,
