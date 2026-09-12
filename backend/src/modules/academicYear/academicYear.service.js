@@ -6,6 +6,7 @@ import {
   findAcademicYearById,
   findAcademicYearByName,
   findAcademicYears,
+  findAcademicYearsForExport,
   findCurrentAcademicYear,
   getAcademicYearStats,
   updateAcademicYear,
@@ -107,6 +108,51 @@ export const getAcademicYearsService = async (page = 1, limit = 10) => {
 
 export const getAcademicYearStatsService = async () => {
   return await getAcademicYearStats();
+};
+
+const escapeCsvValue = (value) => {
+  if (value === null || value === undefined) return "";
+
+  const stringValue = String(value);
+  return /[",\r\n]/.test(stringValue)
+    ? `"${stringValue.replace(/"/g, '""')}"`
+    : stringValue;
+};
+
+const formatDateForCsv = (value) => {
+  if (!value) return "";
+
+  const date = new Date(value);
+  return Number.isNaN(date.getTime()) ? "" : date.toISOString();
+};
+
+export const getAcademicYearsForExportService = async () => {
+  const academicYears = await findAcademicYearsForExport();
+  const headers = [
+    "Academic Year",
+    "Start Date",
+    "End Date",
+    "Status",
+    "Current Year",
+    "Created At",
+    "Updated At",
+  ];
+
+  const rows = academicYears.map((academicYear) =>
+    [
+      academicYear.name,
+      formatDateForCsv(academicYear.startDate),
+      formatDateForCsv(academicYear.endDate),
+      academicYear.status,
+      academicYear.isCurrent ? "Yes" : "No",
+      formatDateForCsv(academicYear.createdAt),
+      formatDateForCsv(academicYear.updatedAt),
+    ]
+      .map(escapeCsvValue)
+      .join(","),
+  );
+
+  return [headers.join(","), ...rows].join("\r\n");
 };
 
 export const updateAcademicYearService = async (academicYearId, updateData) => {

@@ -8,6 +8,7 @@ import {
   getAcademicYearByIdService,
   getAcademicYearStatsService,
   getAcademicYearsService,
+  getAcademicYearsForExportService,
   updateAcademicYearService,
 } from "./academicYear.service.js";
 
@@ -70,6 +71,18 @@ export const getAcademicYearStatsController = asyncHandler(async (req, res) => {
     message: "Academic year statistics fetched successfully",
     data: stats,
   });
+});
+
+export const getAcademicYearsCsvController = asyncHandler(async (req, res) => {
+  const csv = await getAcademicYearsForExportService();
+
+  res.setHeader("Content-Type", "text/csv; charset=utf-8");
+  res.setHeader(
+    "Content-Disposition",
+    'attachment; filename="academic-years.csv"',
+  );
+
+  return res.status(200).send(csv);
 });
 
 export const getAcademicYearsController = asyncHandler(async (req, res) => {

@@ -6,6 +6,7 @@ import {
   deactivateAcademicYearController,
   getAcademicYearByIdController,
   getAcademicYearStatsController,
+  getAcademicYearsCsvController,
   getAcademicYearsController,
   updateAcademicYearController,
 } from "./academicYear.controller.js";
@@ -25,6 +26,13 @@ router.get(
   authenticate,
   authorize("ADMIN"),
   getAcademicYearStatsController,
+);
+
+router.get(
+  "/export/csv",
+  authenticate,
+  authorize("ADMIN"),
+  getAcademicYearsCsvController,
 );
 
 router.get(
