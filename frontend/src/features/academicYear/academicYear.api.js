@@ -54,8 +54,15 @@ export const getAcademicYearStats = async () => {
   return response.data.data;
 };
 
-export const exportAcademicYearsCsv = async () => {
+export const exportAcademicYearsCsv = async (params = {}) => {
+  const cleanParams = Object.fromEntries(
+    Object.entries(params).filter(
+      ([, value]) => value !== undefined && value !== null && value !== "",
+    ),
+  );
+
   const response = await apiClient.get("/academic-years/export/csv", {
+    params: cleanParams,
     responseType: "blob",
   });
 

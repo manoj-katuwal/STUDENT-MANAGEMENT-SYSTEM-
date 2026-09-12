@@ -1,4 +1,5 @@
 import { useState } from "react";
+import useDebounce from "../hooks/useDebounce";
 
 import AcademicYearPageContextBar from "../components/academicYear/AcademicYearContextBar";
 import AcademicYearHeader from "../components/academicYear/AcademicYearHeader";
@@ -16,16 +17,22 @@ import CreateAcademicYearModal from "../components/academicYear/CreateAcademicYe
 import EditAcademicYearModel from "../components/academicYear/EditAcademicYearModel";
 import ConfirmModal from "../components/common/ConfirmModal";
 import ViewAcademicYearModal from "../components/academicYear/ViewAcademicYearModal";
+import AcademicYearFilters from "../components/academicYear/AcademicYearFilters";
 
 const AcademicYearPage = () => {
   const [currentPage, setCurrentPage] = useState(1);
+  const [search, setSearch] = useState("");
+  const [selectedStatus, setSelectedStatus] = useState("");
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
   const [selectedAcademicYear, setSelectedAcademicYear] = useState(null);
   const [viewAcademicYear, setViewAcademicYear] = useState(null);
   const [statusTarget, setStatusTarget] = useState(null);
+  const debouncedSearch = useDebounce(search, 700);
   const { data, isLoading, isError, refetch } = useAcademicYears({
     page: currentPage,
     limit: 10,
+    search: debouncedSearch,
+    status: selectedStatus || undefined,
   });
   const { data: stats } = useAcademicYearStats();
 
@@ -34,7 +41,10 @@ const AcademicYearPage = () => {
   const exportAcademicYearsMutation = useExportAcademicYearsCsv();
 
   const handleExportCsv = async () => {
-    const blob = await exportAcademicYearsMutation.mutateAsync();
+    const blob = await exportAcademicYearsMutation.mutateAsync({
+      search: debouncedSearch,
+      status: selectedStatus,
+    });
     const url = window.URL.createObjectURL(blob);
     const link = document.createElement("a");
 
@@ -72,6 +82,23 @@ const AcademicYearPage = () => {
         }
       />
       <AcademicYearStats stats={stats} />
+      <AcademicYearFilters
+        search={search}
+        onSearchChange={(value) => {
+          setSearch(value);
+          setCurrentPage(1);
+        }}
+        selectedStatus={selectedStatus}
+        onStatusChange={(value) => {
+          setSelectedStatus(value);
+          setCurrentPage(1);
+        }}
+        onReset={() => {
+          setSearch("");
+          setSelectedStatus("");
+          setCurrentPage(1);
+        }}
+      />
       <AcademicYearTable
         academicYears={data?.academicYears ?? []}
         isLoading={isLoading}
