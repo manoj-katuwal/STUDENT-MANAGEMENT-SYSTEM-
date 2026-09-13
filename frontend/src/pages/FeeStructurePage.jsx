@@ -1,10 +1,16 @@
 import FeeStructureContextBar from "../components/feeStructures/FeeStructureContextBar";
 import FeeStructureHeader from "../components/feeStructures/FeeStructureHeader";
-import { useCurrentAcademicYear } from "../features/academicYear/academicYear.hooks";
+import FeeStructureStats from "../components/feeStructures/FeeStructureStats";
+import {
+  useAcademicYearStats,
+  useCurrentAcademicYear,
+} from "../features/academicYear/academicYear.hooks";
 
 const FeeStructurePage = () => {
   const { currentAcademicYear, isLoading: isAcademicYearLoading } =
     useCurrentAcademicYear();
+
+  const { data: stats, isLoading: isStatsLoading } = useAcademicYearStats();
   return (
     <div className="min-h-full p-6 lg:p-8 space-y-6">
       <FeeStructureContextBar
@@ -12,6 +18,7 @@ const FeeStructurePage = () => {
         isLoading={isAcademicYearLoading}
       />
       <FeeStructureHeader onAdd={() => {}} />
+      <FeeStructureStats stats={stats} isLoading={isStatsLoading} />
     </div>
   );
 };
