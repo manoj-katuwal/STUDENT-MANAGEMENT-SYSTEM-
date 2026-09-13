@@ -28,7 +28,11 @@ const FeeStructurePage = () => {
 
   const { data: academicYearsData } = useAcademicYears({ page: 1, limit: 100 });
   const { data: classesData } = useClasses({ page: 1, limit: 100 });
-  const { data: feeStructuresData, isLoading : isFeeStructureLoading } = useFeeStructures({
+  const {
+    data: feeStructuresData,
+    isLoading: isFeeStructureLoading,
+    refetch,
+  } = useFeeStructures({
     page: 1,
     limit: 100,
     ...filters,
@@ -61,6 +65,10 @@ const FeeStructurePage = () => {
       <FeeStructureTable
         feeStructures={feeStructuresData?.feeStructures ?? []}
         isLoading={isFeeStructureLoading}
+        onView={() => {}}
+        onEdit={() => {}}
+        onToggleStatus={() => {}}
+        onRetry={refetch}
       />
     </div>
   );
