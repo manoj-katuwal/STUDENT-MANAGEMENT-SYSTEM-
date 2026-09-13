@@ -168,7 +168,25 @@ export const getUpcomingDueStudentFees = async (days) => {
 
   return await StudentFee.find({
     dueAmount: { $gt: 0 },
-    status: { $ne: 'CANCELLED' },
+    status: { $ne: "CANCELLED" },
     dueDate: { $gte: today, $lte: futureDate },
   });
+};
+
+export const getFeeStructureStats = async () => {
+  const [total, active, tuition, auxiliary] = await Promise.all([
+    FeeStructure.countDocuments(),
+    FeeStructure.countDocuments({ status: "ACTIVE" }),
+    FeeStructure.countDocuments({ feeType: "TUITION" }),
+    FeeStructure.countDocuments({
+      feeType: { $in: ["TRANSPORT", "EXAM"] },
+    }),
+  ]);
+
+  return {
+    total,
+    active,
+    tuition,
+    auxiliary,
+  };
 };

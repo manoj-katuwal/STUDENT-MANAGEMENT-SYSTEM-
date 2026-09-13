@@ -1,4 +1,13 @@
-import { countStudentFees, createStudentFee, findStudentFee, findStudentFeeById, findStudentFees, getStudentFeeSummary, updateStudentFee } from "./studentFee.repository.js";
+import {
+  countStudentFees,
+  createStudentFee,
+  findStudentFee,
+  findStudentFeeById,
+  findStudentFees,
+  getFeeStructureStats,
+  getStudentFeeSummary,
+  updateStudentFee,
+} from "./studentFee.repository.js";
 import { findStudentById } from "../students/student.repository.js";
 import { findAcademicYearById } from "../academicYear/academicYear.repository.js";
 import { findFeeStructureById } from "../feeStructure/feeStructure.repository.js";
@@ -109,7 +118,10 @@ export const createStudentFeeService = async (studentFeeData, performedBy) => {
     description: "Student fee assigned",
     performedBy,
   });
-  logger.info("Student fee assigned", { studentFeeId: studentFee._id, performedBy });
+  logger.info("Student fee assigned", {
+    studentFeeId: studentFee._id,
+    performedBy,
+  });
 
   return studentFee;
 };
@@ -180,7 +192,11 @@ export const getStudentFeesService = async ({
   };
 };
 
-export const updateStudentFeeService = async (studentFeeId, updateData, performedBy) => {
+export const updateStudentFeeService = async (
+  studentFeeId,
+  updateData,
+  performedBy,
+) => {
   const studentFee = await findStudentFeeById(studentFeeId);
 
   if (!studentFee) {
@@ -303,4 +319,8 @@ export const getStudentFeeSummaryService = async (studentId) => {
   const summary = await getStudentFeeSummary(studentId);
 
   return summary;
+};
+
+export const getFeeStructureStatsService = async () => {
+  return await getFeeStructureStats();
 };
