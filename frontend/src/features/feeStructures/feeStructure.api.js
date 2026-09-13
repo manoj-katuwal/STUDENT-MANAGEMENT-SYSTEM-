@@ -33,4 +33,10 @@ export const updateFeeStructure = async (feeStructureId, updateData) => {
   return response.data.data;
 };
 
+export const createFeeStructure = async (feeStructureData) => {
+  const response = await apiClient.post("/fee-structures", feeStructureData);
+
+  return response.data.data;
+};
+
 

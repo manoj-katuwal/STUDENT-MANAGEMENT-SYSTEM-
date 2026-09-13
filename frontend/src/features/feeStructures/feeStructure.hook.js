@@ -4,7 +4,7 @@ import {
   useMutation,
   useQueryClient,
 } from "@tanstack/react-query";
-import { getFeeStructureById, getFeeStructures, getFeeStructureStats, updateFeeStructure } from "./feeStructure.api";
+import { createFeeStructure, getFeeStructureById, getFeeStructures, getFeeStructureStats, updateFeeStructure } from "./feeStructure.api";
 
 export const useFeeStructures = (params = {}) => {
   return useQuery({
@@ -43,6 +43,20 @@ export const useUpdateFeeStructure = () => {
         queryClient.invalidateQueries({
           queryKey: ["feeStructure", feeStructureId],
         }),
+      ]);
+    },
+  });
+};
+
+export const useCreateFeeStructure = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: createFeeStructure,
+    onSuccess: async () => {
+      await Promise.all([
+        queryClient.invalidateQueries({ queryKey: ["feeStructures"] }),
+        queryClient.invalidateQueries({ queryKey: ["feeStructureStats"] }),
       ]);
     },
   });

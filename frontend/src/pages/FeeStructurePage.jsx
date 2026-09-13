@@ -9,6 +9,7 @@ import {
 } from "../features/academicYear/academicYear.hooks";
 import { useClasses } from "../features/classes/class.hooks";
 import {
+  useCreateFeeStructure,
   useFeeStructure,
   useFeeStructures,
   useFeeStructureStats,
@@ -17,6 +18,7 @@ import {
 import FeeStructureTable from "../components/feeStructures/FeeStructureTable";
 import ViewFeeStructureModal from "../components/feeStructures/ViewFeeStructureModal";
 import EditFeeStructureModal from "../components/feeStructures/EditFeeStructureModal";
+import CreateFeeStructureModal from "../components/feeStructures/CreateFeeStructureModal";
 
 const initialFilters = {
   academicYearId: "",
@@ -31,6 +33,7 @@ const FeeStructurePage = () => {
   const [filters, setFilters] = useState(initialFilters);
   const [viewFeeStructureId, setViewFeeStructureId] = useState(null);
   const [editFeeStructureId, setEditFeeStructureId] = useState(null);
+  const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
 
   const { data: academicYearsData } = useAcademicYears({ page: 1, limit: 100 });
   const { data: classesData } = useClasses({ page: 1, limit: 100 });
@@ -48,6 +51,7 @@ const FeeStructurePage = () => {
   const { data: viewedFeeStructure } = useFeeStructure(viewFeeStructureId);
   const { data: editingFeeStructure } = useFeeStructure(editFeeStructureId);
   const updateFeeStructureMutation = useUpdateFeeStructure();
+  const createFeeStructureMutation = useCreateFeeStructure();
 
   const handleFilterChange = (key, value) => {
     setFilters((previousFilters) => ({
@@ -63,7 +67,12 @@ const FeeStructurePage = () => {
         currentAcademicYear={currentAcademicYear}
         isLoading={isAcademicYearLoading}
       />
-      <FeeStructureHeader onAdd={() => {}} />
+      <FeeStructureHeader
+        onAdd={() => {
+          createFeeStructureMutation.reset();
+          setIsCreateModalOpen(true);
+        }}
+      />
       <FeeStructureStats stats={stats} isLoading={isStatsLoading} />
       <FeeStructureFilters
         filters={filters}
@@ -109,6 +118,24 @@ const FeeStructurePage = () => {
         isPending={updateFeeStructureMutation.isPending}
         error={updateFeeStructureMutation.error}
       />
+
+      {isCreateModalOpen && (
+        <CreateFeeStructureModal
+          academicYears={academicYearsData?.academicYears ?? []}
+          classList={classesData?.classes ?? []}
+          onClose={() => setIsCreateModalOpen(false)}
+          onSubmit={async (feeStructureData) => {
+            try {
+              await createFeeStructureMutation.mutateAsync(feeStructureData);
+              setIsCreateModalOpen(false);
+            } catch {
+              // The modal displays the API error and remains open for correction.
+            }
+          }}
+          isPending={createFeeStructureMutation.isPending}
+          error={createFeeStructureMutation.error}
+        />
+      )}
     </div>
   );
 };
