@@ -22,6 +22,7 @@ import ViewFeeStructureModal from "../components/feeStructures/ViewFeeStructureM
 import EditFeeStructureModal from "../components/feeStructures/EditFeeStructureModal";
 import CreateFeeStructureModal from "../components/feeStructures/CreateFeeStructureModal";
 import ConfirmModal from "../components/common/ConfirmModal";
+import FeeStructurePagination from "../components/feeStructures/FeeStructurePagination";
 
 const initialFilters = {
   academicYearId: "",
@@ -33,6 +34,7 @@ const initialFilters = {
 const FeeStructurePage = () => {
   const { currentAcademicYear, isLoading: isAcademicYearLoading } =
     useCurrentAcademicYear();
+  const [currentPage, setCurrentPage] = useState(1);
   const [filters, setFilters] = useState(initialFilters);
   const [viewFeeStructureId, setViewFeeStructureId] = useState(null);
   const [editFeeStructureId, setEditFeeStructureId] = useState(null);
@@ -47,8 +49,8 @@ const FeeStructurePage = () => {
     isError: isFeeStructureError,
     refetch,
   } = useFeeStructures({
-    page: 1,
-    limit: 100,
+    page: currentPage,
+    limit: 10,
     ...filters,
   });
 
@@ -85,6 +87,7 @@ const FeeStructurePage = () => {
       ...previousFilters,
       [key]: value,
     }));
+    setCurrentPage(1);
   };
 
   const { data: stats, isLoading: isStatsLoading } = useFeeStructureStats();
@@ -106,7 +109,10 @@ const FeeStructurePage = () => {
         academicYears={academicYearsData?.academicYears ?? []}
         classes={classesData?.classes ?? []}
         onFilterChange={handleFilterChange}
-        onClear={() => setFilters(initialFilters)}
+        onClear={() => {
+          setFilters(initialFilters);
+          setCurrentPage(1);
+        }}
         resultCount={feeStructuresData?.pagination?.total}
       />
       <FeeStructureTable
@@ -184,6 +190,11 @@ const FeeStructurePage = () => {
           error={createFeeStructureMutation.error}
         />
       )}
+
+      <FeeStructurePagination
+        pagination={feeStructuresData?.pagination}
+        onPageChange={setCurrentPage}
+      />
     </div>
   );
 };
