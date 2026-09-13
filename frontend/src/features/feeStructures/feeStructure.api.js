@@ -40,3 +40,23 @@ export const createFeeStructure = async (feeStructureData) => {
 };
 
 
+export const deactivateFeeStructure = async (feeStructureId) => {
+  const response = await apiClient.patch(
+    `/fee-structures/${feeStructureId}/deactivate`,
+  );
+
+  return response.data.data;
+};
+
+export const activateFeeStructure = async (feeStructureId) => {
+  const response = await apiClient.patch(
+    `/fee-structures/${feeStructureId}/activate`,
+  );
+
+  return response.data.data;
+};
+
+
+
+
+

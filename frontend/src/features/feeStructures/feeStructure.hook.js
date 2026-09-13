@@ -4,7 +4,7 @@ import {
   useMutation,
   useQueryClient,
 } from "@tanstack/react-query";
-import { createFeeStructure, getFeeStructureById, getFeeStructures, getFeeStructureStats, updateFeeStructure } from "./feeStructure.api";
+import { activateFeeStructure, createFeeStructure, deactivateFeeStructure, getFeeStructureById, getFeeStructures, getFeeStructureStats, updateFeeStructure } from "./feeStructure.api";
 
 export const useFeeStructures = (params = {}) => {
   return useQuery({
@@ -59,5 +59,18 @@ export const useCreateFeeStructure = () => {
         queryClient.invalidateQueries({ queryKey: ["feeStructureStats"] }),
       ]);
     },
+  });
+};
+
+
+export const useDeactivateFeeStructure = () => {
+  return useMutation({
+    mutationFn: deactivateFeeStructure,
+  });
+};
+
+export const useActivateFeeStructure = () => {
+  return useMutation({
+    mutationFn: activateFeeStructure,
   });
 };
