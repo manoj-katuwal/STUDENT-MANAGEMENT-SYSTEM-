@@ -1,5 +1,5 @@
-import { useQuery, keepPreviousData } from "@tanstack/react-query";
-import { getFeeStructureById, getFeeStructures, getFeeStructureStats } from "./feeStructure.api";
+import { useQuery, keepPreviousData, useMutation } from "@tanstack/react-query";
+import { getFeeStructureById, getFeeStructures, getFeeStructureStats, updateFeeStructure } from "./feeStructure.api";
 
 export const useFeeStructures = (params = {}) => {
   return useQuery({
@@ -22,5 +22,12 @@ export const useFeeStructure = (feeStructureId) => {
     queryKey: ["feeStructure", feeStructureId],
     queryFn: () => getFeeStructureById(feeStructureId),
     enabled: Boolean(feeStructureId),
+  });
+};
+
+export const useUpdateFeeStructure = () => {
+  return useMutation({
+    mutationFn: ({ feeStructureId, updateData }) =>
+      updateFeeStructure(feeStructureId, updateData),
   });
 };

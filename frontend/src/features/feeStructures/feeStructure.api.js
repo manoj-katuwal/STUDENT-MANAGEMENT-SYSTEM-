@@ -24,4 +24,13 @@ export const getFeeStructureById = async (feeStructureId) => {
 };
 
 
+export const updateFeeStructure = async (feeStructureId, updateData) => {
+  const response = await apiClient.patch(
+    `/fee-structures/${feeStructureId}`,
+    updateData,
+  );
+
+  return response.data.data;
+};
+
 
