@@ -3,7 +3,6 @@ import express from "express";
 import {
   cancelStudentFeeController,
   createStudentFeeController,
-  getFeeStructureStatsController,
   getStudentFeeByIdController,
   getStudentFeesController,
   getStudentFeeSummaryController,
@@ -46,13 +45,6 @@ router.patch(
   authenticate,
   authorize("ADMIN"),
   cancelStudentFeeController,
-);
-
-router.get(
-  "/stats",
-  authenticate,
-  authorize("ADMIN"),
-  getFeeStructureStatsController,
 );
 
 export default router;

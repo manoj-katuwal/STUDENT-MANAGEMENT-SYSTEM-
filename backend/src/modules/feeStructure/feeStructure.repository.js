@@ -37,6 +37,32 @@ export const countFeeStructures = async (filter = {}) => {
   return await FeeStructure.countDocuments(filter);
 };
 
+export const getFeeStructureStats = async () => {
+  const [total, active, tuition, transport, exam, tuitionAmounts] = await Promise.all([
+    FeeStructure.countDocuments(),
+    FeeStructure.countDocuments({ status: "ACTIVE" }),
+    FeeStructure.countDocuments({ feeType: "TUITION" }),
+    FeeStructure.countDocuments({ feeType: "TRANSPORT" }),
+    FeeStructure.countDocuments({ feeType: "EXAM" }),
+    FeeStructure.aggregate([
+      { $match: { feeType: "TUITION" } },
+      { $group: { _id: null, average: { $avg: "$amount" } } },
+    ]),
+  ]);
+
+  return {
+    total,
+    active,
+    inactive: total - active,
+    activePercentage: total ? (active / total) * 100 : 0,
+    tuition,
+    auxiliary: transport + exam,
+    transport,
+    exam,
+    averageTuitionAmount: tuitionAmounts[0]?.average ?? 0,
+  };
+};
+
 export const updateFeeStructure = async (feeStructureId, updateData) => {
   return await FeeStructure.findByIdAndUpdate(feeStructureId, updateData, {
     new: true,

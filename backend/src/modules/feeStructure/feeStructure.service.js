@@ -1,7 +1,7 @@
 import AppError from "../../shared/utils/error/AppError.js";
 import { findAcademicYearById } from "../academicYear/academicYear.repository.js";
 import { findClassById } from "../classes/class.repository.js";
-import { countFeeStructures, createFeeStructure, findFeeStructureByCombination, findFeeStructureById, findFeeStructures, updateFeeStructure } from "./feeStructure.repository.js";
+import { countFeeStructures, createFeeStructure, findFeeStructureByCombination, findFeeStructureById, findFeeStructures, getFeeStructureStats, updateFeeStructure } from "./feeStructure.repository.js";
 
 export const createFeeStructureService = async (feeStructureData) => {
   const { academicYearId, classId, feeType, amount } = feeStructureData;
@@ -126,6 +126,10 @@ export const getFeeStructureByIdService = async (feeStructureId) => {
   }
 
   return feeStructure;
+};
+
+export const getFeeStructureStatsService = async () => {
+  return await getFeeStructureStats();
 };
 
 export const updateFeeStructureService = async (feeStructureId, updateData) => {

@@ -5,6 +5,7 @@ import {
   createFeeStructureController,
   deactivateFeeStructureController,
   getFeeStructureByIdController,
+  getFeeStructureStatsController,
   getFeeStructuresController,
   updateFeeStructureController,
 } from "./feeStructure.controller.js";
@@ -23,6 +24,7 @@ router.post(
 );
 
 router.get("/", authenticate, authorize("ADMIN"), getFeeStructuresController);
+router.get("/stats", authenticate, authorize("ADMIN"), getFeeStructureStatsController);
 router.get(
   "/:feeStructureId",
   authenticate,

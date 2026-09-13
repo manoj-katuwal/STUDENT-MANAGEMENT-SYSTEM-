@@ -5,6 +5,7 @@ import {
   createFeeStructureService,
   deactivateFeeStructureService,
   getFeeStructureByIdService,
+  getFeeStructureStatsService,
   getFeeStructuresService,
   updateFeeStructureService,
 } from "./feeStructure.service.js";
@@ -47,6 +48,17 @@ export const getFeeStructuresController = asyncHandler(async (req, res) => {
     message: "Fee structures fetched successfully",
     data: result.feeStructures,
     meta: result.pagination,
+  });
+});
+
+export const getFeeStructureStatsController = asyncHandler(async (req, res) => {
+  const stats = await getFeeStructureStatsService();
+
+  return successResponse({
+    res,
+    statusCode: 200,
+    message: "Fee structure stats fetched successfully",
+    data: stats,
   });
 });
 

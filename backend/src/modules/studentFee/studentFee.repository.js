@@ -4,7 +4,6 @@ import mongoose from "mongoose";
 export const createStudentFee = async (studentFeeData) => {
   return await StudentFee.create(studentFeeData);
 };
-
 export const findStudentFeeById = async (studentFeeId, options = {}) => {
   return await StudentFee.findById(studentFeeId, null, options);
 };
@@ -171,22 +170,4 @@ export const getUpcomingDueStudentFees = async (days) => {
     status: { $ne: "CANCELLED" },
     dueDate: { $gte: today, $lte: futureDate },
   });
-};
-
-export const getFeeStructureStats = async () => {
-  const [total, active, tuition, auxiliary] = await Promise.all([
-    FeeStructure.countDocuments(),
-    FeeStructure.countDocuments({ status: "ACTIVE" }),
-    FeeStructure.countDocuments({ feeType: "TUITION" }),
-    FeeStructure.countDocuments({
-      feeType: { $in: ["TRANSPORT", "EXAM"] },
-    }),
-  ]);
-
-  return {
-    total,
-    active,
-    tuition,
-    auxiliary,
-  };
 };

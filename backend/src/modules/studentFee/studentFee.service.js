@@ -4,7 +4,6 @@ import {
   findStudentFee,
   findStudentFeeById,
   findStudentFees,
-  getFeeStructureStats,
   getStudentFeeSummary,
   updateStudentFee,
 } from "./studentFee.repository.js";
@@ -125,7 +124,6 @@ export const createStudentFeeService = async (studentFeeData, performedBy) => {
 
   return studentFee;
 };
-
 export const getStudentFeeByIdService = async (studentFeeId) => {
   const studentFee = await findStudentFeeById(studentFeeId);
 
@@ -319,8 +317,4 @@ export const getStudentFeeSummaryService = async (studentId) => {
   const summary = await getStudentFeeSummary(studentId);
 
   return summary;
-};
-
-export const getFeeStructureStatsService = async () => {
-  return await getFeeStructureStats();
 };
