@@ -11,8 +11,16 @@ const FeeStructureStats = ({ stats, isLoading = false }) => {
   // Static placeholder data based on the design
   const total = stats?.total ?? 0;
   const active = stats?.active ?? 0;
+  const inactive = stats?.inactive ?? 0;
+  const activePercentage = stats?.activePercentage ?? 0;
   const tuition = stats?.tuition ?? 0;
   const auxiliary = stats?.auxiliary ?? 0;
+  const transport = stats?.transport ?? 0;
+  const exam = stats?.exam ?? 0;
+  const averageTuitionAmount = stats?.averageTuitionAmount ?? 0;
+  const formattedAverageTuition = new Intl.NumberFormat("en-NP", {
+    maximumFractionDigits: 0,
+  }).format(averageTuitionAmount);
 
   const statCards = [
     {
@@ -28,7 +36,7 @@ const FeeStructureStats = ({ stats, isLoading = false }) => {
             <Sliders className="h-3.5 w-3.5" />
             Configured
           </span>
-          <span>Across 12 grade tiers</span>
+          <span>All configured fee structures</span>
         </div>
       ),
     },
@@ -42,14 +50,18 @@ const FeeStructureStats = ({ stats, isLoading = false }) => {
       footer: (
         <div className="space-y-1.5 w-full">
           <div className="flex items-center justify-between text-xs font-medium">
-            <span className="text-slate-500">87.5% in effect</span>
-            <span className="font-bold text-slate-900">3 Inactive</span>
+            <span className="text-slate-500">
+              {activePercentage.toFixed(1)}% in effect
+            </span>
+            <span className="font-bold text-slate-900">
+              {inactive} Inactive
+            </span>
           </div>
           {/* Progress Bar */}
           <div className="h-1.5 w-full overflow-hidden rounded-full bg-slate-100">
             <div
               className="h-full rounded-full bg-emerald-500"
-              style={{ width: "87.5%" }}
+              style={{ width: `${activePercentage}%` }}
             />
           </div>
         </div>
@@ -60,7 +72,7 @@ const FeeStructureStats = ({ stats, isLoading = false }) => {
       value: (
         <div className="flex items-baseline gap-2">
           <span>{isLoading ? "—" : tuition}</span>
-          <span className="text-base font-medium text-slate-500">Classes</span>
+          <span className="text-base font-medium text-slate-500">Structures</span>
         </div>
       ),
       icon: GraduationCap,
@@ -70,7 +82,9 @@ const FeeStructureStats = ({ stats, isLoading = false }) => {
       footer: (
         <div className="flex items-center justify-between text-xs">
           <span className="text-slate-500">Average Base Rate</span>
-          <span className="font-bold text-slate-900">NPR 24,500/yr</span>
+          <span className="font-bold text-slate-900">
+            NPR {formattedAverageTuition}
+          </span>
         </div>
       ),
     },
@@ -89,10 +103,12 @@ const FeeStructureStats = ({ stats, isLoading = false }) => {
       footer: (
         <div className="flex items-center gap-3 text-xs font-semibold">
           <span className="flex items-center gap-1 text-blue-600">
-            <span className="h-1.5 w-1.5 rounded-full bg-blue-600" />8 Transport
+            <span className="h-1.5 w-1.5 rounded-full bg-blue-600" />
+            {transport} Transport
           </span>
           <span className="flex items-center gap-1 text-slate-600">
-            <span className="h-1.5 w-1.5 rounded-full bg-slate-400" />6 Exam
+            <span className="h-1.5 w-1.5 rounded-full bg-slate-400" />
+            {exam} Exam
           </span>
         </div>
       ),
