@@ -64,6 +64,7 @@ const FeeStructurePage = () => {
   const deactivateFeeStructureMutation = useDeactivateFeeStructure();
   const activateFeeStructureMutation = useActivateFeeStructure();
   const exportFeeStructuresMutation = useExportFeeStructuresCsv();
+  const { data: stats, isLoading: isStatsLoading } = useFeeStructureStats();
 
   const handleConfirmStatusChange = async () => {
     if (!statusAction) return;
@@ -106,7 +107,6 @@ const FeeStructurePage = () => {
     window.URL.revokeObjectURL(url);
   };
 
-  const { data: stats, isLoading: isStatsLoading } = useFeeStructureStats();
   return (
     <div className="min-h-full p-6 lg:p-8 space-y-6">
       <FeeStructureContextBar
