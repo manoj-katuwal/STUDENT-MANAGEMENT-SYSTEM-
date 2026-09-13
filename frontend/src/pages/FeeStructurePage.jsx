@@ -9,10 +9,12 @@ import {
 } from "../features/academicYear/academicYear.hooks";
 import { useClasses } from "../features/classes/class.hooks";
 import {
+  useFeeStructure,
   useFeeStructures,
   useFeeStructureStats,
 } from "../features/feeStructures/feeStructure.hook";
 import FeeStructureTable from "../components/feeStructures/FeeStructureTable";
+import ViewFeeStructureModal from "../components/feeStructures/ViewFeeStructureModal";
 
 const initialFilters = {
   academicYearId: "",
@@ -25,18 +27,24 @@ const FeeStructurePage = () => {
   const { currentAcademicYear, isLoading: isAcademicYearLoading } =
     useCurrentAcademicYear();
   const [filters, setFilters] = useState(initialFilters);
+  const [selectedFeeStructureId, setSelectedFeeStructureId] = useState(null);
 
   const { data: academicYearsData } = useAcademicYears({ page: 1, limit: 100 });
   const { data: classesData } = useClasses({ page: 1, limit: 100 });
   const {
     data: feeStructuresData,
     isLoading: isFeeStructureLoading,
+    isError: isFeeStructureError,
     refetch,
   } = useFeeStructures({
     page: 1,
     limit: 100,
     ...filters,
   });
+
+  const { data: selectedFeeStructure } = useFeeStructure(
+    selectedFeeStructureId,
+  );
 
   const handleFilterChange = (key, value) => {
     setFilters((previousFilters) => ({
@@ -65,10 +73,15 @@ const FeeStructurePage = () => {
       <FeeStructureTable
         feeStructures={feeStructuresData?.feeStructures ?? []}
         isLoading={isFeeStructureLoading}
-        onView={() => {}}
+        isError={isFeeStructureError}
+        onView={(feeStructure) => setSelectedFeeStructureId(feeStructure._id)}
         onEdit={() => {}}
         onToggleStatus={() => {}}
         onRetry={refetch}
+      />
+      <ViewFeeStructureModal
+        feeStructure={selectedFeeStructure}
+        onClose={() => setSelectedFeeStructureId(null)}
       />
     </div>
   );
