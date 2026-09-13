@@ -66,7 +66,7 @@ const ViewAcademicYearModal = ({ open, academicYear, onClose }) => {
         {/* Content Body */}
         <div className="space-y-4 px-6 py-5">
           {/* Main Title Hero Card */}
-          <div className="flex items-center justify-between rounded-xl bg-gradient-to-r from-indigo-50/80 via-indigo-50/40 to-transparent p-4 ring-1 ring-indigo-500/10">
+          <div className="flex items-center justify-between rounded-xl bg-linear-to-r from-indigo-50/80 via-indigo-50/40 to-transparent p-4 ring-1 ring-indigo-500/10">
             <div className="flex items-center gap-3">
               <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-white text-indigo-600 shadow-sm ring-1 ring-slate-200/60">
                 <CalendarDays className="h-5 w-5" />
