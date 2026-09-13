@@ -11,4 +11,10 @@ export const getFeeStructures = async (params = {}) => {
   };
 };
 
+export const getFeeStructureStats = async () => {
+  const response = await apiClient.get("/fee-structures/stats");
+
+  return response.data.data;
+};
+
 
