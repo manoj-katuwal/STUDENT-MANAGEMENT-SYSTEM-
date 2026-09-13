@@ -82,9 +82,7 @@ const ViewFeeStructureModal = ({ feeStructure, onClose }) => {
                 </span>
               </div>
               <p className="mt-2 text-sm font-semibold text-slate-900">
-                {feeStructure.academicYearId?.name ||
-                  feeStructure.academicYearId ||
-                  "—"}
+                {feeStructure.academicYearId?.name || "—"}
               </p>
             </div>
 
@@ -97,7 +95,7 @@ const ViewFeeStructureModal = ({ feeStructure, onClose }) => {
                 </span>
               </div>
               <p className="mt-2 text-sm font-semibold text-slate-900">
-                {feeStructure.classId?.name || feeStructure.classId || "—"}
+                {feeStructure.classId?.name || "—"}
               </p>
             </div>
 
