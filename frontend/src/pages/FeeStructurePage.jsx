@@ -1,26 +1,17 @@
-import React, { useState } from 'react'
-import { useFeeStructures } from '../features/feeStructures/feeStructure.hook';
+import FeeStructureContextBar from "../components/feeStructures/FeeStructureContextBar";
+import { useCurrentAcademicYear } from "../features/academicYear/academicYear.hooks";
 
 const FeeStructurePage = () => {
-    const [currentPage, setCurrentPage] = useState(1);
-
-    const [filters, setFilters] = useState({
-      academicYearId: "",
-      classId: "",
-      feeType: "",
-      status: "",
-    });
-
-    const { data, isLoading, isError } = useFeeStructures({
-      page: currentPage,
-      limit: 10,
-      ...filters,
-    });
+  const { currentAcademicYear, isLoading: isAcademicYearLoading } =
+    useCurrentAcademicYear();
   return (
-    <div>
-      Fee Structure Page
+    <div className="min-h-full p-6 lg:p-8">
+      <FeeStructureContextBar
+        currentAcademicYear={currentAcademicYear}
+        isLoading={isAcademicYearLoading}
+      />
     </div>
-  )
-}
+  );
+};
 
-export default FeeStructurePage
+export default FeeStructurePage;
