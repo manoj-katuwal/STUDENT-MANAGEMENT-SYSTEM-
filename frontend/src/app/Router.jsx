@@ -21,6 +21,7 @@ import SectionsPage from "../pages/SectionsPage";
 import SectionDetailsPage from "../components/sections/SectionDetailsPage";
 import SectionEditPage from "../components/sections/SectionEditPage";
 import AcademicYearPage from "../pages/AcademicYearPage";
+import FeeStructurePage from "../pages/FeeStructurePage";
 
 const Router = () => {
   return (
@@ -36,6 +37,9 @@ const Router = () => {
               {/* ADMIN */}
               <Route element={<RoleRoute allowedRoles={["ADMIN"]} />}>
                 <Route path="/users" element={<UsersPage />} />
+              </Route>
+              <Route element={<RoleRoute allowedRoles={["ADMIN"]} />}>
+                <Route path="/fee-structures" element={<FeeStructurePage />} />
               </Route>
 
               <Route element={<RoleRoute allowedRoles={["ADMIN"]} />}>
