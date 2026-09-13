@@ -64,13 +64,35 @@ export const useCreateFeeStructure = () => {
 
 
 export const useDeactivateFeeStructure = () => {
+  const queryClient = useQueryClient();
+
   return useMutation({
     mutationFn: deactivateFeeStructure,
+    onSuccess: async (_, feeStructureId) => {
+      await Promise.all([
+        queryClient.invalidateQueries({ queryKey: ["feeStructures"] }),
+        queryClient.invalidateQueries({ queryKey: ["feeStructureStats"] }),
+        queryClient.invalidateQueries({
+          queryKey: ["feeStructure", feeStructureId],
+        }),
+      ]);
+    },
   });
 };
 
 export const useActivateFeeStructure = () => {
+  const queryClient = useQueryClient();
+
   return useMutation({
     mutationFn: activateFeeStructure,
+    onSuccess: async (_, feeStructureId) => {
+      await Promise.all([
+        queryClient.invalidateQueries({ queryKey: ["feeStructures"] }),
+        queryClient.invalidateQueries({ queryKey: ["feeStructureStats"] }),
+        queryClient.invalidateQueries({
+          queryKey: ["feeStructure", feeStructureId],
+        }),
+      ]);
+    },
   });
 };

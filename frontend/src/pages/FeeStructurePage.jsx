@@ -9,7 +9,9 @@ import {
 } from "../features/academicYear/academicYear.hooks";
 import { useClasses } from "../features/classes/class.hooks";
 import {
+  useActivateFeeStructure,
   useCreateFeeStructure,
+  useDeactivateFeeStructure,
   useFeeStructure,
   useFeeStructures,
   useFeeStructureStats,
@@ -19,6 +21,7 @@ import FeeStructureTable from "../components/feeStructures/FeeStructureTable";
 import ViewFeeStructureModal from "../components/feeStructures/ViewFeeStructureModal";
 import EditFeeStructureModal from "../components/feeStructures/EditFeeStructureModal";
 import CreateFeeStructureModal from "../components/feeStructures/CreateFeeStructureModal";
+import ConfirmModal from "../components/common/ConfirmModal";
 
 const initialFilters = {
   academicYearId: "",
@@ -34,6 +37,7 @@ const FeeStructurePage = () => {
   const [viewFeeStructureId, setViewFeeStructureId] = useState(null);
   const [editFeeStructureId, setEditFeeStructureId] = useState(null);
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
+  const [statusAction, setStatusAction] = useState(null);
 
   const { data: academicYearsData } = useAcademicYears({ page: 1, limit: 100 });
   const { data: classesData } = useClasses({ page: 1, limit: 100 });
@@ -52,6 +56,29 @@ const FeeStructurePage = () => {
   const { data: editingFeeStructure } = useFeeStructure(editFeeStructureId);
   const updateFeeStructureMutation = useUpdateFeeStructure();
   const createFeeStructureMutation = useCreateFeeStructure();
+
+  const deactivateFeeStructureMutation = useDeactivateFeeStructure();
+  const activateFeeStructureMutation = useActivateFeeStructure();
+
+  const handleConfirmStatusChange = async () => {
+    if (!statusAction) return;
+
+    const mutation =
+      statusAction.status === "ACTIVE"
+        ? deactivateFeeStructureMutation
+        : activateFeeStructureMutation;
+
+    try {
+      await mutation.mutateAsync(statusAction._id);
+      setStatusAction(null);
+    } catch {
+      // Keep the confirmation modal open when the API rejects the change.
+    }
+  };
+
+  const isStatusChangePending =
+    deactivateFeeStructureMutation.isPending ||
+    activateFeeStructureMutation.isPending;
 
   const handleFilterChange = (key, value) => {
     setFilters((previousFilters) => ({
@@ -91,12 +118,33 @@ const FeeStructurePage = () => {
           updateFeeStructureMutation.reset();
           setEditFeeStructureId(feeStructure._id);
         }}
-        onToggleStatus={() => {}}
+        onToggleStatus={setStatusAction}
         onRetry={refetch}
       />
       <ViewFeeStructureModal
         feeStructure={viewedFeeStructure}
         onClose={() => setViewFeeStructureId(null)}
+      />
+
+      <ConfirmModal
+        open={Boolean(statusAction)}
+        title={
+          statusAction?.status === "ACTIVE"
+            ? "Deactivate Fee Structure"
+            : "Activate Fee Structure"
+        }
+        message={
+          statusAction?.status === "ACTIVE"
+            ? `Deactivate the ${statusAction?.feeType?.toLowerCase()} fee for ${statusAction?.classId?.name ?? "this class"}?`
+            : `Activate the ${statusAction?.feeType?.toLowerCase()} fee for ${statusAction?.classId?.name ?? "this class"}?`
+        }
+        confirmText={
+          statusAction?.status === "ACTIVE" ? "Deactivate" : "Activate"
+        }
+        variant={statusAction?.status === "ACTIVE" ? "warning" : "info"}
+        isLoading={isStatusChangePending}
+        onConfirm={handleConfirmStatusChange}
+        onCancel={() => setStatusAction(null)}
       />
 
       <EditFeeStructureModal
