@@ -36,12 +36,14 @@ export const useUpdateFeeStructure = () => {
   return useMutation({
     mutationFn: ({ feeStructureId, updateData }) =>
       updateFeeStructure(feeStructureId, updateData),
-    onSuccess: (_, { feeStructureId }) => {
-      queryClient.invalidateQueries({ queryKey: ["feeStructures"] });
-      queryClient.invalidateQueries({ queryKey: ["feeStructureStats"] });
-      queryClient.invalidateQueries({
-        queryKey: ["feeStructure", feeStructureId],
-      });
+    onSuccess: async (_, { feeStructureId }) => {
+      await Promise.all([
+        queryClient.invalidateQueries({ queryKey: ["feeStructures"] }),
+        queryClient.invalidateQueries({ queryKey: ["feeStructureStats"] }),
+        queryClient.invalidateQueries({
+          queryKey: ["feeStructure", feeStructureId],
+        }),
+      ]);
     },
   });
 };

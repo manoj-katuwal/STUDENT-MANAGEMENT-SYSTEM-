@@ -78,7 +78,10 @@ const FeeStructurePage = () => {
         isLoading={isFeeStructureLoading}
         isError={isFeeStructureError}
         onView={(feeStructure) => setViewFeeStructureId(feeStructure._id)}
-        onEdit={(feeStructure) => setEditFeeStructureId(feeStructure._id)}
+        onEdit={(feeStructure) => {
+          updateFeeStructureMutation.reset();
+          setEditFeeStructureId(feeStructure._id);
+        }}
         onToggleStatus={() => {}}
         onRetry={refetch}
       />
@@ -92,13 +95,19 @@ const FeeStructurePage = () => {
         academicYears={academicYearsData?.academicYears ?? []}
         classList={classesData?.classes ?? []}
         onClose={() => setEditFeeStructureId(null)}
-        onSubmit={(updateData) => {
-          updateFeeStructureMutation.mutate(
-            { feeStructureId: editFeeStructureId, updateData },
-            { onSuccess: () => setEditFeeStructureId(null) },
-          );
+        onSubmit={async (updateData) => {
+          try {
+            await updateFeeStructureMutation.mutateAsync({
+              feeStructureId: editFeeStructureId,
+              updateData,
+            });
+            setEditFeeStructureId(null);
+          } catch {
+            // The modal displays the API error and remains open for correction.
+          }
         }}
         isPending={updateFeeStructureMutation.isPending}
+        error={updateFeeStructureMutation.error}
       />
     </div>
   );
