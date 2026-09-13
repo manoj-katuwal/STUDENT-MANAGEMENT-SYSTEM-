@@ -11,6 +11,21 @@ export const getFeeStructures = async (params = {}) => {
   };
 };
 
+export const exportFeeStructuresCsv = async (params = {}) => {
+  const cleanParams = Object.fromEntries(
+    Object.entries(params).filter(
+      ([, value]) => value !== undefined && value !== null && value !== "",
+    ),
+  );
+
+  const response = await apiClient.get("/fee-structures/export/csv", {
+    params: cleanParams,
+    responseType: "blob",
+  });
+
+  return response.data;
+};
+
 export const getFeeStructureStats = async () => {
   const response = await apiClient.get("/fee-structures/stats");
 
@@ -55,7 +70,6 @@ export const activateFeeStructure = async (feeStructureId) => {
 
   return response.data.data;
 };
-
 
 
 

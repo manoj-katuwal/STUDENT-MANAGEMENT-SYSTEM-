@@ -4,13 +4,19 @@ import {
   useMutation,
   useQueryClient,
 } from "@tanstack/react-query";
-import { activateFeeStructure, createFeeStructure, deactivateFeeStructure, getFeeStructureById, getFeeStructures, getFeeStructureStats, updateFeeStructure } from "./feeStructure.api";
+import { activateFeeStructure, createFeeStructure, deactivateFeeStructure, exportFeeStructuresCsv, getFeeStructureById, getFeeStructures, getFeeStructureStats, updateFeeStructure } from "./feeStructure.api";
 
 export const useFeeStructures = (params = {}) => {
   return useQuery({
     queryKey: ["feeStructures", params],
     queryFn: () => getFeeStructures(params),
     placeholderData: keepPreviousData,
+  });
+};
+
+export const useExportFeeStructuresCsv = () => {
+  return useMutation({
+    mutationFn: exportFeeStructuresCsv,
   });
 };
 

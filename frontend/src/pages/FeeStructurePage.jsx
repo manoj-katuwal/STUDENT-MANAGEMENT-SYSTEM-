@@ -12,6 +12,7 @@ import {
   useActivateFeeStructure,
   useCreateFeeStructure,
   useDeactivateFeeStructure,
+  useExportFeeStructuresCsv,
   useFeeStructure,
   useFeeStructures,
   useFeeStructureStats,
@@ -25,6 +26,7 @@ import ConfirmModal from "../components/common/ConfirmModal";
 import FeeStructurePagination from "../components/feeStructures/FeeStructurePagination";
 
 const initialFilters = {
+  search: "",
   academicYearId: "",
   classId: "",
   feeType: "",
@@ -61,6 +63,7 @@ const FeeStructurePage = () => {
 
   const deactivateFeeStructureMutation = useDeactivateFeeStructure();
   const activateFeeStructureMutation = useActivateFeeStructure();
+  const exportFeeStructuresMutation = useExportFeeStructuresCsv();
 
   const handleConfirmStatusChange = async () => {
     if (!statusAction) return;
@@ -90,6 +93,19 @@ const FeeStructurePage = () => {
     setCurrentPage(1);
   };
 
+  const handleExportCsv = async () => {
+    const blob = await exportFeeStructuresMutation.mutateAsync(filters);
+    const url = window.URL.createObjectURL(blob);
+    const link = document.createElement("a");
+
+    link.href = url;
+    link.download = "fee-structures.csv";
+    document.body.appendChild(link);
+    link.click();
+    link.remove();
+    window.URL.revokeObjectURL(url);
+  };
+
   const { data: stats, isLoading: isStatsLoading } = useFeeStructureStats();
   return (
     <div className="min-h-full p-6 lg:p-8 space-y-6">
@@ -98,6 +114,8 @@ const FeeStructurePage = () => {
         isLoading={isAcademicYearLoading}
       />
       <FeeStructureHeader
+        onExport={handleExportCsv}
+        isExporting={exportFeeStructuresMutation.isPending}
         onAdd={() => {
           createFeeStructureMutation.reset();
           setIsCreateModalOpen(true);
