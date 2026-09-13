@@ -12,6 +12,7 @@ import {
   useFeeStructures,
   useFeeStructureStats,
 } from "../features/feeStructures/feeStructure.hook";
+import FeeStructureTable from "../components/feeStructures/FeeStructureTable";
 
 const initialFilters = {
   academicYearId: "",
@@ -27,7 +28,7 @@ const FeeStructurePage = () => {
 
   const { data: academicYearsData } = useAcademicYears({ page: 1, limit: 100 });
   const { data: classesData } = useClasses({ page: 1, limit: 100 });
-  const { data: feeStructuresData } = useFeeStructures({
+  const { data: feeStructuresData, isLoading : isFeeStructureLoading } = useFeeStructures({
     page: 1,
     limit: 100,
     ...filters,
@@ -56,6 +57,10 @@ const FeeStructurePage = () => {
         onFilterChange={handleFilterChange}
         onClear={() => setFilters(initialFilters)}
         resultCount={feeStructuresData?.pagination?.total}
+      />
+      <FeeStructureTable
+        feeStructures={feeStructuresData?.feeStructures ?? []}
+        isLoading={isFeeStructureLoading}
       />
     </div>
   );
