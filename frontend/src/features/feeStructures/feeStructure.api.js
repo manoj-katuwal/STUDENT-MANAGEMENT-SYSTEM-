@@ -17,4 +17,11 @@ export const getFeeStructureStats = async () => {
   return response.data.data;
 };
 
+export const getFeeStructureById = async (feeStructureId) => {
+  const response = await apiClient.get(`/fee-structures/${feeStructureId}`);
+
+  return response.data.data;
+};
+
+
 
