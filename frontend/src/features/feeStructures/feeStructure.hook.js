@@ -1,4 +1,9 @@
-import { useQuery, keepPreviousData, useMutation } from "@tanstack/react-query";
+import {
+  useQuery,
+  keepPreviousData,
+  useMutation,
+  useQueryClient,
+} from "@tanstack/react-query";
 import { getFeeStructureById, getFeeStructures, getFeeStructureStats, updateFeeStructure } from "./feeStructure.api";
 
 export const useFeeStructures = (params = {}) => {
@@ -26,8 +31,17 @@ export const useFeeStructure = (feeStructureId) => {
 };
 
 export const useUpdateFeeStructure = () => {
+  const queryClient = useQueryClient();
+
   return useMutation({
     mutationFn: ({ feeStructureId, updateData }) =>
       updateFeeStructure(feeStructureId, updateData),
+    onSuccess: (_, { feeStructureId }) => {
+      queryClient.invalidateQueries({ queryKey: ["feeStructures"] });
+      queryClient.invalidateQueries({ queryKey: ["feeStructureStats"] });
+      queryClient.invalidateQueries({
+        queryKey: ["feeStructure", feeStructureId],
+      });
+    },
   });
 };
