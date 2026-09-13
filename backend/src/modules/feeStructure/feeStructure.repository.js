@@ -5,7 +5,9 @@ export const createFeeStructure = async (feeStructureData) => {
 };
 
 export const findFeeStructureById = async (feeStructureId) => {
-  return await FeeStructure.findById(feeStructureId);
+  return await FeeStructure.findById(feeStructureId)
+    .populate("academicYearId", "name")
+    .populate("classId", "name");
 };
 
 export const findFeeStructureByCombination = async ({
