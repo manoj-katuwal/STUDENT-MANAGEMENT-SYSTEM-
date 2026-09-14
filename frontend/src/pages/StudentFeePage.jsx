@@ -4,6 +4,7 @@ import { useCurrentAcademicYear } from "../features/academicYear/academicYear.ho
 import StudentFeeHeader from "../components/studentFee/StudentFeeHeader";
 import StudentFeeStats from "../components/studentFee/StudentFeeStats";
 import StudentFeeFilters from "../components/studentFee/StudentFeeFilters";
+import StudentFeeTable from "../components/studentFee/StudentFeeTable";
 
 const StudentFeePage = () => {
   const { currentAcademicYear, isLoading: isAcademicYearLoading } =
@@ -17,6 +18,7 @@ const StudentFeePage = () => {
       <StudentFeeHeader />
       <StudentFeeStats />
       <StudentFeeFilters />
+      <StudentFeeTable />
     </div>
   );
 };
