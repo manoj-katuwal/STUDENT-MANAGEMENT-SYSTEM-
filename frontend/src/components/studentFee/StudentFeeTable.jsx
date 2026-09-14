@@ -1,15 +1,5 @@
 import React from "react";
-import {
-  MoreVertical,
-  Receipt,
-  Eye,
-  CreditCard,
-  FileSpreadsheet,
-  AlertCircle,
-  RefreshCw,
-  Layers,
-  Ban,
-} from "lucide-react";
+import { Eye, Pencil, AlertCircle, RefreshCw, Layers, Ban } from "lucide-react";
 
 const StudentFeeTable = ({
   studentFees = [],
@@ -239,30 +229,43 @@ const StudentFeeTable = ({
                 <td className="px-5 py-4 text-right whitespace-nowrap">
                   <div className="flex items-center justify-end gap-1">
                     <button
-                      title="View Ledger"
-                      className="p-1.5 rounded-lg text-slate-400 hover:text-slate-700 hover:bg-slate-100 transition-colors cursor-pointer"
+                      type="button"
+                      title="View Fee Breakdown"
+                      className="p-1.5 rounded-lg text-slate-400 hover:text-indigo-600 hover:bg-indigo-50 transition-colors cursor-pointer"
                       onClick={() => onView?.(row)}
                     >
                       <Eye className="w-4 h-4" />
                     </button>
-                    <button
-                      title="Collect Payment"
-                      className="p-1.5 rounded-lg text-slate-400 hover:text-blue-600 hover:bg-blue-50 transition-colors cursor-pointer"
-                      onClick={() => {
-                        onEdit?.(row);
-                      }}
-                    >
-                      <CreditCard className="w-4 h-4" />
-                    </button>
-                    <button
-                      title="Cancelled "
-                      className="p-1.5 rounded-lg text-slate-400 hover:text-slate-700 hover:bg-slate-100 transition-colors cursor-pointer"
-                      onClick={() => {
-                        onCancel?.(row);
-                      }}
-                    >
-                      <Ban className="w-4 h-4" />
-                    </button>
+
+                    {row.status !== "CANCELLED" && (
+                      <button
+                        type="button"
+                        title="Adjust Concession / Discount"
+                        className="p-1.5 rounded-lg text-slate-400 hover:text-blue-600 hover:bg-blue-50 transition-colors cursor-pointer"
+                        onClick={() => onEdit?.(row)}
+                      >
+                        <Pencil className="w-4 h-4" />
+                      </button>
+                    )}
+
+                    {row.status !== "CANCELLED" && (
+                      <button
+                        type="button"
+                        title={
+                          (row.paidAmount ?? 0) > 0
+                            ? `Cannot cancel: Payment of NPR ${(row.paidAmount ?? 0).toLocaleString()} exists`
+                            : "Cancel Fee Assignment"
+                        }
+                        className={`p-1.5 rounded-lg transition-colors cursor-pointer ${
+                          (row.paidAmount ?? 0) > 0
+                            ? "text-slate-300 hover:text-amber-600 hover:bg-amber-50"
+                            : "text-slate-400 hover:text-rose-600 hover:bg-rose-50"
+                        }`}
+                        onClick={() => onCancel?.(row)}
+                      >
+                        <Ban className="w-4 h-4" />
+                      </button>
+                    )}
                   </div>
                 </td>
               </tr>

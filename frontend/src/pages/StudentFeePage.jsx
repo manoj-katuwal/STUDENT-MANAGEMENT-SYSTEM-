@@ -5,7 +5,11 @@ import StudentFeeHeader from "../components/studentFee/StudentFeeHeader";
 import StudentFeeStats from "../components/studentFee/StudentFeeStats";
 import StudentFeeFilters from "../components/studentFee/StudentFeeFilters";
 import StudentFeeTable from "../components/studentFee/StudentFeeTable";
-import { useCancelStudentFee, useStudentFees, useUpdateStudentFee } from "../features/studentFee/studentFee.hooks";
+import {
+  useCancelStudentFee,
+  useStudentFees,
+  useUpdateStudentFee,
+} from "../features/studentFee/studentFee.hooks";
 import StudentFeeViewModal from "../components/studentFee/StudentFeeViewModel";
 import StudentFeeEditModal from "../components/studentFee/StudentFeeEditModel";
 import StudentFeeCancelModal from "../components/studentFee/StudentFeeCancelModel";
@@ -52,6 +56,7 @@ const StudentFeePage = () => {
 
       <StudentFeeEditModal
         studentFee={editingStudentFee}
+        isLoading={updateStudentFeeMutation.isPending}
         onClose={() => setEditingStudentFee(null)}
         onSubmit={(data) => {
           updateStudentFeeMutation.mutate(
@@ -70,6 +75,7 @@ const StudentFeePage = () => {
 
       <StudentFeeCancelModal
         studentFee={cancellingStudentFee}
+        isLoading={cancelStudentFeeMutation.isPending}
         onClose={() => setCancellingStudentFee(null)}
         onConfirm={() => {
           cancelStudentFeeMutation.mutate(cancellingStudentFee._id, {
