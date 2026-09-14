@@ -8,6 +8,7 @@ import {
   AlertCircle,
   RefreshCw,
   Layers,
+  Ban,
 } from "lucide-react";
 
 
@@ -17,6 +18,10 @@ const StudentFeeTable = ({
   isLoading = false,
   isError = false,
   onRetry,
+  onView,
+  onEdit,
+  onCancel
+  
 }) => {
 
   
@@ -242,20 +247,23 @@ const StudentFeeTable = ({
                     <button
                       title="View Ledger"
                       className="p-1.5 rounded-lg text-slate-400 hover:text-slate-700 hover:bg-slate-100 transition-colors cursor-pointer"
+                      onClick={()=> onView?.(row)}
                     >
                       <Eye className="w-4 h-4" />
                     </button>
                     <button
                       title="Collect Payment"
                       className="p-1.5 rounded-lg text-slate-400 hover:text-blue-600 hover:bg-blue-50 transition-colors cursor-pointer"
+                      onClick={()=>{onEdit?.(row)}}
                     >
                       <CreditCard className="w-4 h-4" />
                     </button>
                     <button
-                      title="More Options"
+                      title="Cancelled "
                       className="p-1.5 rounded-lg text-slate-400 hover:text-slate-700 hover:bg-slate-100 transition-colors cursor-pointer"
+                      onClick={()=>{onCancel?.(row)}}
                     >
-                      <MoreVertical className="w-4 h-4" />
+                      <Ban className="w-4 h-4" />
                     </button>
                   </div>
                 </td>

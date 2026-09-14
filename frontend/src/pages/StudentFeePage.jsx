@@ -29,6 +29,9 @@ const StudentFeePage = () => {
         isLoading={isLoading}
         isError={isError}
         onRetry={refetch}
+        onView={(studentFee) => console.log("View", studentFee)}
+        onEdit={(studentFee) => console.log("Edit", studentFee)}
+        onCancel={(studentFee) => console.log("Cancel", studentFee)}
       />
     </div>
   );
