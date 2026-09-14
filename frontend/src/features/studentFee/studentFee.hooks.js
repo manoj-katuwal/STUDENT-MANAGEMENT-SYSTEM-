@@ -5,9 +5,10 @@ import {
   useQueryClient,
 } from "@tanstack/react-query";
 import {
-    cancelStudentFee,
+  cancelStudentFee,
   createStudentFee,
   getStudentFeeById,
+  getStudentFeeLedgerSummary,
   getStudentFees,
   getStudentFeeSummary,
   updateStudentFee,
@@ -96,5 +97,12 @@ export const useCancelStudentFee = () => {
         queryKey: ["studentFeeSummary"],
       });
     },
+  });
+};
+
+export const useStudentFeeLedgerSummary = () => {
+  return useQuery({
+    queryKey: ["studentFeeLedgerSummary"],
+    queryFn: getStudentFeeLedgerSummary,
   });
 };

@@ -42,3 +42,8 @@ export const cancelStudentFee = async (studentFeeId) => {
 
   return response.data.data;
 };
+
+export const getStudentFeeLedgerSummary = async () => {
+  const response = await apiClient.get("/student-fees/summary");
+  return response.data.data;
+};
