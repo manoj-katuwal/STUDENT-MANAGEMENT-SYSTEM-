@@ -1,6 +1,7 @@
 import React from "react";
 import StudentFeeContextBar from "../components/studentFee/StudentFeeContextBar";
 import { useCurrentAcademicYear } from "../features/academicYear/academicYear.hooks";
+import StudentFeeHeader from "../components/studentFee/StudentFeeHeader";
 
 const StudentFeePage = () => {
   const { currentAcademicYear, isLoading: isAcademicYearLoading } =
@@ -11,6 +12,7 @@ const StudentFeePage = () => {
         currentAcademicYear={currentAcademicYear}
         isLoading={isAcademicYearLoading}
       />
+      <StudentFeeHeader />
     </div>
   );
 };
