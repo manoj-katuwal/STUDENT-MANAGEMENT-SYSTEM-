@@ -7,12 +7,14 @@ import StudentFeeFilters from "../components/studentFee/StudentFeeFilters";
 import StudentFeeTable from "../components/studentFee/StudentFeeTable";
 import {
   useCancelStudentFee,
+  useCreateStudentFee,
   useStudentFees,
   useUpdateStudentFee,
 } from "../features/studentFee/studentFee.hooks";
 import StudentFeeViewModal from "../components/studentFee/StudentFeeViewModel";
 import StudentFeeEditModal from "../components/studentFee/StudentFeeEditModel";
 import StudentFeeCancelModal from "../components/studentFee/StudentFeeCancelModel";
+import StudentFeeAssignModal from "../components/studentFee/StudentFeeAssignModal";
 
 const StudentFeePage = () => {
   const { currentAcademicYear, isLoading: isAcademicYearLoading } =
@@ -22,11 +24,13 @@ const StudentFeePage = () => {
     limit: 10,
   });
 
+  const createStudentFeeMutation = useCreateStudentFee();
   const updateStudentFeeMutation = useUpdateStudentFee();
   const cancelStudentFeeMutation = useCancelStudentFee();
   const [selectedStudentFee, setSelectedStudentFee] = useState(null);
   const [editingStudentFee, setEditingStudentFee] = useState(null);
   const [cancellingStudentFee, setCancellingStudentFee] = useState(null);
+  const [isAssignModalOpen, setIsAssignModalOpen] = useState(false);
   console.log("Student Fee Data:", data);
   return (
     <div className="min-h-full p-6 lg:p-8 space-y-6">
@@ -34,7 +38,7 @@ const StudentFeePage = () => {
         currentAcademicYear={currentAcademicYear}
         isLoading={isAcademicYearLoading}
       />
-      <StudentFeeHeader />
+      <StudentFeeHeader onAssignFee={() => setIsAssignModalOpen(true)} />
       <StudentFeeStats />
       <StudentFeeFilters />
       <StudentFeeTable
@@ -46,6 +50,19 @@ const StudentFeePage = () => {
         onEdit={(studentFee) => setEditingStudentFee(studentFee)}
         onCancel={(studentFee) => {
           setCancellingStudentFee(studentFee);
+        }}
+      />
+
+      <StudentFeeAssignModal
+        isOpen={isAssignModalOpen}
+        onClose={() => setIsAssignModalOpen(false)}
+        isSubmitting={createStudentFeeMutation.isPending}
+        onSubmit={(formData) => {
+          createStudentFeeMutation.mutate(formData, {
+            onSuccess: () => {
+              setIsAssignModalOpen(false);
+            },
+          });
         }}
       />
 
