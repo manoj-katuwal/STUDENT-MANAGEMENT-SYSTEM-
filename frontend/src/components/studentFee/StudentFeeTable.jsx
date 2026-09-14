@@ -11,8 +11,6 @@ import {
   Ban,
 } from "lucide-react";
 
-
-
 const StudentFeeTable = ({
   studentFees = [],
   isLoading = false,
@@ -20,12 +18,8 @@ const StudentFeeTable = ({
   onRetry,
   onView,
   onEdit,
-  onCancel
-  
+  onCancel,
 }) => {
-
-  
-
   const getStatusBadge = (status) => {
     switch (status) {
       case "PAID":
@@ -209,30 +203,30 @@ const StudentFeeTable = ({
 
                 {/* Total */}
                 <td className="px-4 py-4 text-right whitespace-nowrap font-medium text-slate-600">
-                  NPR {row.totalAmount.toLocaleString()}
+                  NPR {(row.totalAmount ?? 0).toLocaleString()}
                 </td>
 
                 {/* Discount */}
                 <td className="px-4 py-4 text-right whitespace-nowrap text-slate-500">
-                  {row.discountAmount > 0
-                    ? `NPR ${row.discountAmount.toLocaleString()}`
+                  {(row.discountAmount ?? 0) > 0
+                    ? `NPR ${(row.discountAmount ?? 0).toLocaleString()}`
                     : "-"}
                 </td>
 
                 {/* Net */}
                 <td className="px-4 py-4 text-right whitespace-nowrap font-semibold text-slate-900">
-                  NPR {(row.totalAmount ?? 0).toLocaleString() }
+                  NPR {(row.netAmount ?? 0).toLocaleString()}
                 </td>
 
                 {/* Paid */}
                 <td className="px-4 py-4 text-right whitespace-nowrap font-semibold text-emerald-600">
-                  NPR {row.paidAmount.toLocaleString()}
+                  NPR {(row.paidAmount ?? 0).toLocaleString()}
                 </td>
 
                 {/* Due */}
                 <td className="px-4 py-4 text-right whitespace-nowrap font-semibold text-rose-600">
-                  {row.dueAmount > 0
-                    ? `NPR ${row.dueAmount.toLocaleString()}`
+                  {(row.dueAmount ?? 0) > 0
+                    ? `NPR ${(row.dueAmount ?? 0).toLocaleString()}`
                     : "NPR 0"}
                 </td>
 
@@ -247,21 +241,25 @@ const StudentFeeTable = ({
                     <button
                       title="View Ledger"
                       className="p-1.5 rounded-lg text-slate-400 hover:text-slate-700 hover:bg-slate-100 transition-colors cursor-pointer"
-                      onClick={()=> onView?.(row)}
+                      onClick={() => onView?.(row)}
                     >
                       <Eye className="w-4 h-4" />
                     </button>
                     <button
                       title="Collect Payment"
                       className="p-1.5 rounded-lg text-slate-400 hover:text-blue-600 hover:bg-blue-50 transition-colors cursor-pointer"
-                      onClick={()=>{onEdit?.(row)}}
+                      onClick={() => {
+                        onEdit?.(row);
+                      }}
                     >
                       <CreditCard className="w-4 h-4" />
                     </button>
                     <button
                       title="Cancelled "
                       className="p-1.5 rounded-lg text-slate-400 hover:text-slate-700 hover:bg-slate-100 transition-colors cursor-pointer"
-                      onClick={()=>{onCancel?.(row)}}
+                      onClick={() => {
+                        onCancel?.(row);
+                      }}
                     >
                       <Ban className="w-4 h-4" />
                     </button>
