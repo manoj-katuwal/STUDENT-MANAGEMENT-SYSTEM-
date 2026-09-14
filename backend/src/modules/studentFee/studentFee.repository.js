@@ -171,3 +171,48 @@ export const getUpcomingDueStudentFees = async (days) => {
     dueDate: { $gte: today, $lte: futureDate },
   });
 };
+
+export const getStudentFeeLedgerSummary = async () => {
+  return await StudentFee.aggregate([
+    {
+      $match: {
+        status: { $ne: "CANCELLED" },
+      },
+    },
+    {
+      $group: {
+        _id: null,
+        totalOutstanding: { $sum: "$dueAmount" },
+        totalPaid: { $sum: "$paidAmount" },
+
+        pendingFees: {
+          $sum: {
+            $cond: [{ $eq: ["$status", "PENDING"] }, 1, 0],
+          },
+        },
+
+        partialPayments: {
+          $sum: {
+            $cond: [{ $eq: ["$status", "PARTIAL"] }, 1, 0],
+          },
+        },
+
+        paidFees: {
+          $sum: {
+            $cond: [{ $eq: ["$status", "PAID"] }, 1, 0],
+          },
+        },
+      },
+    },
+    {
+      $project: {
+        _id: 0,
+        totalOutstanding: 1,
+        totalPaid: 1,
+        pendingFees: 1,
+        partialPayments: 1,
+        paidFees: 1,
+      },
+    },
+  ]);
+};
