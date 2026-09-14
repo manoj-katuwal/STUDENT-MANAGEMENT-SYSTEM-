@@ -5,6 +5,7 @@ import {
   createFeeStructureService,
   deactivateFeeStructureService,
   getFeeStructureByIdService,
+  getFeeStructuresForExportService,
   getFeeStructureStatsService,
   getFeeStructuresService,
   updateFeeStructureService,
@@ -32,6 +33,7 @@ export const getFeeStructuresController = asyncHandler(async (req, res) => {
   const feeType = req.query.feeType?.trim() || "";
 
   const status = req.query.status?.trim() || "";
+  const search = req.query.search?.trim() || "";
 
   const result = await getFeeStructuresService(
     page,
@@ -40,6 +42,7 @@ export const getFeeStructuresController = asyncHandler(async (req, res) => {
     classId,
     feeType,
     status,
+    search,
   );
 
   return successResponse({
@@ -60,6 +63,24 @@ export const getFeeStructureStatsController = asyncHandler(async (req, res) => {
     message: "Fee structure stats fetched successfully",
     data: stats,
   });
+});
+
+export const getFeeStructuresCsvController = asyncHandler(async (req, res) => {
+  const csv = await getFeeStructuresForExportService({
+    search: req.query.search,
+    academicYearId: req.query.academicYearId,
+    classId: req.query.classId,
+    feeType: req.query.feeType,
+    status: req.query.status,
+  });
+
+  res.setHeader("Content-Type", "text/csv; charset=utf-8");
+  res.setHeader(
+    "Content-Disposition",
+    'attachment; filename="fee-structures.csv"',
+  );
+
+  return res.status(200).send(csv);
 });
 
 export const getFeeStructureByIdController = asyncHandler(async (req, res) => {

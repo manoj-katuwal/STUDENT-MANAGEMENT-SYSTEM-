@@ -35,6 +35,13 @@ export const findFeeStructures = async ({
     .limit(limit);
 };
 
+export const findFeeStructuresForExport = async (filter = {}) => {
+  return await FeeStructure.find(filter)
+    .populate("academicYearId", "name")
+    .populate("classId", "name code")
+    .sort({ createdAt: -1 });
+};
+
 export const countFeeStructures = async (filter = {}) => {
   return await FeeStructure.countDocuments(filter);
 };

@@ -1,7 +1,7 @@
 import AppError from "../../shared/utils/error/AppError.js";
-import { findAcademicYearById } from "../academicYear/academicYear.repository.js";
-import { findClassById } from "../classes/class.repository.js";
-import { countFeeStructures, createFeeStructure, findFeeStructureByCombination, findFeeStructureById, findFeeStructures, getFeeStructureStats, updateFeeStructure } from "./feeStructure.repository.js";
+import { findAcademicYearById, findAcademicYearsForExport } from "../academicYear/academicYear.repository.js";
+import { findClassById, findClassesForExport } from "../classes/class.repository.js";
+import { countFeeStructures, createFeeStructure, findFeeStructureByCombination, findFeeStructureById, findFeeStructures, findFeeStructuresForExport, getFeeStructureStats, updateFeeStructure } from "./feeStructure.repository.js";
 
 export const createFeeStructureService = async (feeStructureData) => {
   const { academicYearId, classId, feeType, amount } = feeStructureData;
@@ -75,6 +75,7 @@ export const getFeeStructuresService = async (
   classId = "",
   feeType = "",
   status = "",
+  search = "",
 ) => {
   const skip = (page - 1) * limit;
 
@@ -94,6 +95,25 @@ export const getFeeStructuresService = async (
 
   if (status) {
     filter.status = status;
+  }
+
+  if (search) {
+    const [academicYears, classes] = await Promise.all([
+      findAcademicYearsForExport({
+        name: { $regex: search, $options: "i" },
+      }),
+      findClassesForExport({
+        $or: [
+          { name: { $regex: search, $options: "i" } },
+          { code: { $regex: search, $options: "i" } },
+        ],
+      }),
+    ]);
+
+    filter.$or = [
+      { academicYearId: { $in: academicYears.map((year) => year._id) } },
+      { classId: { $in: classes.map((classRecord) => classRecord._id) } },
+    ];
   }
 
   const [feeStructures, total] = await Promise.all([
@@ -130,6 +150,93 @@ export const getFeeStructureByIdService = async (feeStructureId) => {
 
 export const getFeeStructureStatsService = async () => {
   return await getFeeStructureStats();
+};
+
+const escapeCsvValue = (value) => {
+  if (value === null || value === undefined) return "";
+
+  const stringValue = String(value);
+  if (
+    stringValue.includes(",") ||
+    stringValue.includes('"') ||
+    stringValue.includes("\n") ||
+    stringValue.includes("\r")
+  ) {
+    return `"${stringValue.replace(/"/g, '""')}"`;
+  }
+
+  return stringValue;
+};
+
+const getExportFilter = async ({
+  search = "",
+  academicYearId = "",
+  classId = "",
+  feeType = "",
+  status = "",
+} = {}) => {
+  const filter = {};
+  const cleanSearch = typeof search === "string" ? search.trim() : "";
+
+  if (academicYearId) filter.academicYearId = academicYearId;
+  if (classId) filter.classId = classId;
+  if (feeType) filter.feeType = feeType;
+  if (status) filter.status = status;
+
+  if (cleanSearch) {
+    const [academicYears, classes] = await Promise.all([
+      findAcademicYearsForExport({
+        name: { $regex: cleanSearch, $options: "i" },
+      }),
+      findClassesForExport({
+        $or: [
+          { name: { $regex: cleanSearch, $options: "i" } },
+          { code: { $regex: cleanSearch, $options: "i" } },
+        ],
+      }),
+    ]);
+
+    filter.$or = [
+      { academicYearId: { $in: academicYears.map((year) => year._id) } },
+      { classId: { $in: classes.map((classRecord) => classRecord._id) } },
+    ];
+  }
+
+  return filter;
+};
+
+export const getFeeStructuresForExportService = async (filters = {}) => {
+  const feeStructures = await findFeeStructuresForExport(
+    await getExportFilter(filters),
+  );
+
+  const headers = [
+    "Academic Year",
+    "Class Name",
+    "Class Code",
+    "Fee Type",
+    "Amount",
+    "Status",
+    "Created At",
+    "Updated At",
+  ];
+
+  const rows = feeStructures.map((feeStructure) =>
+    [
+      feeStructure.academicYearId?.name,
+      feeStructure.classId?.name,
+      feeStructure.classId?.code,
+      feeStructure.feeType,
+      feeStructure.amount,
+      feeStructure.status,
+      feeStructure.createdAt?.toISOString(),
+      feeStructure.updatedAt?.toISOString(),
+    ]
+      .map(escapeCsvValue)
+      .join(","),
+  );
+
+  return [headers.join(","), ...rows].join("\r\n");
 };
 
 export const updateFeeStructureService = async (feeStructureId, updateData) => {
@@ -234,4 +341,3 @@ export const activateFeeStructureService = async (feeStructureId) => {
     status: "ACTIVE",
   });
 };
-

@@ -5,6 +5,7 @@ import {
   createFeeStructureController,
   deactivateFeeStructureController,
   getFeeStructureByIdController,
+  getFeeStructuresCsvController,
   getFeeStructureStatsController,
   getFeeStructuresController,
   updateFeeStructureController,
@@ -25,6 +26,12 @@ router.post(
 
 router.get("/", authenticate, authorize("ADMIN"), getFeeStructuresController);
 router.get("/stats", authenticate, authorize("ADMIN"), getFeeStructureStatsController);
+router.get(
+  "/export/csv",
+  authenticate,
+  authorize("ADMIN"),
+  getFeeStructuresCsvController,
+);
 router.get(
   "/:feeStructureId",
   authenticate,
