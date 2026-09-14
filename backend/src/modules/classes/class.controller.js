@@ -5,6 +5,7 @@ import {
   getClassByIdService,
   getClassesService,
   getClassStatsService,
+  getClassesForExportService,
   updateClassService,
   updateClassStatusService,
 } from "./class.service.js";
@@ -83,4 +84,16 @@ export const getClassStatsController = asyncHandler(async (req, res) => {
     message: "Class statistics fetched successfully",
     data: stats,
   });
+});
+
+export const getClassesCsvController = asyncHandler(async (req, res) => {
+  const csv = await getClassesForExportService({
+    search: req.query.search,
+    status: req.query.status,
+  });
+
+  res.setHeader("Content-Type", "text/csv; charset=utf-8");
+  res.setHeader("Content-Disposition", 'attachment; filename="classes.csv"');
+
+  return res.status(200).send(csv);
 });
