@@ -5,25 +5,25 @@ export const getStudentFees = async (params) => {
     params,
   });
 
-  return response.data;
+  return response.data.data;
 };
 
 export const getStudentFeeById = async (studentFeeId) => {
   const response = await apiClient.get(`/student-fees/${studentFeeId}`);
 
-  return response.data;
+  return response.data.data;
 };
 
 export const getStudentFeeSummary = async (studentId) => {
   const response = await apiClient.get(`/student-fees/summary/${studentId}`);
 
-  return response.data;
+  return response.data.data;
 };
 
 export const createStudentFee = async (studentFeeData) => {
   const response = await apiClient.post("/student-fees", studentFeeData);
 
-  return response.data;
+  return response.data.data;
 };
 
 export const updateStudentFee = async (studentFeeId, updateData) => {
@@ -32,7 +32,7 @@ export const updateStudentFee = async (studentFeeId, updateData) => {
     updateData,
   );
 
-  return response.data;
+  return response.data.data;
 };
 
 export const cancelStudentFee = async (studentFeeId) => {
@@ -40,5 +40,5 @@ export const cancelStudentFee = async (studentFeeId) => {
     `/student-fees/${studentFeeId}/cancel`,
   );
 
-  return response.data;
+  return response.data.data;
 };

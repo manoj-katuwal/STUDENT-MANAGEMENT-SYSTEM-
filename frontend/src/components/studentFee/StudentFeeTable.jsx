@@ -5,59 +5,21 @@ import {
   Eye,
   CreditCard,
   FileSpreadsheet,
+  AlertCircle,
+  RefreshCw,
+  Layers,
 } from "lucide-react";
 
-// Dummy data to demonstrate production table layout
-const dummyFeeRecords = [
-  {
-    id: "1",
-    studentName: "Aarav Sharma",
-    avatar:
-      "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=100&auto=format&fit=crop&q=80",
-    admissionNo: "ADM-2081-001",
-    academicYear: "2081/82",
-    feeType: "Tuition & Annual Fee",
-    totalAmount: 45000,
-    discountAmount: 5000,
-    netAmount: 40000,
-    paidAmount: 40000,
-    dueAmount: 0,
-    status: "PAID",
-  },
-  {
-    id: "2",
-    studentName: "Siddharth Thapa",
-    avatar:
-      "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=100&auto=format&fit=crop&q=80",
-    admissionNo: "ADM-2081-042",
-    academicYear: "2081/82",
-    feeType: "Semester Fee",
-    totalAmount: 55000,
-    discountAmount: 0,
-    netAmount: 55000,
-    paidAmount: 25000,
-    dueAmount: 30000,
-    status: "PARTIAL",
-  },
-  {
-    id: "3",
-    studentName: "Pooja Adhikari",
-    avatar:
-      "https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=100&auto=format&fit=crop&q=80",
-    admissionNo: "ADM-2081-089",
-    academicYear: "2081/82",
-    feeType: "Exam & Lab Fee",
-    totalAmount: 18000,
-    discountAmount: 2000,
-    netAmount: 16000,
-    paidAmount: 0,
-    dueAmount: 16000,
-    status: "PENDING",
-  },
-];
 
-const StudentFeeTable = () => {
-  const records = dummyFeeRecords; // Switch to [] to test the empty state
+
+const StudentFeeTable = ({
+  studentFees = [],
+  isLoading = false,
+  isError = false,
+  onRetry,
+}) => {
+
+  
 
   const getStatusBadge = (status) => {
     switch (status) {
@@ -89,6 +51,75 @@ const StudentFeeTable = () => {
         return null;
     }
   };
+
+  // 1. Loading State
+  if (isLoading) {
+    return (
+      <div className="overflow-hidden rounded-2xl border border-slate-200/80 bg-white shadow-xs">
+        <div className="animate-pulse">
+          <div className="h-12 border-b border-slate-200/80 bg-slate-50/50" />
+          {[1, 2, 3, 4, 5].map((row) => (
+            <div
+              key={row}
+              className="grid grid-cols-5 items-center gap-4 border-b border-slate-100 px-6 py-4"
+            >
+              <div className="h-4.5 w-3/4 rounded bg-slate-200/70" />
+              <div className="h-5 w-16 rounded-md bg-slate-200/70" />
+              <div className="h-6 w-20 rounded-full bg-slate-200/70" />
+              <div className="h-4.5 w-24 rounded bg-slate-200/70" />
+              <div className="ml-auto flex gap-2">
+                <div className="h-8 w-8 rounded-lg bg-slate-100" />
+                <div className="h-8 w-8 rounded-lg bg-slate-100" />
+                <div className="h-8 w-8 rounded-lg bg-slate-100" />
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+    );
+  }
+
+  // 2. Error State
+  if (isError) {
+    return (
+      <div className="rounded-2xl border border-red-200 bg-red-50/50 p-8 text-center shadow-xs">
+        <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-red-100 text-red-600">
+          <AlertCircle className="h-6 w-6" />
+        </div>
+        <h3 className="mt-3 text-base font-semibold text-slate-900">
+          Failed to load fee records
+        </h3>
+        <p className="mt-1 text-sm text-slate-500">
+          Something went wrong while fetching the records. Please try again.
+        </p>
+        <button
+          type="button"
+          onClick={onRetry}
+          className="mt-4 inline-flex cursor-pointer items-center gap-2 rounded-xl bg-white px-4 py-2 text-xs font-semibold text-red-700 shadow-xs ring-1 ring-inset ring-red-200 transition-all hover:bg-red-50"
+        >
+          <RefreshCw className="h-3.5 w-3.5" />
+          <span>Retry Loading</span>
+        </button>
+      </div>
+    );
+  }
+
+  // 3. Empty State
+  if (studentFees.length === 0) {
+    return (
+      <div className="rounded-2xl border border-slate-200/80 bg-white px-6 py-14 text-center shadow-xs">
+        <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-2xl bg-slate-100 text-slate-400">
+          <Layers className="h-6 w-6" />
+        </div>
+        <h3 className="mt-3 text-sm font-semibold text-slate-900">
+          No fee records found
+        </h3>
+        <p className="mt-1 text-xs text-slate-500">
+          Try adjusting your search or filters to find what you are looking for.
+        </p>
+      </div>
+    );
+  }
 
   return (
     <div className="overflow-hidden rounded-xl border border-slate-200/80 bg-white shadow-xs">
@@ -135,123 +166,101 @@ const StudentFeeTable = () => {
 
           {/* Table Body */}
           <tbody className="divide-y divide-slate-100 bg-white">
-            {records.length > 0 ? (
-              records.map((row) => (
-                <tr
-                  key={row.id}
-                  className="transition-colors hover:bg-slate-50/60"
-                >
-                  {/* Student Info */}
-                  <td className="px-5 py-4 whitespace-nowrap">
-                    <div className="flex items-center gap-3">
-                      <img
-                        src={row.avatar}
-                        alt={row.studentName}
-                        className="h-9 w-9 rounded-full object-cover ring-1 ring-slate-200"
-                      />
-                      <div>
-                        <span className="font-semibold text-slate-900 block">
-                          {row.studentName}
-                        </span>
-                      </div>
+            {studentFees.map((row) => (
+              <tr
+                key={row._id}
+                className="transition-colors hover:bg-slate-50/60"
+              >
+                {/* Student Info */}
+                <td className="px-5 py-4 whitespace-nowrap">
+                  <div className="flex items-center gap-3">
+                    <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl border border-indigo-100/60 bg-indigo-50 font-semibold text-indigo-600">
+                      {row.studentId?.name
+                        ? row.studentId.name.charAt(0).toUpperCase()
+                        : "S"}
                     </div>
-                  </td>
-
-                  {/* Admission No */}
-                  <td className="px-4 py-4 whitespace-nowrap font-medium text-slate-700 font-mono text-xs">
-                    {row.admissionNo}
-                  </td>
-
-                  {/* Academic Year */}
-                  <td className="px-4 py-4 whitespace-nowrap text-slate-600">
-                    {row.academicYear}
-                  </td>
-
-                  {/* Fee Type */}
-                  <td className="px-4 py-4 whitespace-nowrap font-medium text-slate-800">
-                    {row.feeType}
-                  </td>
-
-                  {/* Total */}
-                  <td className="px-4 py-4 text-right whitespace-nowrap font-medium text-slate-600">
-                    NPR {row.totalAmount.toLocaleString()}
-                  </td>
-
-                  {/* Discount */}
-                  <td className="px-4 py-4 text-right whitespace-nowrap text-slate-500">
-                    {row.discountAmount > 0
-                      ? `NPR ${row.discountAmount.toLocaleString()}`
-                      : "-"}
-                  </td>
-
-                  {/* Net */}
-                  <td className="px-4 py-4 text-right whitespace-nowrap font-semibold text-slate-900">
-                    NPR {row.netAmount.toLocaleString()}
-                  </td>
-
-                  {/* Paid */}
-                  <td className="px-4 py-4 text-right whitespace-nowrap font-semibold text-emerald-600">
-                    NPR {row.paidAmount.toLocaleString()}
-                  </td>
-
-                  {/* Due */}
-                  <td className="px-4 py-4 text-right whitespace-nowrap font-semibold text-rose-600">
-                    {row.dueAmount > 0
-                      ? `NPR ${row.dueAmount.toLocaleString()}`
-                      : "NPR 0"}
-                  </td>
-
-                  {/* Status */}
-                  <td className="px-4 py-4 text-center whitespace-nowrap">
-                    {getStatusBadge(row.status)}
-                  </td>
-
-                  {/* Actions */}
-                  <td className="px-5 py-4 text-right whitespace-nowrap">
-                    <div className="flex items-center justify-end gap-1">
-                      <button
-                        title="View Ledger"
-                        className="p-1.5 rounded-lg text-slate-400 hover:text-slate-700 hover:bg-slate-100 transition-colors cursor-pointer"
-                      >
-                        <Eye className="w-4 h-4" />
-                      </button>
-                      <button
-                        title="Collect Payment"
-                        className="p-1.5 rounded-lg text-slate-400 hover:text-blue-600 hover:bg-blue-50 transition-colors cursor-pointer"
-                      >
-                        <CreditCard className="w-4 h-4" />
-                      </button>
-                      <button
-                        title="More Options"
-                        className="p-1.5 rounded-lg text-slate-400 hover:text-slate-700 hover:bg-slate-100 transition-colors cursor-pointer"
-                      >
-                        <MoreVertical className="w-4 h-4" />
-                      </button>
-                    </div>
-                  </td>
-                </tr>
-              ))
-            ) : (
-              /* Empty State */
-              <tr>
-                <td colSpan={11} className="px-4 py-14 text-center">
-                  <div className="flex flex-col items-center justify-center space-y-3">
-                    <div className="flex h-12 w-12 items-center justify-center rounded-full bg-slate-100 text-slate-400">
-                      <FileSpreadsheet className="h-6 w-6" />
-                    </div>
-                    <div className="space-y-1">
-                      <p className="text-base font-semibold text-slate-800">
-                        No student fee records found
-                      </p>
-                      <p className="text-xs text-slate-500 max-w-sm mx-auto">
-                        There are no assigned fees matching your search or
-                        filter criteria.
-                      </p>
+                    <div>
+                      <span className="font-semibold text-slate-900 block">
+                        {row.studentId.name}
+                      </span>
                     </div>
                   </div>
                 </td>
+
+                {/* Admission No */}
+                <td className="px-4 py-4 whitespace-nowrap font-medium text-slate-700 font-mono text-xs">
+                  {row.studentId?.admissionNumber || "-"}
+                </td>
+
+                {/* Academic Year */}
+                <td className="px-4 py-4 whitespace-nowrap text-slate-600">
+                  {row.academicYearId?.name || "—"}
+                </td>
+
+                {/* Fee Type */}
+                <td className="px-4 py-4 whitespace-nowrap font-medium text-slate-800">
+                  {row.feeStructureId?.feeType || "—"}
+                </td>
+
+                {/* Total */}
+                <td className="px-4 py-4 text-right whitespace-nowrap font-medium text-slate-600">
+                  NPR {row.totalAmount.toLocaleString()}
+                </td>
+
+                {/* Discount */}
+                <td className="px-4 py-4 text-right whitespace-nowrap text-slate-500">
+                  {row.discountAmount > 0
+                    ? `NPR ${row.discountAmount.toLocaleString()}`
+                    : "-"}
+                </td>
+
+                {/* Net */}
+                <td className="px-4 py-4 text-right whitespace-nowrap font-semibold text-slate-900">
+                  NPR {(row.totalAmount ?? 0).toLocaleString() }
+                </td>
+
+                {/* Paid */}
+                <td className="px-4 py-4 text-right whitespace-nowrap font-semibold text-emerald-600">
+                  NPR {row.paidAmount.toLocaleString()}
+                </td>
+
+                {/* Due */}
+                <td className="px-4 py-4 text-right whitespace-nowrap font-semibold text-rose-600">
+                  {row.dueAmount > 0
+                    ? `NPR ${row.dueAmount.toLocaleString()}`
+                    : "NPR 0"}
+                </td>
+
+                {/* Status */}
+                <td className="px-4 py-4 text-center whitespace-nowrap">
+                  {getStatusBadge(row.status)}
+                </td>
+
+                {/* Actions */}
+                <td className="px-5 py-4 text-right whitespace-nowrap">
+                  <div className="flex items-center justify-end gap-1">
+                    <button
+                      title="View Ledger"
+                      className="p-1.5 rounded-lg text-slate-400 hover:text-slate-700 hover:bg-slate-100 transition-colors cursor-pointer"
+                    >
+                      <Eye className="w-4 h-4" />
+                    </button>
+                    <button
+                      title="Collect Payment"
+                      className="p-1.5 rounded-lg text-slate-400 hover:text-blue-600 hover:bg-blue-50 transition-colors cursor-pointer"
+                    >
+                      <CreditCard className="w-4 h-4" />
+                    </button>
+                    <button
+                      title="More Options"
+                      className="p-1.5 rounded-lg text-slate-400 hover:text-slate-700 hover:bg-slate-100 transition-colors cursor-pointer"
+                    >
+                      <MoreVertical className="w-4 h-4" />
+                    </button>
+                  </div>
+                </td>
               </tr>
-            )}
+            ))}
           </tbody>
         </table>
       </div>
