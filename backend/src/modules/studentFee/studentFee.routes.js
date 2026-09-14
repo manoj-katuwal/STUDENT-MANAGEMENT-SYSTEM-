@@ -4,6 +4,7 @@ import {
   cancelStudentFeeController,
   createStudentFeeController,
   getStudentFeeByIdController,
+  getStudentFeeLedgerSummary,
   getStudentFeesController,
   getStudentFeeSummaryController,
   updateStudentFeeController,
@@ -47,4 +48,6 @@ router.patch(
   cancelStudentFeeController,
 );
 
+
+router.get("/summary", getStudentFeeLedgerSummary);
 export default router;
