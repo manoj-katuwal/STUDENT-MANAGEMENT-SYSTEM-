@@ -19,7 +19,14 @@ router.post("/", authenticate, authorize("ADMIN"), createStudentFeeController);
 
 router.get("/", authenticate, authorize("ADMIN"), getStudentFeesController);
 
-// IMPORTANT: summary route before /:studentFeeId
+// IMPORTANT: static routes before /:studentFeeId param route
+router.get(
+  "/summary",
+  authenticate,
+  authorize("ADMIN"),
+  getStudentFeeLedgerSummary,
+);
+
 router.get(
   "/summary/:studentId",
   authenticate,
@@ -48,6 +55,4 @@ router.patch(
   cancelStudentFeeController,
 );
 
-
-router.get("/summary", getStudentFeeLedgerSummary);
 export default router;
