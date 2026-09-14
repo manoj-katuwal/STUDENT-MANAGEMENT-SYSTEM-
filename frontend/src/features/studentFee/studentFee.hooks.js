@@ -44,13 +44,9 @@ export const useCreateStudentFee = () => {
   return useMutation({
     mutationFn: createStudentFee,
     onSuccess: () => {
-      queryClient.invalidateQueries({
-        queryKey: ["studentFees"],
-      });
-
-      queryClient.invalidateQueries({
-        queryKey: ["studentFeeSummary"],
-      });
+      queryClient.invalidateQueries({ queryKey: ["studentFees"] });
+      queryClient.invalidateQueries({ queryKey: ["studentFeeSummary"] });
+      queryClient.invalidateQueries({ queryKey: ["studentFeeLedgerSummary"] });
     },
   });
 };
@@ -63,17 +59,12 @@ export const useUpdateStudentFee = () => {
       updateStudentFee(studentFeeId, updateData),
 
     onSuccess: (_, variables) => {
-      queryClient.invalidateQueries({
-        queryKey: ["studentFees"],
-      });
-
+      queryClient.invalidateQueries({ queryKey: ["studentFees"] });
       queryClient.invalidateQueries({
         queryKey: ["studentFee", variables.studentFeeId],
       });
-
-      queryClient.invalidateQueries({
-        queryKey: ["studentFeeSummary"],
-      });
+      queryClient.invalidateQueries({ queryKey: ["studentFeeSummary"] });
+      queryClient.invalidateQueries({ queryKey: ["studentFeeLedgerSummary"] });
     },
   });
 };
@@ -85,17 +76,10 @@ export const useCancelStudentFee = () => {
     mutationFn: cancelStudentFee,
 
     onSuccess: (_, studentFeeId) => {
-      queryClient.invalidateQueries({
-        queryKey: ["studentFees"],
-      });
-
-      queryClient.invalidateQueries({
-        queryKey: ["studentFee", studentFeeId],
-      });
-
-      queryClient.invalidateQueries({
-        queryKey: ["studentFeeSummary"],
-      });
+      queryClient.invalidateQueries({ queryKey: ["studentFees"] });
+      queryClient.invalidateQueries({ queryKey: ["studentFee", studentFeeId] });
+      queryClient.invalidateQueries({ queryKey: ["studentFeeSummary"] });
+      queryClient.invalidateQueries({ queryKey: ["studentFeeLedgerSummary"] });
     },
   });
 };
