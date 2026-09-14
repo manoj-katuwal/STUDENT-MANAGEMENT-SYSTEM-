@@ -9,6 +9,7 @@ import {
   Layers3,
   CalendarDays,
   ReceiptText,
+  Receipt,
 } from "lucide-react";
 
 export const NAV_ITEMS = [
@@ -88,6 +89,14 @@ export const NAV_ITEMS = [
     label: "Fee Structures",
     path: "/fee-structures",
     icon: ReceiptText,
+    group: null,
+    allowedRoles: ["ADMIN"],
+  },
+
+  {
+    label: "Student Fees",
+    path: "/student-fees",
+    icon: Receipt,
     group: null,
     allowedRoles: ["ADMIN"],
   },

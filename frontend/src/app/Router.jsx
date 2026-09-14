@@ -22,6 +22,7 @@ import SectionDetailsPage from "../components/sections/SectionDetailsPage";
 import SectionEditPage from "../components/sections/SectionEditPage";
 import AcademicYearPage from "../pages/AcademicYearPage";
 import FeeStructurePage from "../pages/FeeStructurePage";
+import StudentFeePage from "../pages/StudentFeePage";
 
 const Router = () => {
   return (
@@ -38,6 +39,11 @@ const Router = () => {
               <Route element={<RoleRoute allowedRoles={["ADMIN"]} />}>
                 <Route path="/users" element={<UsersPage />} />
               </Route>
+
+              <Route element={<RoleRoute allowedRoles={["ADMIN"]} />}>
+                <Route path="/student-fees"  element={<StudentFeePage />}/>
+              </Route>
+
               <Route element={<RoleRoute allowedRoles={["ADMIN"]} />}>
                 <Route path="/fee-structures" element={<FeeStructurePage />} />
               </Route>
