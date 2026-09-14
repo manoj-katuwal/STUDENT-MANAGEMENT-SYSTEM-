@@ -91,9 +91,3 @@ export const useClassStats = () => {
     queryFn: getClassStats,
   });
 };
-
-export const useExportClassesCsv = () => {
-  return useMutation({
-    mutationFn: exportClassesCsv,
-  });
-};
