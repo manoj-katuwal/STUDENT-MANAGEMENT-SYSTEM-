@@ -5,9 +5,10 @@ import StudentFeeHeader from "../components/studentFee/StudentFeeHeader";
 import StudentFeeStats from "../components/studentFee/StudentFeeStats";
 import StudentFeeFilters from "../components/studentFee/StudentFeeFilters";
 import StudentFeeTable from "../components/studentFee/StudentFeeTable";
-import { useStudentFees, useUpdateStudentFee } from "../features/studentFee/studentFee.hooks";
+import { useCancelStudentFee, useStudentFees, useUpdateStudentFee } from "../features/studentFee/studentFee.hooks";
 import StudentFeeViewModal from "../components/studentFee/StudentFeeViewModel";
 import StudentFeeEditModal from "../components/studentFee/StudentFeeEditModel";
+import StudentFeeCancelModal from "../components/studentFee/StudentFeeCancelModel";
 
 const StudentFeePage = () => {
   const { currentAcademicYear, isLoading: isAcademicYearLoading } =
@@ -18,8 +19,10 @@ const StudentFeePage = () => {
   });
 
   const updateStudentFeeMutation = useUpdateStudentFee();
+  const cancelStudentFeeMutation = useCancelStudentFee();
   const [selectedStudentFee, setSelectedStudentFee] = useState(null);
   const [editingStudentFee, setEditingStudentFee] = useState(null);
+  const [cancellingStudentFee, setCancellingStudentFee] = useState(null);
   console.log("Student Fee Data:", data);
   return (
     <div className="min-h-full p-6 lg:p-8 space-y-6">
@@ -37,7 +40,9 @@ const StudentFeePage = () => {
         onRetry={refetch}
         onView={(studentFee) => setSelectedStudentFee(studentFee)}
         onEdit={(studentFee) => setEditingStudentFee(studentFee)}
-        onCancel={(studentFee) => console.log("Cancel", studentFee)}
+        onCancel={(studentFee) => {
+          setCancellingStudentFee(studentFee);
+        }}
       />
 
       <StudentFeeViewModal
@@ -60,6 +65,18 @@ const StudentFeePage = () => {
               },
             },
           );
+        }}
+      />
+
+      <StudentFeeCancelModal
+        studentFee={cancellingStudentFee}
+        onClose={() => setCancellingStudentFee(null)}
+        onConfirm={() => {
+          cancelStudentFeeMutation.mutate(cancellingStudentFee._id, {
+            onSuccess: () => {
+              setCancellingStudentFee(null);
+            },
+          });
         }}
       />
     </div>
