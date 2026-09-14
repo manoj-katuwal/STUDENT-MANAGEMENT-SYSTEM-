@@ -31,7 +31,7 @@ const StudentFeePage = () => {
   const [editingStudentFee, setEditingStudentFee] = useState(null);
   const [cancellingStudentFee, setCancellingStudentFee] = useState(null);
   const [isAssignModalOpen, setIsAssignModalOpen] = useState(false);
-  console.log("Student Fee Data:", data);
+
   return (
     <div className="min-h-full p-6 lg:p-8 space-y-6">
       <StudentFeeContextBar
