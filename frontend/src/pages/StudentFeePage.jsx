@@ -5,8 +5,9 @@ import StudentFeeHeader from "../components/studentFee/StudentFeeHeader";
 import StudentFeeStats from "../components/studentFee/StudentFeeStats";
 import StudentFeeFilters from "../components/studentFee/StudentFeeFilters";
 import StudentFeeTable from "../components/studentFee/StudentFeeTable";
-import { useStudentFees } from "../features/studentFee/studentFee.hooks";
+import { useStudentFees, useUpdateStudentFee } from "../features/studentFee/studentFee.hooks";
 import StudentFeeViewModal from "../components/studentFee/StudentFeeViewModel";
+import StudentFeeEditModal from "../components/studentFee/StudentFeeEditModel";
 
 const StudentFeePage = () => {
   const { currentAcademicYear, isLoading: isAcademicYearLoading } =
@@ -15,7 +16,10 @@ const StudentFeePage = () => {
     page: 1,
     limit: 10,
   });
+
+  const updateStudentFeeMutation = useUpdateStudentFee();
   const [selectedStudentFee, setSelectedStudentFee] = useState(null);
+  const [editingStudentFee, setEditingStudentFee] = useState(null);
   console.log("Student Fee Data:", data);
   return (
     <div className="min-h-full p-6 lg:p-8 space-y-6">
@@ -32,13 +36,31 @@ const StudentFeePage = () => {
         isError={isError}
         onRetry={refetch}
         onView={(studentFee) => setSelectedStudentFee(studentFee)}
-        onEdit={(studentFee) => console.log("Edit", studentFee)}
+        onEdit={(studentFee) => setEditingStudentFee(studentFee)}
         onCancel={(studentFee) => console.log("Cancel", studentFee)}
       />
 
       <StudentFeeViewModal
         studentFee={selectedStudentFee}
         onClose={() => setSelectedStudentFee(null)}
+      />
+
+      <StudentFeeEditModal
+        studentFee={editingStudentFee}
+        onClose={() => setEditingStudentFee(null)}
+        onSubmit={(data) => {
+          updateStudentFeeMutation.mutate(
+            {
+              studentFeeId: editingStudentFee._id,
+              updateData: data,
+            },
+            {
+              onSuccess: () => {
+                setEditingStudentFee(null);
+              },
+            },
+          );
+        }}
       />
     </div>
   );
