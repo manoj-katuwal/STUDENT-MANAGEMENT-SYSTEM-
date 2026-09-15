@@ -31,7 +31,22 @@ export const logActivity = async ({
   action,
   description,
   performedBy,
-}) => {
+}, options = {}) => {
+  if (options.session) {
+    return AuditLog.create(
+      [
+        {
+          entityType,
+          entityId,
+          action,
+          description,
+          performedBy,
+        },
+      ],
+      options,
+    ).then((result) => result[0]);
+  }
+
   try {
     return await AuditLog.create({
       entityType,
