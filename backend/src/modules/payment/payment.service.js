@@ -118,7 +118,6 @@ export const createOfflinePaymentService = async (paymentData, performedBy) => {
       },
       { session },
     );
-
     await logActivity({
       entityType: "Payment",
       entityId: payment._id,
