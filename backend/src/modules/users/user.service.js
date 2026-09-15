@@ -80,7 +80,7 @@ export const changeUserPassword = async (
   await refreshTokenRepository.revokeAllUserRefreshTokens(userId);
 };
 
-export const createNewUser = async ({ name, email, password, role }) => {
+export const createNewUser = async ({ name, email, password, role }, options ={}) => {
   const existingUser = await findUserByEmail(email);
 
   if (existingUser) {
@@ -94,7 +94,7 @@ export const createNewUser = async ({ name, email, password, role }) => {
     email,
     password: hashedPassword,
     role,
-  });
+  }, options);
 
   return user;
 };

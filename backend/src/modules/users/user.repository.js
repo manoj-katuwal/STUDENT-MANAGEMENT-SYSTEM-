@@ -9,8 +9,8 @@ import {
 import User from "./user.model.js";
 import { revokeAllUserRefreshTokens } from "../auth/refreshToken/refreshToken.repository.js";
 
-export const createUser = async (userData) => {
-  return await User.create(userData);
+export const createUser = async (userData, options = {}) => {
+  return await User.create([userData], options).then((result) => result[0]);
 };
 
 export const findUserByEmail = async (email) => {

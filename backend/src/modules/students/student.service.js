@@ -13,6 +13,8 @@ import {
 
 import { findClassById } from "../classes/class.repository.js";
 import { findSectionById } from "../section/section.repository.js";
+import mongoose from "mongoose";
+import { createNewUser } from "../users/user.service.js";
 
 const escapeCsvValue = (value) => {
   if (value === null || value === undefined) {
@@ -127,6 +129,18 @@ export const createStudentService = async (studentData) => {
     throw new AppError("Admission number is required", 400);
   }
 
+  if (!studentData.email) {
+    throw new AppError("Student email is required", 400);
+  }
+
+  if (!studentData.password) {
+    throw new AppError("Student password is required", 400);
+  }
+
+  if (studentData.password.length < 8) {
+    throw new AppError("Student password must be at least 8 characters", 400);
+  }
+
   const existingStudent = await findStudentByAdmissionNumber(
     studentData.admissionNumber,
   );
@@ -139,10 +153,38 @@ export const createStudentService = async (studentData) => {
   }
 
   await validateAcademicAssignment(studentData.classId, studentData.sectionId);
+  const session = await mongoose.startSession();
 
-  const student = await createStudent(studentData);
+  try {
+    session.startTransaction();
 
-  return student;
+    const user = await createNewUserr(
+      {
+        name: studentData.name,
+        email: studentData.email,
+        password: studentData.password,
+        role: "STUDENT",
+      },
+      { session },
+    );
+
+    const student = await createStudent(
+      {
+        ...studentData,
+        userId: user._id,
+      },
+      { session },
+    );
+
+    await session.commitTransaction();
+
+    return student;
+  } catch (error) {
+    await session.abortTransaction();
+    throw error;
+  } finally {
+    await session.endSession();
+  }
 };
 
 export const getStudentByIdService = async (studentId) => {

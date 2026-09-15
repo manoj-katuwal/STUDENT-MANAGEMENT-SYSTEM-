@@ -1,7 +1,9 @@
 import Student from "./student.model.js";
 
-export const createStudent = async (studentData) => {
-  return await Student.create(studentData);
+export const createStudent = async (studentData, options = {}) => {
+  return await Student.create([studentData], options).then(
+    (result) => result[0],
+  );
 };
 
 export const findStudentById = async (studentId) => {
