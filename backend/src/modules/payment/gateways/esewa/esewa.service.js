@@ -15,6 +15,7 @@ import { generateReceiptNumber } from "../../../receipt/receiptCounter.service.j
 import { createReceiptService } from "../../../receipt/receipt.service.js";
 import { logActivity } from "../../../auditLog/auditLog.service.js";
 import logger from "../../../../config/logger.js";
+import axios from "axios"
 
 export const generateEsewaSignature = ({ totalAmount, transactionUuid }) => {
   const message = `total_amount=${totalAmount},transaction_uuid=${transactionUuid},product_code=${esewaConfig.productCode}`;
@@ -197,56 +198,92 @@ export const handleEsewaSuccessService = async (encodedData) => {
     throw new AppError("eSewa payment was not completed", 400);
   }
 
-  const payment = await findPaymentByTransactionId(transactionUuid);
-  if (!payment) {
-    throw new AppError("Payment transaction not found", 404);
-  }
 
-  if (payment.gateway !== "ESEWA") {
-    throw new AppError("Invalid payment gateway", 400);
-  }
+ const verification = await verifyEsewaTransaction({
+  transactionUuid,
+  totalAmount,
+});
 
-  if (payment.paymentStatus === "SUCCESS") {
-    return payment;
-  }
+if (verification.status !== "COMPLETE") {
+  throw new AppError("eSewa payment verification failed", 400);
+}
 
-  if (Number(payment.amount) !== Number(totalAmount)) {
-    throw new AppError("Payment amount mismatch", 400);
-  }
+if (
+  Number(verification.total_amount) !== Number(totalAmount) ||
+  verification.transaction_uuid !== transactionUuid
+) {
+  throw new AppError("eSewa transaction verification mismatch", 400);
+}
 
-  const updatedStudentFee = await updateStudentFeeWithPayment(
-    payment.studentFeeId,
-    Number(payment.amount),
-  );
+  const session = await mongoose.startSession();
 
-  if (!updatedStudentFee) {
-    throw new AppError(
-      "Payment could not be processed because the due amount has changed",
-      409,
+  try {
+    session.startTransaction();
+
+    const payment = await findPaymentByTransactionId(transactionUuid, {
+      session,
+    });
+    if (!payment) {
+      throw new AppError("Payment transaction not found", 404);
+    }
+
+    if (payment.gateway !== "ESEWA") {
+      throw new AppError("Invalid payment gateway", 400);
+    }
+
+    if (payment.paymentStatus === "SUCCESS") {
+      await session.commitTransaction();
+      return payment;
+    }
+
+    if (Number(payment.amount) !== Number(totalAmount)) {
+      throw new AppError("Payment amount mismatch", 400);
+    }
+
+    const updatedStudentFee = await updateStudentFeeWithPayment(
+      payment.studentFeeId,
+      Number(payment.amount),
+      { session },
     );
+
+    if (!updatedStudentFee) {
+      throw new AppError(
+        "Payment could not be processed because the due amount has changed",
+        409,
+      );
+    }
+
+    updatedStudentFee.status =
+      updatedStudentFee.dueAmount === 0 ? "PAID" : "PARTIAL";
+    await updatedStudentFee.save({ session });
+
+    payment.paymentStatus = "SUCCESS";
+    payment.paidAt = new Date();
+    payment.gatewayTransactionId = transactionCode;
+    await payment.save({ session });
+
+    const receiptNumber = await generateReceiptNumber({ session });
+    await createReceiptService(
+      {
+        paymentId: payment._id,
+        studentFeeId: payment.studentFeeId,
+        receiptNumber,
+        amount: payment.amount,
+        paymentMethod: payment.paymentMethod,
+        paymentType: payment.paymentType,
+        paidAt: payment.paidAt,
+      },
+      { session },
+    );
+
+    await session.commitTransaction();
+    return payment;
+  } catch (error) {
+    await session.abortTransaction();
+    throw error;
+  } finally {
+    await session.endSession();
   }
-
-  updatedStudentFee.status =
-    updatedStudentFee.dueAmount === 0 ? "PAID" : "PARTIAL";
-  await updatedStudentFee.save();
-
-  payment.paymentStatus = "SUCCESS";
-  payment.paidAt = new Date();
-  payment.gatewayTransactionId = transactionCode;
-  await payment.save();
-
-  const receiptNumber = await generateReceiptNumber();
-  await createReceiptService({
-    paymentId: payment._id,
-    studentFeeId: payment.studentFeeId,
-    receiptNumber,
-    amount: payment.amount,
-    paymentMethod: payment.paymentMethod,
-    paymentType: payment.paymentType,
-    paidAt: payment.paidAt,
-  });
-
-  return payment;
 };
 
 export const handleEsewaFailureService = async (query) => {
@@ -276,4 +313,21 @@ export const handleEsewaFailureService = async (query) => {
   await payment.save();
 
   return payment;
+};
+
+export const verifyEsewaTransaction = async ({
+  transactionUuid,
+  totalAmount,
+}) => {
+
+
+  const response = await axios.get(esewaConfig.statusUrl, {
+    params: {
+      product_code: esewaConfig.productCode,
+      total_amount: totalAmount,
+      transaction_uuid: transactionUuid,
+    },
+  });
+
+  return response.data;
 };
