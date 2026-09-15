@@ -1,4 +1,3 @@
-import React from "react";
 import { Eye, Edit3, Phone } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 
@@ -15,6 +14,7 @@ const StudentsTable = ({ students = [], isLoading = false }) => {
               <th className="py-3.5 px-4">Admission No.</th>
               <th className="py-3.5 px-4">Class</th>
               <th className="py-3.5 px-4">Section</th>
+              <th className="py-3.5 px-4">Email</th>
               <th className="py-3.5 px-4">Phone</th>
               <th className="py-3.5 px-4">Status</th>
               <th className="py-3.5 px-4 text-right">Actions</th>
@@ -67,7 +67,7 @@ const StudentsTable = ({ students = [], isLoading = false }) => {
             ) : students.length === 0 ? (
               <tr>
                 <td
-                  colSpan="7"
+                  colSpan="8"
                   className="py-8 text-center text-slate-400 font-medium"
                 >
                   No student records found.
@@ -121,6 +121,13 @@ const StudentsTable = ({ students = [], isLoading = false }) => {
                     {/* Section (Populated Object) */}
                     <td className="py-3 px-4 text-slate-600">
                       {student.sectionId?.name || "N/A"}
+                    </td>
+
+                    {/* Email */}
+                    <td className="py-3 px-4 text-slate-600">
+                      <span className="text-xs break-all">
+                        {student.userId?.email || "N/A"}
+                      </span>
                     </td>
 
                     {/* Phone */}
