@@ -1,0 +1,37 @@
+import { useQuery } from "@tanstack/react-query";
+import { useMutation } from "@tanstack/react-query";
+import { createOfflinePayment } from "./payment.api";
+import { getPayments } from "./payment.api";
+import { getPaymentById } from "./payment.api";
+import { getPaymentsByStudentFee } from "./payment.api";
+
+export const usePayments = (params = {}) => {
+  return useQuery({
+    queryKey: ["payments", params],
+    queryFn: () => getPayments(params),
+    placeholderData: (previousData) => previousData,
+  });
+};
+
+export const usePayment = (paymentId) => {
+  return useQuery({
+    queryKey: ["payment", paymentId],
+    queryFn: () => getPaymentById(paymentId),
+    enabled: Boolean(paymentId),
+  });
+};
+
+export const useStudentFeePayments = (studentFeeId) => {
+  return useQuery({
+    queryKey: ["student-fee-payments", studentFeeId],
+    queryFn: () => getPaymentsByStudentFee(studentFeeId),
+    enabled: Boolean(studentFeeId),
+  });
+};
+
+
+export const useCreateOfflinePayment = () => {
+  return useMutation({
+    mutationFn: createOfflinePayment,
+  });
+};
