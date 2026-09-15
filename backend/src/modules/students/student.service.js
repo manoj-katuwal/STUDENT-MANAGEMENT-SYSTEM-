@@ -119,7 +119,7 @@ const validateAcademicAssignment = async (classId, sectionId) => {
     throw new AppError("Cannot assign student to an inactive section", 400);
   }
 
-  if (section.classId.toString() !== classId.toString()) {
+  if (section.classId._id.toString() !== classId.toString()) {
     throw new AppError("Section does not belong to the selected class", 400);
   }
 };
@@ -158,7 +158,7 @@ export const createStudentService = async (studentData) => {
   try {
     session.startTransaction();
 
-    const user = await createNewUserr(
+    const user = await createNewUser(
       {
         name: studentData.name,
         email: studentData.email,
