@@ -232,7 +232,7 @@ if (
     }
 
     if (payment.paymentStatus === "SUCCESS") {
-      await session.commitTransaction();
+      await session.abortTransaction();
       return payment;
     }
 
@@ -272,6 +272,17 @@ if (
         paymentMethod: payment.paymentMethod,
         paymentType: payment.paymentType,
         paidAt: payment.paidAt,
+      },
+      { session },
+    );
+
+    await logActivity(
+      {
+        entityType: "Payment",
+        entityId: payment._id,
+        action: "SUCCESS",
+        description: "eSewa payment completed successfully",
+        performedBy: null,
       },
       { session },
     );
@@ -327,6 +338,10 @@ export const verifyEsewaTransaction = async ({
       total_amount: totalAmount,
       transaction_uuid: transactionUuid,
     },
+  });
+
+  logger.info("eSewa status verification response", {
+    response: response.data,
   });
 
   return response.data;
