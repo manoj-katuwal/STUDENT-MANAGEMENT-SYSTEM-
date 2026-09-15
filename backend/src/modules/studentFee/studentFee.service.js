@@ -11,6 +11,7 @@ import {
 import { findStudentById } from "../students/student.repository.js";
 import { findAcademicYearById } from "../academicYear/academicYear.repository.js";
 import { findFeeStructureById } from "../feeStructure/feeStructure.repository.js";
+import Student from "../students/student.model.js";
 import AppError from "../../shared/utils/error/AppError.js";
 import { logActivity } from "../auditLog/auditLog.service.js";
 import logger from "../../config/logger.js";
@@ -142,8 +143,19 @@ export const getStudentFeesService = async ({
   academicYearId,
   feeStructureId,
   status,
+  search,
 }) => {
   const filter = {};
+
+  if (search?.trim()) {
+    const escapedSearch = search.trim().replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+    const searchPattern = new RegExp(escapedSearch, "i");
+    const students = await Student.find({
+      $or: [{ name: searchPattern }, { admissionNumber: searchPattern }],
+    }).select("_id");
+
+    filter.studentId = { $in: students.map((student) => student._id) };
+  }
 
   if (studentId) {
     filter.studentId = studentId;

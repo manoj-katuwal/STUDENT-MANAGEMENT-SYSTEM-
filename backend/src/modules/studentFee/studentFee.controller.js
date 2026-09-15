@@ -32,6 +32,7 @@ export const getStudentFeesController = asyncHandler(async (req, res) => {
     academicYearId: req.query.academicYearId,
     feeStructureId: req.query.feeStructureId,
     status: req.query.status,
+    search: req.query.search,
   });
 
   return successResponse({
