@@ -9,6 +9,7 @@ import StudentFeeHeader from "../components/studentFee/StudentFeeHeader";
 import StudentFeeStats from "../components/studentFee/StudentFeeStats";
 import StudentFeeFilters from "../components/studentFee/StudentFeeFilters";
 import StudentFeeTable from "../components/studentFee/StudentFeeTable";
+import StudentFeePagination from "../components/studentFee/StudentFeePagination";
 import {
   useCancelStudentFee,
   useCreateStudentFee,
@@ -30,6 +31,7 @@ const StudentFeePage = () => {
   };
   const { currentAcademicYear, isLoading: isAcademicYearLoading } =
     useCurrentAcademicYear();
+  const [currentPage, setCurrentPage] = useState(1);
   const [filters, setFilters] = useState(initialFilters);
   const { data: academicYearsData } = useAcademicYears({ page: 1, limit: 100 });
   const { data: feeStructuresData } = useFeeStructures({
@@ -37,7 +39,7 @@ const StudentFeePage = () => {
     limit: 100,
   });
   const { data, isLoading, isError, refetch } = useStudentFees({
-    page: 1,
+    page: currentPage,
     limit: 10,
     ...filters,
   });
@@ -83,13 +85,17 @@ const StudentFeePage = () => {
         filters={filters}
         academicYears={academicYearsData?.academicYears ?? []}
         feeStructures={feeStructuresData?.feeStructures ?? []}
-        onFilterChange={(key, value) =>
+        onFilterChange={(key, value) => {
           setFilters((previousFilters) => ({
             ...previousFilters,
             [key]: value,
-          }))
-        }
-        onClear={() => setFilters(initialFilters)}
+          }));
+          setCurrentPage(1);
+        }}
+        onClear={() => {
+          setFilters(initialFilters);
+          setCurrentPage(1);
+        }}
       />
       <StudentFeeTable
         studentFees={data?.studentFees ?? []}
@@ -101,6 +107,11 @@ const StudentFeePage = () => {
         onCancel={(studentFee) => {
           setCancellingStudentFee(studentFee);
         }}
+      />
+      <StudentFeePagination
+        pagination={data?.pagination}
+        onPageChange={setCurrentPage}
+        isLoading={isLoading}
       />
 
       <StudentFeeAssignModal
