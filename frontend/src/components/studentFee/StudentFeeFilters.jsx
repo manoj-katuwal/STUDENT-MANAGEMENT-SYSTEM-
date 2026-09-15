@@ -1,7 +1,22 @@
-import React from "react";
 import { Search, RotateCcw, Filter } from "lucide-react";
 
-const StudentFeeFilters = () => {
+const StudentFeeFilters = ({
+  filters = {},
+  academicYears = [],
+  feeStructures = [],
+  onFilterChange,
+  onClear,
+}) => {
+  const hasActiveFilters =
+    filters.search ||
+    filters.academicYearId ||
+    filters.feeStructureId ||
+    filters.status;
+
+  const handleFilterChange = (key, value) => {
+    onFilterChange?.(key, value);
+  };
+
   return (
     <div className="rounded-xl border border-slate-200/80 bg-white p-4 sm:p-5 shadow-xs transition-all">
       {/* Optional Header inside Filter section */}
@@ -14,6 +29,8 @@ const StudentFeeFilters = () => {
         </div>
         <button
           type="button"
+          onClick={onClear}
+          disabled={!hasActiveFilters}
           className="inline-flex items-center gap-1.5 text-xs font-semibold text-slate-500 hover:text-slate-800 transition-colors cursor-pointer"
         >
           <RotateCcw className="h-3.5 w-3.5 text-slate-400 group-hover:rotate-180 transition-transform" />
@@ -33,6 +50,10 @@ const StudentFeeFilters = () => {
             <input
               type="text"
               placeholder="Search by name, roll no..."
+              value={filters.search || ""}
+              onChange={(event) =>
+                handleFilterChange("search", event.target.value)
+              }
               className="w-full rounded-lg border border-slate-200 bg-slate-50/50 pl-9 pr-3 py-2 text-sm text-slate-800 placeholder:text-slate-400 outline-none transition-all focus:border-blue-500 focus:bg-white focus:ring-2 focus:ring-blue-100"
             />
           </div>
@@ -43,10 +64,19 @@ const StudentFeeFilters = () => {
           <label className="text-xs font-semibold uppercase tracking-wider text-slate-500">
             Academic Year
           </label>
-          <select className="w-full rounded-lg border border-slate-200 bg-slate-50/50 px-3 py-2 text-sm text-slate-800 outline-none transition-all focus:border-blue-500 focus:bg-white focus:ring-2 focus:ring-blue-100 cursor-pointer">
+          <select
+            value={filters.academicYearId || ""}
+            onChange={(event) =>
+              handleFilterChange("academicYearId", event.target.value)
+            }
+            className="w-full rounded-lg border border-slate-200 bg-slate-50/50 px-3 py-2 text-sm text-slate-800 outline-none transition-all focus:border-blue-500 focus:bg-white focus:ring-2 focus:ring-blue-100 cursor-pointer"
+          >
             <option value="">All academic years</option>
-            <option value="2081/82">2081/82</option>
-            <option value="2080/81">2080/81</option>
+            {academicYears.map((academicYear) => (
+              <option key={academicYear._id} value={academicYear._id}>
+                {academicYear.name}
+              </option>
+            ))}
           </select>
         </div>
 
@@ -55,11 +85,19 @@ const StudentFeeFilters = () => {
           <label className="text-xs font-semibold uppercase tracking-wider text-slate-500">
             Fee Structure
           </label>
-          <select className="w-full rounded-lg border border-slate-200 bg-slate-50/50 px-3 py-2 text-sm text-slate-800 outline-none transition-all focus:border-blue-500 focus:bg-white focus:ring-2 focus:ring-blue-100 cursor-pointer">
+          <select
+            value={filters.feeStructureId || ""}
+            onChange={(event) =>
+              handleFilterChange("feeStructureId", event.target.value)
+            }
+            className="w-full rounded-lg border border-slate-200 bg-slate-50/50 px-3 py-2 text-sm text-slate-800 outline-none transition-all focus:border-blue-500 focus:bg-white focus:ring-2 focus:ring-blue-100 cursor-pointer"
+          >
             <option value="">All fee structures</option>
-            <option value="TUITION">Tuition Fee</option>
-            <option value="EXAM">Examination Fee</option>
-            <option value="TRANSPORT">Transportation</option>
+            {feeStructures.map((feeStructure) => (
+              <option key={feeStructure._id} value={feeStructure._id}>
+                {feeStructure.name || feeStructure.feeType}
+              </option>
+            ))}
           </select>
         </div>
 
@@ -68,7 +106,13 @@ const StudentFeeFilters = () => {
           <label className="text-xs font-semibold uppercase tracking-wider text-slate-500">
             Status
           </label>
-          <select className="w-full rounded-lg border border-slate-200 bg-slate-50/50 px-3 py-2 text-sm text-slate-800 outline-none transition-all focus:border-blue-500 focus:bg-white focus:ring-2 focus:ring-blue-100 cursor-pointer">
+          <select
+            value={filters.status || ""}
+            onChange={(event) =>
+              handleFilterChange("status", event.target.value)
+            }
+            className="w-full rounded-lg border border-slate-200 bg-slate-50/50 px-3 py-2 text-sm text-slate-800 outline-none transition-all focus:border-blue-500 focus:bg-white focus:ring-2 focus:ring-blue-100 cursor-pointer"
+          >
             <option value="">All statuses</option>
             <option value="PENDING">Pending</option>
             <option value="PARTIAL">Partial</option>

@@ -1,6 +1,10 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import StudentFeeContextBar from "../components/studentFee/StudentFeeContextBar";
-import { useCurrentAcademicYear } from "../features/academicYear/academicYear.hooks";
+import {
+  useAcademicYears,
+  useCurrentAcademicYear,
+} from "../features/academicYear/academicYear.hooks";
+import { useFeeStructures } from "../features/feeStructures/feeStructure.hook";
 import StudentFeeHeader from "../components/studentFee/StudentFeeHeader";
 import StudentFeeStats from "../components/studentFee/StudentFeeStats";
 import StudentFeeFilters from "../components/studentFee/StudentFeeFilters";
@@ -17,11 +21,24 @@ import StudentFeeCancelModal from "../components/studentFee/StudentFeeCancelMode
 import StudentFeeAssignModal from "../components/studentFee/StudentFeeAssignModal";
 
 const StudentFeePage = () => {
+  const initialFilters = {
+    search: "",
+    academicYearId: "",
+    feeStructureId: "",
+    status: "",
+  };
   const { currentAcademicYear, isLoading: isAcademicYearLoading } =
     useCurrentAcademicYear();
+  const [filters, setFilters] = useState(initialFilters);
+  const { data: academicYearsData } = useAcademicYears({ page: 1, limit: 100 });
+  const { data: feeStructuresData } = useFeeStructures({
+    page: 1,
+    limit: 100,
+  });
   const { data, isLoading, isError, refetch } = useStudentFees({
     page: 1,
     limit: 10,
+    ...filters,
   });
 
   const createStudentFeeMutation = useCreateStudentFee();
@@ -40,7 +57,18 @@ const StudentFeePage = () => {
       />
       <StudentFeeHeader onAssignFee={() => setIsAssignModalOpen(true)} />
       <StudentFeeStats />
-      <StudentFeeFilters />
+      <StudentFeeFilters
+        filters={filters}
+        academicYears={academicYearsData?.academicYears ?? []}
+        feeStructures={feeStructuresData?.feeStructures ?? []}
+        onFilterChange={(key, value) =>
+          setFilters((previousFilters) => ({
+            ...previousFilters,
+            [key]: value,
+          }))
+        }
+        onClear={() => setFilters(initialFilters)}
+      />
       <StudentFeeTable
         studentFees={data?.studentFees ?? []}
         isLoading={isLoading}
