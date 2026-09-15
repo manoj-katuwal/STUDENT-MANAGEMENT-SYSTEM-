@@ -11,6 +11,7 @@ import {
   getStudentFeeLedgerSummary,
   getStudentFees,
   getStudentFeeSummary,
+  exportStudentFeeLedger,
   updateStudentFee,
 } from "./studentFee.api";
 
@@ -19,6 +20,12 @@ export const useStudentFees = (params) => {
     queryKey: ["studentFees", params],
     queryFn: () => getStudentFees(params),
     placeholderData: keepPreviousData,
+  });
+};
+
+export const useExportStudentFeeLedger = () => {
+  return useMutation({
+    mutationFn: exportStudentFeeLedger,
   });
 };
 

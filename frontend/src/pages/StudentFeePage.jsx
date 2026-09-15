@@ -12,6 +12,7 @@ import StudentFeeTable from "../components/studentFee/StudentFeeTable";
 import {
   useCancelStudentFee,
   useCreateStudentFee,
+  useExportStudentFeeLedger,
   useStudentFees,
   useUpdateStudentFee,
 } from "../features/studentFee/studentFee.hooks";
@@ -44,10 +45,27 @@ const StudentFeePage = () => {
   const createStudentFeeMutation = useCreateStudentFee();
   const updateStudentFeeMutation = useUpdateStudentFee();
   const cancelStudentFeeMutation = useCancelStudentFee();
+  const exportStudentFeeMutation = useExportStudentFeeLedger();
   const [selectedStudentFee, setSelectedStudentFee] = useState(null);
   const [editingStudentFee, setEditingStudentFee] = useState(null);
   const [cancellingStudentFee, setCancellingStudentFee] = useState(null);
   const [isAssignModalOpen, setIsAssignModalOpen] = useState(false);
+
+  const handleExport = async () => {
+    const blob = await exportStudentFeeMutation.mutateAsync({
+      academicYearId: filters.academicYearId,
+      status: filters.status,
+    });
+    const url = window.URL.createObjectURL(blob);
+    const link = document.createElement("a");
+
+    link.href = url;
+    link.download = "student-fee-ledger.xlsx";
+    document.body.appendChild(link);
+    link.click();
+    link.remove();
+    window.URL.revokeObjectURL(url);
+  };
 
   return (
     <div className="min-h-full p-6 lg:p-8 space-y-6">
@@ -55,7 +73,11 @@ const StudentFeePage = () => {
         currentAcademicYear={currentAcademicYear}
         isLoading={isAcademicYearLoading}
       />
-      <StudentFeeHeader onAssignFee={() => setIsAssignModalOpen(true)} />
+      <StudentFeeHeader
+        onAssignFee={() => setIsAssignModalOpen(true)}
+        onExport={handleExport}
+        isExporting={exportStudentFeeMutation.isPending}
+      />
       <StudentFeeStats />
       <StudentFeeFilters
         filters={filters}

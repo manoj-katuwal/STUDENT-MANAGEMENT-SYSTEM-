@@ -8,6 +8,21 @@ export const getStudentFees = async (params) => {
   return response.data.data;
 };
 
+export const exportStudentFeeLedger = async (params = {}) => {
+  const cleanParams = Object.fromEntries(
+    Object.entries(params).filter(
+      ([, value]) => value !== undefined && value !== null && value !== "",
+    ),
+  );
+
+  const response = await apiClient.get("/exports/fee-collection", {
+    params: cleanParams,
+    responseType: "blob",
+  });
+
+  return response.data;
+};
+
 export const getStudentFeeById = async (studentFeeId) => {
   const response = await apiClient.get(`/student-fees/${studentFeeId}`);
 

@@ -1,7 +1,6 @@
-import React from "react";
 import { Download, Plus } from "lucide-react";
 
-const StudentFeeHeader = ({ onAssignFee, onExport }) => {
+const StudentFeeHeader = ({ onAssignFee, onExport, isExporting = false }) => {
   return (
     <div className="bg-white border border-slate-200 rounded-xl shadow-sm px-5 py-4 md:px-6 md:py-5">
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
@@ -26,10 +25,12 @@ const StudentFeeHeader = ({ onAssignFee, onExport }) => {
           <button
             type="button"
             onClick={onExport}
+            disabled={isExporting}
+            aria-busy={isExporting}
             className="inline-flex items-center gap-1.5 px-3.5 py-2 border border-slate-200 bg-white hover:bg-slate-50 active:bg-slate-100 text-slate-700 text-sm font-medium rounded-lg shadow-sm transition-colors cursor-pointer"
           >
             <Download className="w-4 h-4 text-slate-500" />
-            <span>Export Ledger CSV</span>
+            <span>{isExporting ? "Exporting Ledger..." : "Export Ledger"}</span>
           </button>
 
           <button
