@@ -8,6 +8,7 @@ export const createStudent = async (studentData, options = {}) => {
 
 export const findStudentById = async (studentId) => {
   return await Student.findById(studentId)
+    .populate("userId", "email")
     .populate("classId", "name code")
     .populate("sectionId", "name");
 };
@@ -37,6 +38,7 @@ export const findStudents = async ({
   limit = 10,
 } = {}) => {
   return await Student.find(filter)
+    .populate("userId", "email")
     .populate("classId", "name code")
     .populate("sectionId", "name")
     .skip(skip)
