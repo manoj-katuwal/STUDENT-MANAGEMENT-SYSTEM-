@@ -1,191 +1,146 @@
-import {
-  Eye,
-  MoreVertical,
-  ArrowUpDown,
-  CreditCard,
-  Building2,
-  Smartphone,
-  CheckCircle2,
-  Clock,
-  RotateCcw,
-} from "lucide-react";
+import { Eye, Download, MoreVertical } from "lucide-react";
 
 const PaymentTable = () => {
   const payments = [
     {
-      id: "TXN-89401",
+      id: "PAY-001",
       student: "Soma Katwal",
       admissionNo: "INT-TEST-002",
-      feeReference: "Tuition Fee - Term 1",
-      amount: "NPR 15,000",
+      amount: "Rs. 15,000",
       method: "Cash",
-      type: "Fee Payment",
       status: "Success",
-      paidAt: "Sep 16, 2026 • 10:42 AM",
+      date: "Sep 16, 2026",
     },
     {
-      id: "TXN-89400",
+      id: "PAY-002",
       student: "Aarav Sharma",
       admissionNo: "INT-TEST-003",
-      feeReference: "Admission & Uniform",
-      amount: "NPR 12,500",
+      amount: "Rs. 12,500",
       method: "eSewa",
-      type: "Admission",
       status: "Success",
-      paidAt: "Sep 15, 2026 • 02:15 PM",
+      date: "Sep 15, 2026",
     },
     {
-      id: "TXN-89399",
+      id: "PAY-003",
       student: "Pooja Thapa",
-      admissionNo: "INT-TEST-008",
-      feeReference: "Exam Fee",
-      amount: "NPR 3,500",
-      method: "Bank Transfer",
-      type: "Exam",
-      status: "Pending",
-      paidAt: "Sep 15, 2026 • 11:30 AM",
-    },
-    {
-      id: "TXN-89398",
-      student: "Rohan Rai",
-      admissionNo: "INT-TEST-012",
-      feeReference: "Monthly Transport",
-      amount: "NPR 4,000",
+      admissionNo: "INT-TEST-004",
+      amount: "Rs. 8,000",
       method: "Khalti",
-      type: "Transport",
-      status: "Reversed",
-      paidAt: "Sep 14, 2026 • 04:05 PM",
+      status: "Pending",
+      date: "Sep 14, 2026",
     },
   ];
 
-  const getMethodIcon = (method) => {
-    switch (method) {
-      case "eSewa":
-      case "Khalti":
-        return <Smartphone className="h-3.5 w-3.5 text-purple-600" />;
-      case "Bank Transfer":
-      case "Cheque":
-        return <Building2 className="h-3.5 w-3.5 text-blue-600" />;
-      default:
-        return <CreditCard className="h-3.5 w-3.5 text-emerald-600" />;
-    }
-  };
-
+  // Status अनुसार dynamic styling
   const getStatusBadge = (status) => {
-    switch (status) {
-      case "Success":
-        return (
-          <span className="inline-flex items-center gap-1 rounded-full bg-emerald-50 px-2.5 py-0.5 text-xs font-semibold text-emerald-700 border border-emerald-200/60">
-            <CheckCircle2 className="h-3 w-3 text-emerald-600" />
-            Success
-          </span>
-        );
-      case "Pending":
-        return (
-          <span className="inline-flex items-center gap-1 rounded-full bg-amber-50 px-2.5 py-0.5 text-xs font-semibold text-amber-700 border border-amber-200/60">
-            <Clock className="h-3 w-3 text-amber-600" />
-            Pending
-          </span>
-        );
-      case "Reversed":
-        return (
-          <span className="inline-flex items-center gap-1 rounded-full bg-slate-100 px-2.5 py-0.5 text-xs font-semibold text-slate-700 border border-slate-200">
-            <RotateCcw className="h-3 w-3 text-slate-500" />
-            Reversed
-          </span>
-        );
+    switch (status.toLowerCase()) {
+      case "success":
+        return "bg-emerald-50 text-emerald-700 ring-emerald-600/20";
+      case "pending":
+        return "bg-amber-50 text-amber-700 ring-amber-600/20";
+      case "failed":
+        return "bg-rose-50 text-rose-700 ring-rose-600/20";
       default:
-        return null;
+        return "bg-slate-50 text-slate-700 ring-slate-600/20";
     }
   };
 
   return (
-    <div className="overflow-hidden rounded-2xl border border-slate-200/80 bg-white shadow-xs">
+    <div className="w-full overflow-hidden rounded-xl border border-slate-200/80 bg-white shadow-sm">
       <div className="overflow-x-auto">
-        <table className="w-full min-w-[1000px] border-collapse text-left text-xs sm:text-sm">
+        <table className="w-full min-w-212.5 border-collapse text-left text-sm">
           <thead>
-            <tr className="border-b border-slate-200/80 bg-slate-50/70 text-[11px] font-bold uppercase tracking-wider text-slate-500 select-none">
-              <th className="px-5 py-3.5">
-                <div className="flex items-center gap-1.5">
-                  Student
-                  <ArrowUpDown className="h-3 w-3 text-slate-400" />
-                </div>
+            <tr className="border-b border-slate-200/80 bg-slate-50/70 text-xs font-semibold uppercase tracking-wider text-slate-500">
+              <th scope="col" className="px-6 py-3.5">
+                Transaction ID
               </th>
-              <th className="px-5 py-3.5">Fee Reference</th>
-              <th className="px-5 py-3.5">
-                <div className="flex items-center gap-1.5">
-                  Amount
-                  <ArrowUpDown className="h-3 w-3 text-slate-400" />
-                </div>
+              <th scope="col" className="px-6 py-3.5">
+                Student Details
               </th>
-              <th className="px-5 py-3.5">Method</th>
-              <th className="px-5 py-3.5">Type</th>
-              <th className="px-5 py-3.5">Status</th>
-              <th className="px-5 py-3.5">Transaction ID & Paid At</th>
-              <th className="px-5 py-3.5 text-right">Actions</th>
+              <th scope="col" className="px-6 py-3.5">
+                Amount
+              </th>
+              <th scope="col" className="px-6 py-3.5">
+                Method
+              </th>
+              <th scope="col" className="px-6 py-3.5">
+                Status
+              </th>
+              <th scope="col" className="px-6 py-3.5">
+                Date
+              </th>
+              <th scope="col" className="px-6 py-3.5 text-right">
+                Actions
+              </th>
             </tr>
           </thead>
 
-          <tbody className="divide-y divide-slate-100">
+          <tbody className="divide-y divide-slate-100 text-slate-700">
             {payments.map((payment) => (
               <tr
                 key={payment.id}
-                className="hover:bg-slate-50/80 transition-colors"
+                className="transition-colors duration-150 hover:bg-slate-50/60"
               >
-                <td className="px-5 py-3.5">
-                  <div className="flex items-center gap-3">
-                    <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-blue-50 text-xs font-bold text-blue-600 border border-blue-100">
-                      {payment.student.charAt(0)}
-                    </div>
-                    <div>
-                      <p className="font-semibold text-slate-900">
-                        {payment.student}
-                      </p>
-                      <p className="text-[11px] font-medium text-slate-400">
-                        {payment.admissionNo}
-                      </p>
-                    </div>
+                {/* ID */}
+                <td className="whitespace-nowrap px-6 py-4 font-mono text-xs font-medium text-slate-600">
+                  {payment.id}
+                </td>
+
+                {/* Student */}
+                <td className="whitespace-nowrap px-6 py-4">
+                  <div className="font-medium text-slate-900">
+                    {payment.student}
+                  </div>
+                  <div className="text-xs text-slate-400">
+                    {payment.admissionNo}
                   </div>
                 </td>
-                <td className="px-5 py-3.5 font-medium text-slate-700">
-                  {payment.feeReference}
-                </td>
-                <td className="px-5 py-3.5 font-bold text-slate-900">
+
+                {/* Amount */}
+                <td className="whitespace-nowrap px-6 py-4 font-semibold text-slate-900">
                   {payment.amount}
                 </td>
-                <td className="px-5 py-3.5">
-                  <div className="inline-flex items-center gap-1.5 rounded-lg bg-slate-100/70 px-2.5 py-1 text-xs font-medium text-slate-700">
-                    {getMethodIcon(payment.method)}
-                    <span>{payment.method}</span>
-                  </div>
-                </td>
-                <td className="px-5 py-3.5">
-                  <span className="text-xs font-medium text-slate-600 bg-slate-50 px-2 py-0.5 rounded border border-slate-200/60">
-                    {payment.type}
+
+                {/* Method */}
+                <td className="whitespace-nowrap px-6 py-4 text-slate-600">
+                  <span className="inline-flex items-center rounded-md bg-slate-100 px-2 py-1 text-xs font-medium text-slate-600">
+                    {payment.method}
                   </span>
                 </td>
-                <td className="px-5 py-3.5">
-                  {getStatusBadge(payment.status)}
+
+                {/* Status */}
+                <td className="whitespace-nowrap px-6 py-4">
+                  <span
+                    className={`inline-flex items-center gap-x-1.5 rounded-full px-2.5 py-1 text-xs font-medium ring-1 ring-inset ${getStatusBadge(
+                      payment.status,
+                    )}`}
+                  >
+                    <span className="h-1.5 w-1.5 rounded-full bg-current" />
+                    {payment.status}
+                  </span>
                 </td>
-                <td className="px-5 py-3.5">
-                  <p className="font-mono text-xs font-semibold text-slate-800">
-                    {payment.id}
-                  </p>
-                  <p className="text-[11px] text-slate-400">{payment.paidAt}</p>
+
+                {/* Date */}
+                <td className="whitespace-nowrap px-6 py-4 text-xs text-slate-500">
+                  {payment.date}
                 </td>
-                <td className="px-5 py-3.5 text-right">
+
+                {/* Actions */}
+                <td className="whitespace-nowrap px-6 py-4 text-right">
                   <div className="flex items-center justify-end gap-1">
                     <button
                       type="button"
-                      className="inline-flex h-8 w-8 items-center justify-center rounded-lg text-slate-400"
+                      title="View Details"
+                      className="rounded-lg p-1.5 text-slate-400 hover:bg-slate-100 hover:text-slate-600 transition-colors"
                     >
                       <Eye className="h-4 w-4" />
                     </button>
                     <button
                       type="button"
-                      className="inline-flex h-8 w-8 items-center justify-center rounded-lg text-slate-400"
+                      title="Download Receipt"
+                      className="rounded-lg p-1.5 text-slate-400 hover:bg-slate-100 hover:text-slate-600 transition-colors"
                     >
-                      <MoreVertical className="h-4 w-4" />
+                      <Download className="h-4 w-4" />
                     </button>
                   </div>
                 </td>
