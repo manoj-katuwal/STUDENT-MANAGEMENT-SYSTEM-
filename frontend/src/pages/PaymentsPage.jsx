@@ -4,16 +4,23 @@ import PaymentContextBar from "../components/payments/PaymentContextBar";
 import PaymentStats from "../components/payments/PaymentStats";
 import PaymentFilters from "../components/payments/PaymentFilters";
 import PaymentTable from "../components/payments/PaymentTable";
+import { usePayments } from "../features/payments/payment.hooks";
 // import PaymentDetailsDrawer from "../components/payments/PaymentDetailsDrawer";
 
 const PaymentsPage = () => {
+  const { data, isLoading, isError } = usePayments({
+    page: 1,
+    limit: 10,
+  });
+
+  console.log("Payments:", data);
   return (
     <div className="min-h-full p-6 lg:p-8 space-y-6">
       <PaymentContextBar />
       <PaymentHeader />
       <PaymentStats />
       <PaymentFilters />
-      <PaymentTable />
+      <PaymentTable  payment={data?.payments ?? []} isLoading={isLoading} isError={isError}/>
       {/* <PaymentDetailsDrawer /> */}
     </div>
   );
