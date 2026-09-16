@@ -202,6 +202,7 @@ export const getPaymentsService = async ({
   studentFeeId,
   paymentMethod,
   paymentType,
+  search,
   paymentStatus,
   gateway,
   page = 1,
@@ -235,10 +236,14 @@ export const getPaymentsService = async ({
     findPayments({
       filter,
       skip,
+      search,
       limit,
     }),
 
-    countPayments(filter),
+    countPayments({
+      filter,
+      search,
+    }),
   ]);
 
   return {

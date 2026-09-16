@@ -53,6 +53,7 @@ export const getPaymentsController = asyncHandler(async (req, res) => {
     paymentType,
     paymentStatus,
     gateway,
+    search,
     page = 1,
     limit = 10,
   } = req.query;
@@ -63,6 +64,7 @@ export const getPaymentsController = asyncHandler(async (req, res) => {
     paymentType,
     paymentStatus,
     gateway,
+    search,
     page: Number(page),
     limit: Number(limit),
   });

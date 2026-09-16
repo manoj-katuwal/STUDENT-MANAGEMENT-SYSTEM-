@@ -32,8 +32,27 @@ export const findPaymentsByStudentFeeId = async (studentFeeId) => {
   return await Payment.find({ studentFeeId }).sort({ createdAt: -1 });
 };
 
-export const findPayments = async ({ filter = {}, skip = 0, limit = 10 }) => {
-  return await Payment.find(filter)
+export const findPayments = async ({
+  filter = {},
+  search,
+  skip = 0,
+  limit = 10,
+}) => {
+  const query = search
+    ? {
+        ...filter,
+        $or: [
+          {
+            transactionId: {
+              $regex: search,
+              $options: "i",
+            },
+          },
+        ],
+      }
+    : filter;
+
+  return await Payment.find(query)
     .populate({
       path: "studentFeeId",
       populate: [
@@ -56,8 +75,22 @@ export const findPayments = async ({ filter = {}, skip = 0, limit = 10 }) => {
     .limit(limit);
 };
 
-export const countPayments = async (filter = {}) => {
-  return await Payment.countDocuments(filter);
+export const countPayments = async ({ filter = {}, search } = {}) => {
+  const query = search
+    ? {
+        ...filter,
+        $or: [
+          {
+            transactionId: {
+              $regex: search,
+              $options: "i",
+            },
+          },
+        ],
+      }
+    : filter;
+
+  return await Payment.countDocuments(query);
 };
 
 export const getPaymentStats = async () => {
