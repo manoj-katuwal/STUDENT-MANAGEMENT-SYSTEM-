@@ -1,4 +1,3 @@
-import React from "react";
 import {
   CreditCard,
   Clock,
@@ -8,48 +7,59 @@ import {
   Receipt,
   Info,
 } from "lucide-react";
+import { usePaymentStats } from "../../features/payments/payment.hooks";
+import { formatCurrency } from "../../utils/formatCurrency";
 
 const PaymentStats = () => {
-  // Static Cards Data
+  const { data: stats, isLoading } = usePaymentStats();
+  const successfulPayments = stats?.successfulPayments ?? 0;
+  const failedPayments = stats?.failedPayments ?? 0;
+  const completedPayments = successfulPayments + failedPayments;
+  const successRate =
+    completedPayments > 0
+      ? ((successfulPayments / completedPayments) * 100).toFixed(1)
+      : "0.0";
+  const formatValue = (value) => (isLoading ? "..." : value);
+
   const statCards = [
     {
       title: "Total Collected",
-      value: "NPR 8,420,500",
+      value: formatValue(formatCurrency(stats?.totalCollected)),
       icon: CreditCard,
       bg: "bg-blue-50/80 text-blue-600",
       hoverBar: "bg-blue-500",
-      subtext: "+14.2% vs last term",
-      subtextClass: "text-emerald-600 font-medium",
+      subtext: `${formatCurrency(stats?.thisMonth)} collected this month`,
+      subtextClass: "text-slate-500 font-medium",
       showTrend: true,
     },
     {
       title: "Today's Collection",
-      value: "NPR 185,000",
+      value: formatValue(formatCurrency(stats?.todayCollection)),
       icon: Receipt,
       bg: "bg-indigo-50/80 text-indigo-600",
       hoverBar: "bg-indigo-500",
-      subtext: "24 transactions logged today",
+      subtext: `${stats?.todayTransactions ?? 0} transactions logged today`,
       subtextClass: "text-slate-500 font-medium",
       showClockIcon: true,
     },
     {
       title: "Successful Payments",
-      value: "818 Payments",
+      value: `${formatValue(successfulPayments)} Payments`,
       icon: CheckCircle2,
       bg: "bg-emerald-50/80 text-emerald-500",
       hoverBar: "bg-emerald-500",
-      subtext: "97.1% Success rate",
+      subtext: `${successRate}% Success rate`,
       subtextClass: "text-slate-500 font-medium",
       showProgress: true,
-      progressWidth: "97.1%",
+      progressWidth: `${successRate}%`,
     },
     {
       title: "Pending & Verification",
-      value: "24 Payments",
+      value: `${formatValue(stats?.pendingPayments ?? 0)} Payments`,
       icon: AlertCircle,
       bg: "bg-amber-50/80 text-amber-600",
       hoverBar: "bg-amber-500",
-      subtext: "18 Bank slips - 6 Cheque clearing",
+      subtext: `${formatCurrency(stats?.pendingAmount)} awaiting verification`,
       subtextClass: "text-amber-700 font-medium",
       showInfoIcon: true,
     },
