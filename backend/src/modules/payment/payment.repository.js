@@ -59,3 +59,54 @@ export const findPayments = async ({ filter = {}, skip = 0, limit = 10 }) => {
 export const countPayments = async (filter = {}) => {
   return await Payment.countDocuments(filter);
 };
+
+export const getPaymentStats = async () => {
+  return await Payment.aggregate([
+    {
+      $facet: {
+        totalCollected: [
+          { $match: { paymentStatus: "SUCCESS" } },
+          {
+            $group: {
+              _id: null,
+              amount: { $sum: "$amount" },
+            },
+          },
+        ],
+
+        pendingAmount: [
+          { $match: { paymentStatus: "PENDING" } },
+          {
+            $group: {
+              _id: null,
+              amount: { $sum: "$amount" },
+            },
+          },
+        ],
+
+        thisMonth: [
+          {
+            $match: {
+              paymentStatus: "SUCCESS",
+              paidAt: {
+                $gte: new Date(
+                  new Date().getFullYear(),
+                  new Date().getMonth(),
+                  1,
+                ),
+              },
+            },
+          },
+          {
+            $group: {
+              _id: null,
+              amount: { $sum: "$amount" },
+            },
+          },
+        ],
+
+        transactions: [{ $count: "total" }],
+      },
+    },
+  ]);
+};

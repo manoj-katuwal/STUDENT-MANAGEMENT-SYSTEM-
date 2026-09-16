@@ -4,6 +4,7 @@ import {
   createOfflinePaymentService,
   getPaymentByIdService,
   getPaymentsService,
+  getPaymentStatsService,
   getStudentFeePaymentHistoryService,
 } from "./payment.service.js";
 
@@ -72,5 +73,16 @@ export const getPaymentsController = asyncHandler(async (req, res) => {
     message: "Payments fetched successfully",
     data: result.payments,
     meta: result.meta,
+  });
+});
+
+export const getPaymentStatsController = asyncHandler(async (req, res) => {
+  const stats = await getPaymentStatsService();
+
+  return successResponse({
+    res,
+    statusCode: 200,
+    message: "Payment stats fetched successfully",
+    data: stats,
   });
 });

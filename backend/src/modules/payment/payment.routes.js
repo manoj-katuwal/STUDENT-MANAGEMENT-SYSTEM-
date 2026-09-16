@@ -6,6 +6,7 @@ import {
   getPaymentByIdController,
   getStudentFeePaymentHistoryController,
   getPaymentsController,
+  getPaymentStatsController,
 } from "./payment.controller.js";
 import {
   esewaFailureController,
@@ -31,6 +32,8 @@ router.get(
   authorize("ADMIN", "ACCOUNTANT"),
   getStudentFeePaymentHistoryController,
 );
+
+router.get("/stats", getPaymentStatsController);
 
 router.get(
   "/:paymentId",

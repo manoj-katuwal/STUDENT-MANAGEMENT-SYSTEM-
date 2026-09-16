@@ -11,6 +11,7 @@ import {
   findPaymentByTransactionId,
   findPayments,
   findPaymentsByStudentFeeId,
+  getPaymentStats,
 } from "./payment.repository.js";
 import { generateReceiptNumber } from "../receipt/receiptCounter.service.js";
 import { createReceiptService } from "../receipt/receipt.service.js";
@@ -248,5 +249,16 @@ export const getPaymentsService = async ({
       total,
       totalPages: Math.ceil(total / limit),
     },
+  };
+};
+
+export const getPaymentStatsService = async () => {
+  const [stats] = await getPaymentStats();
+
+  return {
+    totalCollected: stats.totalCollected[0]?.amount || 0,
+    pendingAmount: stats.pendingAmount[0]?.amount || 0,
+    thisMonth: stats.thisMonth[0]?.amount || 0,
+    transactions: stats.transactions[0]?.total || 0,
   };
 };
