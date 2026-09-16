@@ -4,7 +4,7 @@ import PaymentContextBar from "../components/payments/PaymentContextBar";
 import PaymentStats from "../components/payments/PaymentStats";
 import PaymentFilters from "../components/payments/PaymentFilters";
 import PaymentTable from "../components/payments/PaymentTable";
-import PaymentDetailsDrawer from "../components/payments/PaymentDetailsDrawer";
+// import PaymentDetailsDrawer from "../components/payments/PaymentDetailsDrawer";
 
 const PaymentsPage = () => {
   return (
@@ -14,7 +14,7 @@ const PaymentsPage = () => {
       <PaymentStats />
       <PaymentFilters />
       <PaymentTable />
-      <PaymentDetailsDrawer />
+      {/* <PaymentDetailsDrawer /> */}
     </div>
   );
 };

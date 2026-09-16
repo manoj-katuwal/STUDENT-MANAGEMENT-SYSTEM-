@@ -1,6 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
 import { useMutation } from "@tanstack/react-query";
-import { createOfflinePayment } from "./payment.api";
+import { createOfflinePayment, getPaymentStats } from "./payment.api";
 import { getPayments } from "./payment.api";
 import { getPaymentById } from "./payment.api";
 import { getPaymentsByStudentFee } from "./payment.api";
@@ -29,9 +29,15 @@ export const useStudentFeePayments = (studentFeeId) => {
   });
 };
 
-
 export const useCreateOfflinePayment = () => {
   return useMutation({
     mutationFn: createOfflinePayment,
+  });
+};
+
+export const usePaymentStats = () => {
+  return useQuery({
+    queryKey: ["payment-stats"],
+    queryFn: getPaymentStats,
   });
 };

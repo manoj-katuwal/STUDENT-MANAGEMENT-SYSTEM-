@@ -29,3 +29,9 @@ export const createOfflinePayment = async (paymentData) => {
   return response.data.data;
 };
 
+export const getPaymentStats = async () => {
+  const response = await apiClient.get("/payments/stats");
+
+  return response.data.data;
+};
+
