@@ -2,6 +2,7 @@ import React from "react";
 import PaymentHeader from "../components/payments/PaymentHeader";
 import PaymentContextBar from "../components/payments/PaymentContextBar";
 import PaymentStats from "../components/payments/PaymentStats";
+import PaymentFilters from "../components/payments/PaymentFilters";
 
 const PaymentsPage = () => {
   return (
@@ -9,6 +10,7 @@ const PaymentsPage = () => {
       <PaymentContextBar />
       <PaymentHeader />
       <PaymentStats />
+      <PaymentFilters />
     </div>
   );
 };
