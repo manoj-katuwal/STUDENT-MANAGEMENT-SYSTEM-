@@ -1,3 +1,5 @@
+import { findStudentFeeIdsByStudentIds } from "../studentFee/studentFee.repository.js";
+import Student from "../students/student.model.js";
 import Payment from "./payment.model.js";
 
 export const createPayment = async (paymentData, options = {}) => {
@@ -38,19 +40,47 @@ export const findPayments = async ({
   skip = 0,
   limit = 10,
 }) => {
-  const query = search
-    ? {
-        ...filter,
-        $or: [
-          {
-            transactionId: {
-              $regex: search,
-              $options: "i",
-            },
+  let query = filter;
+
+  if (search) {
+    const matchingStudents = await Student.find({
+      $or: [
+        {
+          name: {
+            $regex: search,
+            $options: "i",
           },
-        ],
-      }
-    : filter;
+        },
+        {
+          admissionNumber: {
+            $regex: search,
+            $options: "i",
+          },
+        },
+      ],
+    }).select("_id");
+
+    const studentIds = matchingStudents.map((student) => student._id);
+
+    const studentFeeIds = await findStudentFeeIdsByStudentIds(studentIds);
+
+    query = {
+      ...filter,
+      $or: [
+        {
+          transactionId: {
+            $regex: search,
+            $options: "i",
+          },
+        },
+        {
+          studentFeeId: {
+            $in: studentFeeIds,
+          },
+        },
+      ],
+    };
+  }
 
   return await Payment.find(query)
     .populate({

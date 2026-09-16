@@ -216,3 +216,15 @@ export const getStudentFeeLedgerSummary = async () => {
     },
   ]);
 };
+
+export const findStudentFeeIdsByStudentIds = async (studentIds = []) => {
+  if (!studentIds.length) {
+    return [];
+  }
+
+  const studentFees = await StudentFee.find({
+    studentId: { $in: studentIds },
+  }).select("_id");
+
+  return studentFees.map((studentFee) => studentFee._id);
+};
