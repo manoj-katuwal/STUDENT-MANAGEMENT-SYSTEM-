@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import PaymentHeader from "../components/payments/PaymentHeader";
 import PaymentContextBar from "../components/payments/PaymentContextBar";
 import PaymentStats from "../components/payments/PaymentStats";
@@ -8,10 +8,13 @@ import { usePayments } from "../features/payments/payment.hooks";
 // import PaymentDetailsDrawer from "../components/payments/PaymentDetailsDrawer";
 
 const PaymentsPage = () => {
+  const [search, setSearch] = useState("");
   const { data, isLoading, isError } = usePayments({
     page: 1,
     limit: 10,
+    search,
   });
+
 
   console.log("Payments:", data);
   return (
@@ -19,7 +22,7 @@ const PaymentsPage = () => {
       <PaymentContextBar />
       <PaymentHeader />
       <PaymentStats />
-      <PaymentFilters />
+      <PaymentFilters search={search} onSearchChange={setSearch} />
       <PaymentTable  payment={data?.payments ?? []} isLoading={isLoading} isError={isError}/>
       {/* <PaymentDetailsDrawer /> */}
     </div>

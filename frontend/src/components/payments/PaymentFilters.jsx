@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import {
   Search,
   SlidersHorizontal,
@@ -6,7 +6,7 @@ import {
   RotateCcw,
 } from "lucide-react";
 
-const PaymentFilters = () => {
+const PaymentFilters = ({search, onSearchChange }) => {
   return (
     <div className="rounded-2xl border border-slate-200/80 bg-white p-4 shadow-xs">
       <div className="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
@@ -16,7 +16,10 @@ const PaymentFilters = () => {
           <input
             type="text"
             placeholder="Search student, admission no., or transaction ID..."
+            value={search}
+            onChange={(e)=>onSearchChange(e.target.value)}
             className="h-10 w-full rounded-xl border border-slate-200 bg-slate-50/50 pl-10 pr-4 text-xs sm:text-sm text-slate-800 placeholder:text-slate-400 transition-all focus:border-blue-500 focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-500/10"
+
           />
         </div>
 
