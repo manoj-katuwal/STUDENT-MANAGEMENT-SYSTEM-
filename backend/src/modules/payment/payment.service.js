@@ -258,6 +258,11 @@ export const getPaymentStatsService = async () => {
   return {
     totalCollected: stats.totalCollected[0]?.amount || 0,
     pendingAmount: stats.pendingAmount[0]?.amount || 0,
+    successfulPayments: stats.successfulPayments[0]?.total || 0,
+    pendingPayments: stats.pendingPayments[0]?.total || 0,
+    failedPayments: stats.failedPayments[0]?.total || 0,
+    todayCollection: stats.todayCollection[0]?.amount || 0,
+    todayTransactions: stats.todayCollection[0]?.transactions || 0,
     thisMonth: stats.thisMonth[0]?.amount || 0,
     transactions: stats.transactions[0]?.total || 0,
   };

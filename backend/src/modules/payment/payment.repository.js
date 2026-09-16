@@ -84,6 +84,39 @@ export const getPaymentStats = async () => {
           },
         ],
 
+        successfulPayments: [
+          { $match: { paymentStatus: "SUCCESS" } },
+          { $count: "total" },
+        ],
+
+        pendingPayments: [
+          { $match: { paymentStatus: "PENDING" } },
+          { $count: "total" },
+        ],
+
+        failedPayments: [
+          { $match: { paymentStatus: "FAILED" } },
+          { $count: "total" },
+        ],
+
+        todayCollection: [
+          {
+            $match: {
+              paymentStatus: "SUCCESS",
+              paidAt: {
+                $gte: new Date(new Date().setHours(0, 0, 0, 0)),
+              },
+            },
+          },
+          {
+            $group: {
+              _id: null,
+              amount: { $sum: "$amount" },
+              transactions: { $sum: 1 },
+            },
+          },
+        ],
+
         thisMonth: [
           {
             $match: {
