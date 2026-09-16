@@ -1,9 +1,15 @@
-function PaymentsPage() {
+import React from "react";
+import PaymentHeader from "../components/payments/PaymentHeader";
+import PaymentContextBar from "../components/payments/PaymentContextBar";
+
+const PaymentsPage = () => {
   return (
-    <div className="p-10">
-      <h1 className="text-3xl font-bold">Payments — ADMIN & ACCOUNTANT</h1>
+    <div className="min-h-full p-6 lg:p-8 space-y-6">
+      <PaymentContextBar />
+
+      <PaymentHeader />
     </div>
   );
-}
+};
 
 export default PaymentsPage;
