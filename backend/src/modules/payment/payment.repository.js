@@ -106,19 +106,47 @@ export const findPayments = async ({
 };
 
 export const countPayments = async ({ filter = {}, search } = {}) => {
-  const query = search
-    ? {
-        ...filter,
-        $or: [
-          {
-            transactionId: {
-              $regex: search,
-              $options: "i",
-            },
+  let query = filter;
+
+  if (search) {
+    const matchingStudents = await Student.find({
+      $or: [
+        {
+          name: {
+            $regex: search,
+            $options: "i",
           },
-        ],
-      }
-    : filter;
+        },
+        {
+          admissionNumber: {
+            $regex: search,
+            $options: "i",
+          },
+        },
+      ],
+    }).select("_id");
+
+    const studentIds = matchingStudents.map((student) => student._id);
+
+    const studentFeeIds = await findStudentFeeIdsByStudentIds(studentIds);
+
+    query = {
+      ...filter,
+      $or: [
+        {
+          transactionId: {
+            $regex: search,
+            $options: "i",
+          },
+        },
+        {
+          studentFeeId: {
+            $in: studentFeeIds,
+          },
+        },
+      ],
+    };
+  }
 
   return await Payment.countDocuments(query);
 };
