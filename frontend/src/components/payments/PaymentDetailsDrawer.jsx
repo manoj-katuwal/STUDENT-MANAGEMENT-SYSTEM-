@@ -78,6 +78,20 @@ const PaymentDetailsDrawer = ({ onClose, paymentId }) => {
   const { mutateAsync: downloadReceipt, isPending: isDownloading } =
     useDownloadReceiptPdf();
 
+    useEffect(() => {
+      const handleEscape = (event) => {
+        if (event.key === "Escape") {
+          onClose();
+        }
+      };
+
+      document.addEventListener("keydown", handleEscape);
+
+      return () => {
+        document.removeEventListener("keydown", handleEscape);
+      };
+    }, [onClose]);
+
   const studentFee = payment?.studentFeeId;
   const student = studentFee?.studentId;
   const feeStructure = studentFee?.feeStructureId;
