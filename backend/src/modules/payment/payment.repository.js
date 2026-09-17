@@ -9,7 +9,27 @@ export const createPayment = async (paymentData, options = {}) => {
 };
 
 export const findPaymentById = async (paymentId, options = {}) => {
-  return await Payment.findById(paymentId, null, options);
+  return await Payment.findById(paymentId, null, options).populate({
+    path: "studentFeeId",
+    populate: [
+      {
+        path: "studentId",
+        select: "name admissionNumber classId",
+        populate: {
+          path: "classId",
+          select: "name",
+        },
+      },
+      {
+        path: "academicYearId",
+        select: "name",
+      },
+      {
+        path: "feeStructureId",
+        select: "feeType amount classId",
+      },
+    ],
+  });
 };
 
 export const findPaymentByTransactionId = async (
