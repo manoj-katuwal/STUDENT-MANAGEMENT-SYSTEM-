@@ -6,16 +6,19 @@ import PaymentFilters from "../components/payments/PaymentFilters";
 import PaymentTable from "../components/payments/PaymentTable";
 import { usePayments } from "../features/payments/payment.hooks";
 // import PaymentDetailsDrawer from "../components/payments/PaymentDetailsDrawer";
+import useDebounce from "../hooks/useDebounce";
 
 const PaymentsPage = () => {
   const [search, setSearch] = useState("");
   const [paymentMethod, setPaymentMethod] = useState("");
   const [paymentStatus, setPaymentStatus] = useState("");
   const [paymentType, setPaymentType] = useState("");
+
+  const debouncedSearch = useDebounce(search, 700);
   const { data, isLoading, isError } = usePayments({
     page: 1,
     limit: 10,
-    search,
+    search: debouncedSearch,
     paymentMethod,
     paymentStatus,
     paymentType,
