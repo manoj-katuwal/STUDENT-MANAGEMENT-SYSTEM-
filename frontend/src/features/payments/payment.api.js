@@ -35,3 +35,9 @@ export const getPaymentStats = async () => {
   return response.data.data;
 };
 
+export const getReceiptByPaymentId = async (paymentId) => {
+  const response = await apiClient.get(`/receipts/payment/${paymentId}`);
+
+  return response.data.data;
+};
+
