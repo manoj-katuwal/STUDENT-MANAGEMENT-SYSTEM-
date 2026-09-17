@@ -36,6 +36,12 @@ const PaymentsPage = () => {
         onPaymentStatusChange={setPaymentStatus}
         paymentType={paymentType}
         onPaymentTypeChange={setPaymentType}
+        onReset={() => {
+          setSearch("");
+          setPaymentMethod("");
+          setPaymentStatus("");
+          setPaymentType("");
+        }}
       />
       <PaymentTable
         payment={data?.payments ?? []}
