@@ -26,6 +26,25 @@ const PaymentsPage = () => {
     paymentType,
   });
 
+  const handleSearchChange = (value) => {
+    setSearch(value);
+    setPage(1);
+  };
+
+  const handlePaymentMethodChange = (value) => {
+    setPaymentMethod(value);
+    setPage(1);
+  };
+  const handlePaymentStatusChange = (value) => {
+    setPaymentStatus(value);
+    setPage(1);
+  };
+
+  const handlePaymentTypeChange = (value) => {
+    setPaymentType(value);
+    setPage(1);
+  };
+
   console.log("Payments:", data);
   console.log("Pagination:", data?.pagination);
   return (
@@ -35,12 +54,12 @@ const PaymentsPage = () => {
       <PaymentStats />
       <PaymentFilters
         search={search}
-        onSearchChange={setSearch}
+        onSearchChange={handleSearchChange}
         paymentMethod={paymentMethod}
-        onPaymentMethodChange={setPaymentMethod}
+        onPaymentMethodChange={handlePaymentMethodChange}
         paymentStatus={paymentStatus}
-        onPaymentStatusChange={setPaymentStatus}
-        paymentType={paymentType}
+        onPaymentStatusChange={handlePaymentStatusChange}
+        paymentType={handlePaymentTypeChange}
         onPaymentTypeChange={setPaymentType}
         onReset={() => {
           setSearch("");
