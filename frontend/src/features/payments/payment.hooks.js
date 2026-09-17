@@ -1,6 +1,11 @@
 import { useQuery } from "@tanstack/react-query";
 import { useMutation } from "@tanstack/react-query";
-import { createOfflinePayment, getPaymentStats, getReceiptByPaymentId } from "./payment.api";
+import {
+  createOfflinePayment,
+  downloadReceiptPdf,
+  getPaymentStats,
+  getReceiptByPaymentId,
+} from "./payment.api";
 import { getPayments } from "./payment.api";
 import { getPaymentById } from "./payment.api";
 import { getPaymentsByStudentFee } from "./payment.api";
@@ -47,5 +52,11 @@ export const useReceiptByPaymentId = (paymentId) => {
     queryKey: ["receipt", paymentId],
     queryFn: () => getReceiptByPaymentId(paymentId),
     enabled: Boolean(paymentId),
+  });
+};
+
+export const useDownloadReceiptPdf = () => {
+  return useMutation({
+    mutationFn: downloadReceiptPdf,
   });
 };

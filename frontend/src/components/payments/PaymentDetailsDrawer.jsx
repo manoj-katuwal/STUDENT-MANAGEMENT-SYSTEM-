@@ -17,6 +17,7 @@ import {
   CloudSnow,
 } from "lucide-react";
 import {
+  useDownloadReceiptPdf,
   usePayment,
   useReceiptByPaymentId,
 } from "../../features/payments/payment.hooks";
@@ -74,9 +75,37 @@ const PaymentDetailsDrawer = ({ onClose, paymentId }) => {
   const { data: payment, isLoading, isError, refetch } = usePayment(paymentId);
   const { data: receipt, isLoading: isReceiptLoading } =
     useReceiptByPaymentId(paymentId);
+  const { mutateAsync: downloadReceipt, isPending: isDownloading } =
+    useDownloadReceiptPdf();
+
   const studentFee = payment?.studentFeeId;
   const student = studentFee?.studentId;
   const feeStructure = studentFee?.feeStructureId;
+
+  const downloadReceiptFile = async () => {
+    if (!receipt?._id) return;
+    try {
+      const blob = await downloadReceipt(receipt._id);
+
+      if (!blob || blob.size === 0) {
+        throw new Error("Received an empty or invalid file.");
+      }
+
+      const url = window.URL.createObjectURL(blob);
+      const link = document.createElement("a");
+
+      link.href = url;
+      link.download = `${receipt.receiptNumber || "receipt"}.pdf`;
+
+      document.body.appendChild(link);
+      link.click();
+
+      link.remove();
+      window.URL.revokeObjectURL(url);
+    } catch (error) {
+      console.error("Failed to download receipt:", error);
+    }
+  };
 
   const renderContent = () => {
     // 1. Loading State
@@ -283,11 +312,12 @@ const PaymentDetailsDrawer = ({ onClose, paymentId }) => {
           {payment?.paymentStatus === "SUCCESS" && (
             <button
               type="button"
-              className="flex h-10 w-full items-center justify-center gap-2 rounded-xl bg-slate-900 text-xs font-semibold text-white shadow-xs transition hover:bg-slate-800 active:scale-[0.98]"
-              onClick={()=> console.log("RECEIPT : ", receipt)}
+              disabled={isDownloading || isReceiptLoading}
+              className="flex h-10 w-full items-center justify-center gap-2 rounded-xl bg-slate-900 text-xs font-semibold text-white shadow-xs transition hover:bg-slate-800 active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed"
+              onClick={downloadReceiptFile}
             >
               <Download className="h-4 w-4" />
-              Download Official Receipt
+              {isDownloading ? "Downloading..." : "Download Receipt"}
             </button>
           )}
           <button

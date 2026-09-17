@@ -41,3 +41,10 @@ export const getReceiptByPaymentId = async (paymentId) => {
   return response.data.data;
 };
 
+export const downloadReceiptPdf = async (receiptId) => {
+  const response = await apiClient.get(`/receipts/${receiptId}/pdf`, {
+    responseType: "blob",
+  });
+
+  return response.data;
+};
