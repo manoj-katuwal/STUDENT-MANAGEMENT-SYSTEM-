@@ -8,6 +8,7 @@ import { usePayments } from "../features/payments/payment.hooks";
 import PaymentDetailsDrawer from "../components/payments/PaymentDetailsDrawer";
 import useDebounce from "../hooks/useDebounce";
 import PaymentPagination from "../components/payments/PaymentPagination";
+import RecordPaymentDrawer from "../components/payments/RecordPaymentDrawer";
 
 const PaymentsPage = () => {
   const [search, setSearch] = useState("");
@@ -16,6 +17,7 @@ const PaymentsPage = () => {
   const [paymentType, setPaymentType] = useState("");
   const [page, setPage] = useState(1);
   const [selectedPaymentId, setSelectedPaymentId] = useState(null);
+  const [isRecordPaymentOpen , setIsRecordPaymentOpen] = useState(false);
 
   const debouncedSearch = useDebounce(search, 700);
   const { data, isLoading, isError } = usePayments({
@@ -51,7 +53,7 @@ const PaymentsPage = () => {
   return (
     <div className="min-h-full p-6 lg:p-8 space-y-6">
       <PaymentContextBar />
-      <PaymentHeader />
+      <PaymentHeader onRecordPayment={() => setIsRecordPaymentOpen(true)} />
       <PaymentStats />
       <PaymentFilters
         search={search}
@@ -89,6 +91,10 @@ const PaymentsPage = () => {
           paymentId={selectedPaymentId}
           onClose={() => setSelectedPaymentId(null)}
         />
+      )}
+
+      {isRecordPaymentOpen && (
+        <RecordPaymentDrawer onClose={() => setIsRecordPaymentOpen(false)} />
       )}
     </div>
   );

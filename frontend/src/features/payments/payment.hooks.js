@@ -9,6 +9,7 @@ import {
 import { getPayments } from "./payment.api";
 import { getPaymentById } from "./payment.api";
 import { getPaymentsByStudentFee } from "./payment.api";
+import { getStudentFees } from "../studentFee/studentFee.api";
 
 export const usePayments = (params = {}) => {
   return useQuery({
@@ -58,5 +59,13 @@ export const useReceiptByPaymentId = (paymentId) => {
 export const useDownloadReceiptPdf = () => {
   return useMutation({
     mutationFn: downloadReceiptPdf,
+  });
+};
+
+export const usePaymentStudentFees = (params = {}) => {
+  return useQuery({
+    queryKey: ["payment-student-fees", params],
+    queryFn: () => getStudentFees(params),
+    enabled: Boolean(params.search?.trim()),
   });
 };
