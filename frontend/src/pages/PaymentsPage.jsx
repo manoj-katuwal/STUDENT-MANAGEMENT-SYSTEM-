@@ -5,7 +5,7 @@ import PaymentStats from "../components/payments/PaymentStats";
 import PaymentFilters from "../components/payments/PaymentFilters";
 import PaymentTable from "../components/payments/PaymentTable";
 import { usePayments } from "../features/payments/payment.hooks";
-// import PaymentDetailsDrawer from "../components/payments/PaymentDetailsDrawer";
+import PaymentDetailsDrawer from "../components/payments/PaymentDetailsDrawer";
 import useDebounce from "../hooks/useDebounce";
 import PaymentPagination from "../components/payments/PaymentPagination";
 
@@ -15,6 +15,7 @@ const PaymentsPage = () => {
   const [paymentStatus, setPaymentStatus] = useState("");
   const [paymentType, setPaymentType] = useState("");
   const [page, setPage] = useState(1);
+  const [selectedPaymentId, setSelectedPaymentId] = useState(null);
 
   const debouncedSearch = useDebounce(search, 700);
   const { data, isLoading, isError } = usePayments({
@@ -73,8 +74,8 @@ const PaymentsPage = () => {
         payment={data?.payments ?? []}
         isLoading={isLoading}
         isError={isError}
+        onView={(paymentId) => setSelectedPaymentId(paymentId)}
       />
-      {/* <PaymentDetailsDrawer /> */}
 
       <PaymentPagination
         page={page}
@@ -82,6 +83,13 @@ const PaymentsPage = () => {
         total={data?.pagination?.total ?? 0}
         onPageChange={setPage}
       />
+
+      {selectedPaymentId && (
+        <PaymentDetailsDrawer
+          paymentId={selectedPaymentId}
+          onClose={() => setSelectedPaymentId(null)}
+        />
+      )}
     </div>
   );
 };

@@ -12,7 +12,7 @@ import {
   AlertCircle,
 } from "lucide-react";
 
-const PaymentTable = ({ payment = [], isLoading, isError }) => {
+const PaymentTable = ({ payment = [], isLoading, isError, onView  }) => {
   // Status badge र Icon dynamic बनाउने
   const renderStatus = (status = "") => {
     switch (status.toLowerCase()) {
@@ -257,6 +257,7 @@ const PaymentTable = ({ payment = [], isLoading, isError }) => {
                           type="button"
                           title="View Details"
                           className="rounded-lg p-2 text-slate-400 hover:bg-slate-100 hover:text-blue-600 transition-all cursor-pointer"
+                          onClick={() => onView?.(item._id)}
                         >
                           <Eye className="h-4 w-4" />
                         </button>
