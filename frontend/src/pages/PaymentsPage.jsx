@@ -7,16 +7,18 @@ import PaymentTable from "../components/payments/PaymentTable";
 import { usePayments } from "../features/payments/payment.hooks";
 // import PaymentDetailsDrawer from "../components/payments/PaymentDetailsDrawer";
 import useDebounce from "../hooks/useDebounce";
+import PaymentPagination from "../components/payments/PaymentPagination";
 
 const PaymentsPage = () => {
   const [search, setSearch] = useState("");
   const [paymentMethod, setPaymentMethod] = useState("");
   const [paymentStatus, setPaymentStatus] = useState("");
   const [paymentType, setPaymentType] = useState("");
+  const [page, setPage] = useState(1);
 
   const debouncedSearch = useDebounce(search, 700);
   const { data, isLoading, isError } = usePayments({
-    page: 1,
+    page,
     limit: 10,
     search: debouncedSearch,
     paymentMethod,
@@ -25,6 +27,7 @@ const PaymentsPage = () => {
   });
 
   console.log("Payments:", data);
+  console.log("Pagination:", data?.pagination);
   return (
     <div className="min-h-full p-6 lg:p-8 space-y-6">
       <PaymentContextBar />
@@ -44,6 +47,7 @@ const PaymentsPage = () => {
           setPaymentMethod("");
           setPaymentStatus("");
           setPaymentType("");
+          setPage(1);
         }}
       />
       <PaymentTable
@@ -52,6 +56,13 @@ const PaymentsPage = () => {
         isError={isError}
       />
       {/* <PaymentDetailsDrawer /> */}
+
+      <PaymentPagination
+        page={page}
+        totalPages={data?.pagination?.totalPages ?? 1}
+        total={data?.pagination?.total ?? 0}
+        onPageChange={setPage}
+      />
     </div>
   );
 };
