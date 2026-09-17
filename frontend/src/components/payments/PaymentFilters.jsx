@@ -1,4 +1,3 @@
-import React, { useState } from "react";
 import {
   Search,
   SlidersHorizontal,
@@ -6,7 +5,13 @@ import {
   RotateCcw,
 } from "lucide-react";
 
-const PaymentFilters = ({search, onSearchChange }) => {
+const PaymentFilters = ({
+  search,
+  onSearchChange,
+  paymentMethod,
+  onPaymentMethodChange,
+  
+}) => {
   return (
     <div className="rounded-2xl border border-slate-200/80 bg-white p-4 shadow-xs">
       <div className="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
@@ -17,9 +22,8 @@ const PaymentFilters = ({search, onSearchChange }) => {
             type="text"
             placeholder="Search student, admission no., or transaction ID..."
             value={search}
-            onChange={(e)=>onSearchChange(e.target.value)}
+            onChange={(e) => onSearchChange(e.target.value)}
             className="h-10 w-full rounded-xl border border-slate-200 bg-slate-50/50 pl-10 pr-4 text-xs sm:text-sm text-slate-800 placeholder:text-slate-400 transition-all focus:border-blue-500 focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-500/10"
-
           />
         </div>
 
@@ -27,13 +31,17 @@ const PaymentFilters = ({search, onSearchChange }) => {
         <div className="flex flex-wrap items-center gap-2.5">
           {/* Payment Method Select */}
           <div className="relative">
-            <select className="h-10 appearance-none rounded-xl border border-slate-200 bg-slate-50/50 pl-3.5 pr-9 text-xs sm:text-sm font-medium text-slate-700 transition-all focus:border-blue-500 focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-500/10 cursor-pointer">
-              <option>All Methods</option>
-              <option>Cash</option>
-              <option>Bank Transfer</option>
-              <option>Cheque</option>
-              <option>eSewa</option>
-              <option>Khalti</option>
+            <select
+              value={paymentMethod || ""}
+              onChange={(e) => onPaymentMethodChange(e.target.value)}
+              className="h-10 appearance-none rounded-xl border border-slate-200 bg-slate-50/50 pl-3.5 pr-9 text-xs sm:text-sm font-medium text-slate-700 transition-all focus:border-blue-500 focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-500/10 cursor-pointer"
+            >
+              <option value="">All Methods</option>
+              <option value="CASH">Cash</option>
+              <option value="BANK_TRANSFER">Bank Transfer</option>
+              <option value="CHEQUE">Cheque</option>
+              <option value="ESEWA">eSewa</option>
+              <option value="KHALTI">Khalti</option>
             </select>
             <ChevronDown className="pointer-events-none absolute right-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
           </div>
