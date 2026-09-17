@@ -11,12 +11,14 @@ const PaymentsPage = () => {
   const [search, setSearch] = useState("");
   const [paymentMethod, setPaymentMethod] = useState("");
   const [paymentStatus, setPaymentStatus] = useState("");
+  const [paymentType, setPaymentType] = useState("");
   const { data, isLoading, isError } = usePayments({
     page: 1,
     limit: 10,
     search,
     paymentMethod,
     paymentStatus,
+    paymentType,
   });
 
   console.log("Payments:", data);
@@ -32,6 +34,8 @@ const PaymentsPage = () => {
         onPaymentMethodChange={setPaymentMethod}
         paymentStatus={paymentStatus}
         onPaymentStatusChange={setPaymentStatus}
+        paymentType={paymentType}
+        onPaymentTypeChange={setPaymentType}
       />
       <PaymentTable
         payment={data?.payments ?? []}

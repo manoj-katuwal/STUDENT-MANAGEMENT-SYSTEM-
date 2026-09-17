@@ -12,6 +12,8 @@ const PaymentFilters = ({
   onPaymentMethodChange,
   paymentStatus,
   onPaymentStatusChange,
+  paymentType,
+  onPaymentTypeChange,
 }) => {
   return (
     <div className="rounded-2xl border border-slate-200/80 bg-white p-4 shadow-xs">
@@ -54,7 +56,7 @@ const PaymentFilters = ({
               onChange={(e) => onPaymentStatusChange(e.target.value)}
               className="h-10 appearance-none rounded-xl border border-slate-200 bg-slate-50/50 pl-3.5 pr-9 text-xs sm:text-sm font-medium text-slate-700 transition-all focus:border-blue-500 focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-500/10 cursor-pointer"
             >
-              <option>All Statuses</option>
+              <option value="">All Statuses</option>
               <option value="SUCCESS">Success</option>
               <option value="PENDING">Pending</option>
               <option value="FAILED">Failed</option>
@@ -65,12 +67,14 @@ const PaymentFilters = ({
 
           {/* Payment Type Select */}
           <div className="relative">
-            <select className="h-10 appearance-none rounded-xl border border-slate-200 bg-slate-50/50 pl-3.5 pr-9 text-xs sm:text-sm font-medium text-slate-700 transition-all focus:border-blue-500 focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-500/10 cursor-pointer">
-              <option>All Types</option>
-              <option>Tuition Fee</option>
-              <option>Admission Fee</option>
-              <option>Exam Fee</option>
-              <option>Transport Fee</option>
+            <select
+              value={paymentType}
+              onChange={(e) => onPaymentTypeChange(e.target.value)}
+              className="h-10 appearance-none rounded-xl border border-slate-200 bg-slate-50/50 pl-3.5 pr-9 text-xs sm:text-sm font-medium text-slate-700 transition-all focus:border-blue-500 focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-500/10 cursor-pointer"
+            >
+              <option value="">All Types</option>
+              <option value="OFFLINE">Offline</option>
+              <option value="ONLINE">Online </option>
             </select>
             <ChevronDown className="pointer-events-none absolute right-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
           </div>
