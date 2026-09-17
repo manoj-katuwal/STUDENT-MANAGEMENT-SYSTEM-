@@ -10,7 +10,8 @@ const PaymentFilters = ({
   onSearchChange,
   paymentMethod,
   onPaymentMethodChange,
-  
+  paymentStatus,
+  onPaymentStatusChange,
 }) => {
   return (
     <div className="rounded-2xl border border-slate-200/80 bg-white p-4 shadow-xs">
@@ -48,12 +49,16 @@ const PaymentFilters = ({
 
           {/* Status Select */}
           <div className="relative">
-            <select className="h-10 appearance-none rounded-xl border border-slate-200 bg-slate-50/50 pl-3.5 pr-9 text-xs sm:text-sm font-medium text-slate-700 transition-all focus:border-blue-500 focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-500/10 cursor-pointer">
+            <select
+              value={paymentStatus}
+              onChange={(e) => onPaymentStatusChange(e.target.value)}
+              className="h-10 appearance-none rounded-xl border border-slate-200 bg-slate-50/50 pl-3.5 pr-9 text-xs sm:text-sm font-medium text-slate-700 transition-all focus:border-blue-500 focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-500/10 cursor-pointer"
+            >
               <option>All Statuses</option>
-              <option>Success</option>
-              <option>Pending</option>
-              <option>Failed</option>
-              <option>Reversed</option>
+              <option value="SUCCESS">Success</option>
+              <option value="PENDING">Pending</option>
+              <option value="FAILED">Failed</option>
+              <option value="REVERSED">Reversed</option>
             </select>
             <ChevronDown className="pointer-events-none absolute right-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
           </div>

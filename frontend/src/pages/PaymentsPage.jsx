@@ -10,11 +10,13 @@ import { usePayments } from "../features/payments/payment.hooks";
 const PaymentsPage = () => {
   const [search, setSearch] = useState("");
   const [paymentMethod, setPaymentMethod] = useState("");
+  const [paymentStatus, setPaymentStatus] = useState("");
   const { data, isLoading, isError } = usePayments({
     page: 1,
     limit: 10,
     search,
     paymentMethod,
+    paymentStatus,
   });
 
   console.log("Payments:", data);
@@ -28,6 +30,8 @@ const PaymentsPage = () => {
         onSearchChange={setSearch}
         paymentMethod={paymentMethod}
         onPaymentMethodChange={setPaymentMethod}
+        paymentStatus={paymentStatus}
+        onPaymentStatusChange={setPaymentStatus}
       />
       <PaymentTable
         payment={data?.payments ?? []}
