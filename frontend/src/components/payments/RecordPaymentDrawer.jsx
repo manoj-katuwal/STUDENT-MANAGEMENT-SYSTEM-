@@ -4,7 +4,6 @@ import {
   CreditCard,
   Search,
   ChevronDown,
-  Calendar,
   Hash,
   StickyNote,
   Banknote,
@@ -215,31 +214,29 @@ const RecordPaymentDrawer = ({ onClose }) => {
                   </p>
                 </div>
 
-                {/* Method + Date */}
-                <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-                  <div>
-                    <label
-                      htmlFor="reference"
-                      className="mb-1.5 block text-sm font-medium text-slate-700"
-                    >
-                      Reference No.
-                    </label>
+                {/* Reference No */}
+                <div>
+                  <label
+                    htmlFor="reference"
+                    className="mb-1.5 block text-sm font-medium text-slate-700"
+                  >
+                    Reference No.
+                  </label>
 
-                    <div className="relative">
-                      <Hash className="pointer-events-none absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
+                  <div className="relative">
+                    <Hash className="pointer-events-none absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
 
-                      <input
-                        id="reference"
-                        type="text"
-                        placeholder="e.g. TXN-88213"
-                        className="h-11 w-full rounded-xl border border-slate-200 bg-white pl-10 pr-3.5 text-sm text-slate-900 shadow-sm outline-none transition placeholder:text-slate-400 focus:border-slate-400 focus:ring-4 focus:ring-slate-900/5"
-                      />
-                    </div>
-
-                    <p className="mt-1.5 text-xs text-slate-500">
-                      Optional for cash payments.
-                    </p>
+                    <input
+                      id="reference"
+                      type="text"
+                      placeholder="e.g. TXN-88213"
+                      className="h-11 w-full rounded-xl border border-slate-200 bg-white pl-10 pr-3.5 text-sm text-slate-900 shadow-sm outline-none transition placeholder:text-slate-400 focus:border-slate-400 focus:ring-4 focus:ring-slate-900/5"
+                    />
                   </div>
+
+                  <p className="mt-1.5 text-xs text-slate-500">
+                    Optional for cash payments.
+                  </p>
                 </div>
 
                 {/* Payment method */}
@@ -248,37 +245,64 @@ const RecordPaymentDrawer = ({ onClose }) => {
                     Payment Method <span className="text-rose-500">*</span>
                   </span>
 
-                  <div className="grid grid-cols-2 gap-2 sm:grid-cols-4">
+                  <div className="grid grid-cols-1 gap-2 sm:grid-cols-3">
+                    {/* Selected state - Cash */}
                     <button
                       type="button"
-                      className="flex flex-col items-center gap-1.5 rounded-xl border border-slate-900 bg-slate-900 px-3 py-3 text-xs font-medium text-white shadow-sm transition"
+                      className="flex items-center gap-3 rounded-xl border border-slate-900 bg-slate-900 px-4 py-3 text-left text-white shadow-sm transition"
                     >
-                      <Banknote className="h-4 w-4" />
-                      Cash
+                      <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-white/10">
+                        <Banknote className="h-4 w-4 text-white" />
+                      </span>
+
+                      <span className="min-w-0 flex-1">
+                        <span className="block text-xs font-semibold">
+                          Cash
+                        </span>
+                        <span className="mt-0.5 block truncate text-[11px] text-slate-300">
+                          Physical payment
+                        </span>
+                      </span>
+
+                      <Check className="h-4 w-4 shrink-0 text-white" />
                     </button>
 
+                    {/* Unselected state - Bank Transfer */}
                     <button
                       type="button"
-                      className="flex flex-col items-center gap-1.5 rounded-xl border border-slate-200 bg-white px-3 py-3 text-xs font-medium text-slate-600 shadow-sm transition hover:border-slate-300 hover:bg-slate-50"
+                      className="flex items-center gap-3 rounded-xl border border-slate-200 bg-white px-4 py-3 text-left text-slate-700 shadow-sm transition hover:border-slate-300 hover:bg-slate-50"
                     >
-                      <Landmark className="h-4 w-4" />
-                      Transfer
+                      <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-slate-100">
+                        <Landmark className="h-4 w-4 text-slate-600" />
+                      </span>
+
+                      <span className="min-w-0 flex-1">
+                        <span className="block text-xs font-semibold">
+                          Bank Transfer
+                        </span>
+                        <span className="mt-0.5 block truncate text-[11px] text-slate-400">
+                          Direct bank payment
+                        </span>
+                      </span>
                     </button>
 
+                    {/* Unselected state - Cheque */}
                     <button
                       type="button"
-                      className="flex flex-col items-center gap-1.5 rounded-xl border border-slate-200 bg-white px-3 py-3 text-xs font-medium text-slate-600 shadow-sm transition hover:border-slate-300 hover:bg-slate-50"
+                      className="flex items-center gap-3 rounded-xl border border-slate-200 bg-white px-4 py-3 text-left text-slate-700 shadow-sm transition hover:border-slate-300 hover:bg-slate-50"
                     >
-                      <CreditCard className="h-4 w-4" />
-                      Card
-                    </button>
+                      <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-slate-100">
+                        <ScrollText className="h-4 w-4 text-slate-600" />
+                      </span>
 
-                    <button
-                      type="button"
-                      className="flex flex-col items-center gap-1.5 rounded-xl border border-slate-200 bg-white px-3 py-3 text-xs font-medium text-slate-600 shadow-sm transition hover:border-slate-300 hover:bg-slate-50"
-                    >
-                      <ScrollText className="h-4 w-4" />
-                      Cheque
+                      <span className="min-w-0 flex-1">
+                        <span className="block text-xs font-semibold">
+                          Cheque
+                        </span>
+                        <span className="mt-0.5 block truncate text-[11px] text-slate-400">
+                          Cheque payment
+                        </span>
+                      </span>
                     </button>
                   </div>
                 </div>
