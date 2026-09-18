@@ -11,8 +11,14 @@ import {
   ScrollText,
   Check,
 } from "lucide-react";
+import useDebounce from "../../hooks/useDebounce";
+import { usePaymentStudentFees } from "../../features/payments/payment.hooks";
 
 const RecordPaymentDrawer = ({ onClose }) => {
+  const { data: studentFeeData, isLoading: isStudentFeesLoading } =
+    usePaymentStudentFees({
+      search: useDebounce,
+    });
   return (
     <div className="fixed inset-0 z-50">
       {/* Backdrop */}
