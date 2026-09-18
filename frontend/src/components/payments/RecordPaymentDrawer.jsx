@@ -246,7 +246,6 @@ const RecordPaymentDrawer = ({ onClose }) => {
                   </span>
 
                   <div className="grid grid-cols-1 gap-2 sm:grid-cols-3">
-                    {/* Selected state - Cash */}
                     <button
                       type="button"
                       className="flex items-center gap-3 rounded-xl border border-slate-900 bg-slate-900 px-4 py-3 text-left text-white shadow-sm transition"
@@ -267,7 +266,6 @@ const RecordPaymentDrawer = ({ onClose }) => {
                       <Check className="h-4 w-4 shrink-0 text-white" />
                     </button>
 
-                    {/* Unselected state - Bank Transfer */}
                     <button
                       type="button"
                       className="flex items-center gap-3 rounded-xl border border-slate-200 bg-white px-4 py-3 text-left text-slate-700 shadow-sm transition hover:border-slate-300 hover:bg-slate-50"
@@ -286,7 +284,6 @@ const RecordPaymentDrawer = ({ onClose }) => {
                       </span>
                     </button>
 
-                    {/* Unselected state - Cheque */}
                     <button
                       type="button"
                       className="flex items-center gap-3 rounded-xl border border-slate-200 bg-white px-4 py-3 text-left text-slate-700 shadow-sm transition hover:border-slate-300 hover:bg-slate-50"
@@ -337,28 +334,15 @@ const RecordPaymentDrawer = ({ onClose }) => {
                     <textarea
                       id="notes"
                       rows={3}
+                      maxLength={500}
                       placeholder="Add any notes about this payment..."
                       className="w-full resize-none rounded-xl border border-slate-200 bg-white py-2.5 pl-10 pr-3.5 text-sm text-slate-900 shadow-sm outline-none transition placeholder:text-slate-400 focus:border-slate-400 focus:ring-4 focus:ring-slate-900/5"
                     />
                   </div>
+                  <p className="mt-1.5 text-xs text-slate-400">
+                    Optional · Maximum 500 characters
+                  </p>
                 </div>
-
-                <label className="flex cursor-pointer items-start gap-3 rounded-xl border border-slate-200 bg-slate-50/70 p-3.5 transition hover:bg-slate-50">
-                  <input
-                    type="checkbox"
-                    defaultChecked
-                    className="mt-0.5 h-4 w-4 shrink-0 rounded border-slate-300 text-slate-900 focus:ring-2 focus:ring-slate-900/20"
-                  />
-                  <span className="min-w-0">
-                    <span className="block text-sm font-medium text-slate-800">
-                      Email receipt to student
-                    </span>
-                    <span className="mt-0.5 block text-xs text-slate-500">
-                      A payment confirmation will be sent to the student's
-                      registered email address.
-                    </span>
-                  </span>
-                </label>
               </div>
             </section>
           </div>
