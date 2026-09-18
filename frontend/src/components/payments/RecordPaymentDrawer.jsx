@@ -369,7 +369,8 @@ const RecordPaymentDrawer = ({ onClose }) => {
 
               <button
                 type="button"
-                className="inline-flex items-center gap-2 rounded-xl bg-slate-900 px-4 py-2.5 text-sm font-semibold text-white shadow-sm transition hover:bg-slate-800 focus:outline-none focus-visible:ring-2 focus-visible:ring-slate-900/20 focus-visible:ring-offset-2"
+                disabled
+                className="inline-flex cursor-not-allowed items-center gap-2 rounded-xl bg-slate-200 px-4 py-2.5 text-sm font-semibold text-slate-400 shadow-sm"
               >
                 <Check className="h-4 w-4" />
                 Record Payment
