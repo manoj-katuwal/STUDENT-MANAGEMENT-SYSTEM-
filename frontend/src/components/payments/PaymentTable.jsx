@@ -88,7 +88,7 @@ const PaymentTable = ({ payment = [], isLoading, isError, onView  }) => {
           <thead>
             <tr className="border-b border-slate-200/80 bg-slate-50/50 text-[11px] font-bold uppercase tracking-wider text-slate-500">
               <th scope="col" className="px-6 py-4">
-                Transaction ID
+                Transaction / Cheque No.
               </th>
               <th scope="col" className="px-6 py-4">
                 Student Details
@@ -184,21 +184,23 @@ const PaymentTable = ({ payment = [], isLoading, isError, onView  }) => {
                 const studentName = item.studentFeeId?.studentId?.name || "N/A";
                 const admissionNo =
                   item.studentFeeId?.studentId?.admissionNumber || "N/A";
-                const transactionId = item.transactionId || item._id;
+                const transactionId = item.transactionId ?? "";
 
                 return (
                   <tr
-                    key={transactionId}
+                    key={item._id}
                     className="group transition-colors duration-150 hover:bg-slate-50/80"
                   >
                     {/* Transaction ID */}
                     <td className="whitespace-nowrap px-6 py-4">
-                      <div className="flex items-center gap-2">
-                        <Receipt className="h-4 w-4 text-slate-400 group-hover:text-blue-600 transition-colors" />
-                        <span className="font-mono text-xs font-semibold text-slate-700">
-                          {transactionId}
-                        </span>
-                      </div>
+                      {transactionId && (
+                        <div className="flex items-center gap-2">
+                          <Receipt className="h-4 w-4 text-slate-400 group-hover:text-blue-600 transition-colors" />
+                          <span className="font-mono text-xs font-semibold text-slate-700">
+                            {transactionId}
+                          </span>
+                        </div>
+                      )}
                     </td>
 
                     {/* Student Info with Avatar */}
