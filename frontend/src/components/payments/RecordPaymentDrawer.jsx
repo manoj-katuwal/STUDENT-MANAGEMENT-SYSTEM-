@@ -74,7 +74,8 @@ const RecordPaymentDrawer = ({ onClose }) => {
         studentFeeId: selectedStudentFee._id,
         amount: Number(amount),
         paymentMethod,
-        transactionId: reference.trim() || undefined,
+        transactionId:
+          paymentMethod === "CASH" ? undefined : reference.trim() || undefined,
         remarks: remarks.trim() || undefined,
       });
       setCreatedPayment(payment);
@@ -332,6 +333,7 @@ const RecordPaymentDrawer = ({ onClose }) => {
                 </div>
 
                 {/* Transaction / Cheque No */}
+                {paymentMethod !== "CASH" && (
                 <div>
                   <label
                     htmlFor="reference"
@@ -354,13 +356,12 @@ const RecordPaymentDrawer = ({ onClose }) => {
                   </div>
 
                   <p className="mt-1.5 text-xs text-slate-500">
-                    {paymentMethod === "CASH"
-                      ? "Optional for cash payments."
-                      : paymentMethod === "BANK_TRANSFER"
+                    {paymentMethod === "BANK_TRANSFER"
                         ? "Enter the bank transaction number."
                         : "Enter the cheque number."}
                   </p>
                 </div>
+                )}
 
                 {/* Payment method */}
                 <div>
@@ -371,7 +372,10 @@ const RecordPaymentDrawer = ({ onClose }) => {
                   <div className="grid grid-cols-1 gap-2 sm:grid-cols-3">
                     <button
                       type="button"
-                      onClick={() => setPaymentMethod("CASH")}
+                      onClick={() => {
+                        setPaymentMethod("CASH");
+                        setReference("");
+                      }}
                       className={`flex items-center gap-3 rounded-xl border px-4 py-3 text-left shadow-sm transition ${
                         paymentMethod === "CASH"
                           ? "border-slate-900 bg-slate-900 text-white"
@@ -505,12 +509,14 @@ const RecordPaymentDrawer = ({ onClose }) => {
                     {createdPayment.paymentReference}
                   </dd>
                 </div>
-                <div className="flex justify-between gap-3">
-                  <dt className="text-emerald-700">Transaction / Cheque No.</dt>
-                  <dd className="font-mono font-medium">
-                    {createdPayment.transactionId || "—"}
-                  </dd>
-                </div>
+                {createdPayment.paymentMethod !== "CASH" && (
+                  <div className="flex justify-between gap-3">
+                    <dt className="text-emerald-700">Transaction / Cheque No.</dt>
+                    <dd className="font-mono font-medium">
+                      {createdPayment.transactionId || "—"}
+                    </dd>
+                  </div>
+                )}
                 <div className="flex justify-between gap-3">
                   <dt className="text-emerald-700">Receipt No.</dt>
                   <dd className="font-mono font-medium">

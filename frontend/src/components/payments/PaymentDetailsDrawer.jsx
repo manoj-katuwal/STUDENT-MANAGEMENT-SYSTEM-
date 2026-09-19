@@ -206,11 +206,13 @@ const PaymentDetailsDrawer = ({ onClose, paymentId }) => {
               value={payment.paymentReference}
               mono
             />
-            <DetailItem
-              label="Transaction / Cheque No."
-              value={payment.transactionId}
-              mono
-            />
+            {payment.paymentMethod !== "CASH" && (
+              <DetailItem
+                label="Transaction / Cheque No."
+                value={payment.transactionId}
+                mono
+              />
+            )}
           </div>
         </section>
 
