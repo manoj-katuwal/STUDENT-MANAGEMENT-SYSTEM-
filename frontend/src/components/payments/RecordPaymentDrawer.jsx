@@ -17,6 +17,37 @@ import {
   usePaymentStudentFees,
 } from "../../features/payments/payment.hooks";
 
+const getPaymentErrorMessage = (error) => {
+  const status = error.response?.status;
+  const message = error.response?.data?.message || "";
+
+  if (message === "Transaction ID already exists") {
+    return "This transaction or cheque number has already been used. Please check it or enter a different number.";
+  }
+
+  if (message.includes("due amount has changed")) {
+    return "The outstanding balance has changed. Please search for and select the student fee again before recording the payment.";
+  }
+
+  if (message === "Cannot make payment for a cancelled student fee") {
+    return "This fee has been cancelled and can no longer receive a payment.";
+  }
+
+  if (message === "Student fee not found" || status === 404) {
+    return "This student fee is no longer available. Please search for the student again.";
+  }
+
+  if (status === 401 || status === 403) {
+    return "You do not have permission to record this payment. Please sign in again or contact an administrator.";
+  }
+
+  if (!error.response) {
+    return "Could not reach the server. Check your internet connection and try again.";
+  }
+
+  return "The payment could not be recorded. Please review the details and try again.";
+};
+
 const RecordPaymentDrawer = ({ onClose }) => {
   const [studentSearch, setStudentSearch] = useState("");
   const [selectedStudentFee, setSelectedStudentFee] = useState(null);
@@ -80,10 +111,7 @@ const RecordPaymentDrawer = ({ onClose }) => {
       });
       setCreatedPayment(payment);
     } catch (error) {
-      setSubmitError(
-        error.response?.data?.message ||
-          "Unable to record the payment. Please try again.",
-      );
+      setSubmitError(getPaymentErrorMessage(error));
     }
   };
   return (
