@@ -39,6 +39,12 @@ const RecordPaymentDrawer = ({ onClose }) => {
       studentFee.status !== "CANCELLED" && Number(studentFee.dueAmount) > 0,
   );
   const outstandingBalance = Number(selectedStudentFee?.dueAmount ?? 0);
+  const isAmountValid =
+    amount.trim() !== "" &&
+    Number(amount) > 0 &&
+    Number(amount) <= (selectedStudentFee?.dueAmount ?? 0);
+  const canSubmit =
+    Boolean(selectedStudentFee) && isAmountValid && Boolean(paymentMethod);
 
   const selectStudentFee = (studentFee) => {
     setSelectedStudentFee(studentFee);
@@ -260,7 +266,11 @@ const RecordPaymentDrawer = ({ onClose }) => {
                           : "Select a student fee"
                       }
                       disabled={!selectedStudentFee}
-                      className="h-11 w-full rounded-xl border border-slate-200 bg-white pl-8 pr-3.5 text-sm font-semibold text-slate-900 shadow-sm outline-none transition placeholder:font-normal placeholder:text-slate-400 focus:border-slate-400 focus:ring-4 focus:ring-slate-900/5"
+                      className={`h-11 w-full rounded-xl border bg-white pl-8 pr-3.5 text-sm font-semibold text-slate-900 shadow-sm outline-none transition placeholder:font-normal placeholder:text-slate-400 focus:ring-4 ${
+                        amount && !isAmountValid
+                          ? "border-rose-300 focus:border-rose-400 focus:ring-rose-500/5"
+                          : "border-slate-200 focus:border-slate-400 focus:ring-slate-900/5"
+                      }`}
                     />
                   </div>
 
@@ -270,6 +280,16 @@ const RecordPaymentDrawer = ({ onClose }) => {
                       Rs. {outstandingBalance.toLocaleString("en-IN")}
                     </span>
                   </p>
+                  {amount && Number(amount) <= 0 && (
+                    <p className="mt-1.5 text-xs text-rose-500">
+                      Amount must be greater than zero.
+                    </p>
+                  )}
+                  {amount && Number(amount) > outstandingBalance && (
+                    <p className="mt-1.5 text-xs text-rose-500">
+                      Amount cannot exceed the outstanding balance.
+                    </p>
+                  )}
                 </div>
 
                 {/* Reference No */}
