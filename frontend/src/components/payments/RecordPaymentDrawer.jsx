@@ -25,6 +25,7 @@ const RecordPaymentDrawer = ({ onClose }) => {
   const [paymentMethod, setPaymentMethod] = useState("CASH");
   const [remarks, setRemarks] = useState("");
   const [submitError, setSubmitError] = useState("");
+  const [createdPayment, setCreatedPayment] = useState(null);
   const debouncedStudentSearch = useDebounce(studentSearch);
   const { mutateAsync: createOfflinePayment, isPending: isCreatingPayment } =
     useCreateOfflinePayment();
@@ -50,13 +51,17 @@ const RecordPaymentDrawer = ({ onClose }) => {
     Number(amount) > 0 &&
     Number(amount) <= (selectedStudentFee?.dueAmount ?? 0);
   const canSubmit =
-    Boolean(selectedStudentFee) && isAmountValid && Boolean(paymentMethod);
+    Boolean(selectedStudentFee) &&
+    isAmountValid &&
+    Boolean(paymentMethod) &&
+    !createdPayment;
 
   const selectStudentFee = (studentFee) => {
     setSelectedStudentFee(studentFee);
     setAmount("");
     setStudentSearch("");
     setSubmitError("");
+    setCreatedPayment(null);
   };
 
   const handleRecordPayment = async () => {
@@ -65,14 +70,14 @@ const RecordPaymentDrawer = ({ onClose }) => {
     setSubmitError("");
 
     try {
-      await createOfflinePayment({
+      const payment = await createOfflinePayment({
         studentFeeId: selectedStudentFee._id,
         amount: Number(amount),
         paymentMethod,
         transactionId: reference.trim() || undefined,
         remarks: remarks.trim() || undefined,
       });
-      onClose();
+      setCreatedPayment(payment);
     } catch (error) {
       setSubmitError(
         error.response?.data?.message ||
@@ -326,13 +331,13 @@ const RecordPaymentDrawer = ({ onClose }) => {
                   )}
                 </div>
 
-                {/* Reference No */}
+                {/* Transaction / Cheque No */}
                 <div>
                   <label
                     htmlFor="reference"
                     className="mb-1.5 block text-sm font-medium text-slate-700"
                   >
-                    Reference No.
+                    Transaction / Cheque No.
                   </label>
 
                   <div className="relative">
@@ -343,13 +348,17 @@ const RecordPaymentDrawer = ({ onClose }) => {
                       type="text"
                       value={reference}
                       onChange={(event) => setReference(event.target.value)}
-                      placeholder="e.g. TXN-88213"
+                      placeholder="e.g. NBL-894321"
                       className="h-11 w-full rounded-xl border border-slate-200 bg-white pl-10 pr-3.5 text-sm text-slate-900 shadow-sm outline-none transition placeholder:text-slate-400 focus:border-slate-400 focus:ring-4 focus:ring-slate-900/5"
                     />
                   </div>
 
                   <p className="mt-1.5 text-xs text-slate-500">
-                    Optional for cash payments.
+                    {paymentMethod === "CASH"
+                      ? "Optional for cash payments."
+                      : paymentMethod === "BANK_TRANSFER"
+                        ? "Enter the bank transaction number."
+                        : "Enter the cheque number."}
                   </p>
                 </div>
 
@@ -486,6 +495,31 @@ const RecordPaymentDrawer = ({ onClose }) => {
               {submitError}
             </p>
           )}
+          {createdPayment && (
+            <div className="mb-3 rounded-xl border border-emerald-200 bg-emerald-50 p-3 text-xs text-emerald-900">
+              <p className="font-semibold">Payment recorded successfully.</p>
+              <dl className="mt-2 space-y-1">
+                <div className="flex justify-between gap-3">
+                  <dt className="text-emerald-700">Payment Reference</dt>
+                  <dd className="font-mono font-medium">
+                    {createdPayment.paymentReference}
+                  </dd>
+                </div>
+                <div className="flex justify-between gap-3">
+                  <dt className="text-emerald-700">Transaction / Cheque No.</dt>
+                  <dd className="font-mono font-medium">
+                    {createdPayment.transactionId || "—"}
+                  </dd>
+                </div>
+                <div className="flex justify-between gap-3">
+                  <dt className="text-emerald-700">Receipt No.</dt>
+                  <dd className="font-mono font-medium">
+                    {createdPayment.receiptNumber}
+                  </dd>
+                </div>
+              </dl>
+            </div>
+          )}
           <div className="flex items-center justify-between gap-4">
             <div className="hidden sm:block">
               <p className="text-[11px] font-medium uppercase tracking-wider text-slate-400">
@@ -514,7 +548,11 @@ const RecordPaymentDrawer = ({ onClose }) => {
                 }`}
               >
                 <Check className="h-4 w-4" />
-                {isCreatingPayment ? "Recording..." : "Record Payment"}
+                {isCreatingPayment
+                  ? "Recording..."
+                  : createdPayment
+                    ? "Payment Recorded"
+                    : "Record Payment"}
               </button>
             </div>
           </div>

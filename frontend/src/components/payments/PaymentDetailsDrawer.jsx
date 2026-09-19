@@ -202,7 +202,12 @@ const PaymentDetailsDrawer = ({ onClose, paymentId }) => {
               value={formatDate(payment.paidAt ?? payment.createdAt, true)}
             />
             <DetailItem
-              label="Transaction ID"
+              label="Payment Reference"
+              value={payment.paymentReference}
+              mono
+            />
+            <DetailItem
+              label="Transaction / Cheque No."
               value={payment.transactionId}
               mono
             />
