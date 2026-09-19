@@ -171,64 +171,6 @@ const RecordPaymentDrawer = ({ onClose }) => {
                     )}
                   </div>
                 )}
-                {Boolean(import.meta.env.VITE_SHOW_MOCK_SEARCH_RESULTS) && (
-                <div className="mt-2 overflow-hidden rounded-xl border border-slate-200 bg-white shadow-lg">
-                  <button
-                    type="button"
-                    className="flex w-full items-center gap-3 px-3.5 py-3 text-left transition hover:bg-slate-50"
-                  >
-                    <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-slate-900 text-xs font-semibold text-white">
-                      AS
-                    </div>
-
-                    <div className="min-w-0 flex-1">
-                      <p className="truncate text-sm font-medium text-slate-900">
-                        Aarav Sharma
-                      </p>
-                      <p className="truncate text-xs text-slate-500">
-                        ID: STU-2041 · Grade 10 · Section A
-                      </p>
-                    </div>
-
-                    <div className="shrink-0 text-right">
-                      <p className="text-[10px] font-semibold uppercase tracking-wider text-slate-400">
-                        Due
-                      </p>
-                      <p className="text-sm font-semibold text-slate-900">
-                        Rs. 450.00
-                      </p>
-                    </div>
-                  </button>
-
-                  <button
-                    type="button"
-                    className="flex w-full items-center gap-3 border-t border-slate-100 px-3.5 py-3 text-left transition hover:bg-slate-50"
-                  >
-                    <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-slate-100 text-xs font-semibold text-slate-600">
-                      SK
-                    </div>
-
-                    <div className="min-w-0 flex-1">
-                      <p className="truncate text-sm font-medium text-slate-900">
-                        Soma Katwal
-                      </p>
-                      <p className="truncate text-xs text-slate-500">
-                        ID: INT-TEST-002 · Grade 10 · Section L1C4
-                      </p>
-                    </div>
-
-                    <div className="shrink-0 text-right">
-                      <p className="text-[10px] font-semibold uppercase tracking-wider text-slate-400">
-                        Due
-                      </p>
-                      <p className="text-sm font-semibold text-slate-900">
-                        Rs. 1,200.00
-                      </p>
-                    </div>
-                  </button>
-                </div>
-                )}
-
                 {/* Selected student preview */}
                 <div className="mt-3 flex items-center gap-3 rounded-xl border border-slate-200 bg-slate-50/70 p-3.5">
                   <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-slate-900 text-xs font-semibold tracking-wide text-white">
