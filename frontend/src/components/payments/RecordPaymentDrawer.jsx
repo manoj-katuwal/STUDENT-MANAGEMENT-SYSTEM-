@@ -18,6 +18,9 @@ const RecordPaymentDrawer = ({ onClose }) => {
   const [studentSearch, setStudentSearch] = useState("");
   const [selectedStudentFee, setSelectedStudentFee] = useState(null);
   const [amount, setAmount] = useState("");
+  const [reference, setReference] = useState("");
+  const [paymentMethod, setPaymentMethod] = useState("CASH");
+  const [remarks, setRemarks] = useState("");
   const debouncedStudentSearch = useDebounce(studentSearch);
 
   const {
@@ -284,6 +287,8 @@ const RecordPaymentDrawer = ({ onClose }) => {
                     <input
                       id="reference"
                       type="text"
+                      value={reference}
+                      onChange={(event) => setReference(event.target.value)}
                       placeholder="e.g. TXN-88213"
                       className="h-11 w-full rounded-xl border border-slate-200 bg-white pl-10 pr-3.5 text-sm text-slate-900 shadow-sm outline-none transition placeholder:text-slate-400 focus:border-slate-400 focus:ring-4 focus:ring-slate-900/5"
                     />
@@ -303,7 +308,12 @@ const RecordPaymentDrawer = ({ onClose }) => {
                   <div className="grid grid-cols-1 gap-2 sm:grid-cols-3">
                     <button
                       type="button"
-                      className="flex items-center gap-3 rounded-xl border border-slate-900 bg-slate-900 px-4 py-3 text-left text-white shadow-sm transition"
+                      onClick={() => setPaymentMethod("CASH")}
+                      className={`flex items-center gap-3 rounded-xl border px-4 py-3 text-left shadow-sm transition ${
+                        paymentMethod === "CASH"
+                          ? "border-slate-900 bg-slate-900 text-white"
+                          : "border-slate-200 bg-white text-slate-700 hover:border-slate-300 hover:bg-slate-50"
+                      }`}
                     >
                       <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-white/10">
                         <Banknote className="h-4 w-4 text-white" />
@@ -323,7 +333,12 @@ const RecordPaymentDrawer = ({ onClose }) => {
 
                     <button
                       type="button"
-                      className="flex items-center gap-3 rounded-xl border border-slate-200 bg-white px-4 py-3 text-left text-slate-700 shadow-sm transition hover:border-slate-300 hover:bg-slate-50"
+                      onClick={() => setPaymentMethod("BANK_TRANSFER")}
+                      className={`flex items-center gap-3 rounded-xl border px-4 py-3 text-left shadow-sm transition ${
+                        paymentMethod === "BANK_TRANSFER"
+                          ? "border-slate-900 bg-slate-900 text-white"
+                          : "border-slate-200 bg-white text-slate-700 hover:border-slate-300 hover:bg-slate-50"
+                      }`}
                     >
                       <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-slate-100">
                         <Landmark className="h-4 w-4 text-slate-600" />
@@ -341,7 +356,12 @@ const RecordPaymentDrawer = ({ onClose }) => {
 
                     <button
                       type="button"
-                      className="flex items-center gap-3 rounded-xl border border-slate-200 bg-white px-4 py-3 text-left text-slate-700 shadow-sm transition hover:border-slate-300 hover:bg-slate-50"
+                      onClick={() => setPaymentMethod("CHEQUE")}
+                      className={`flex items-center gap-3 rounded-xl border px-4 py-3 text-left shadow-sm transition ${
+                        paymentMethod === "CHEQUE"
+                          ? "border-slate-900 bg-slate-900 text-white"
+                          : "border-slate-200 bg-white text-slate-700 hover:border-slate-300 hover:bg-slate-50"
+                      }`}
                     >
                       <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-slate-100">
                         <ScrollText className="h-4 w-4 text-slate-600" />
@@ -390,6 +410,8 @@ const RecordPaymentDrawer = ({ onClose }) => {
                       id="notes"
                       rows={3}
                       maxLength={500}
+                      value={remarks}
+                      onChange={(event) => setRemarks(event.target.value)}
                       placeholder="Add any notes about this payment..."
                       className="w-full resize-none rounded-xl border border-slate-200 bg-white py-2.5 pl-10 pr-3.5 text-sm text-slate-900 shadow-sm outline-none transition placeholder:text-slate-400 focus:border-slate-400 focus:ring-4 focus:ring-slate-900/5"
                     />
