@@ -16,6 +16,8 @@ import { usePaymentStudentFees } from "../../features/payments/payment.hooks";
 
 const RecordPaymentDrawer = ({ onClose }) => {
   const [studentSearch, setStudentSearch] = useState("");
+  const [selectedStudentFee, setSelectedStudentFee] = useState(null);
+  const [amount, setAmount] = useState("");
   const debouncedStudentSearch = useDebounce(studentSearch);
 
   const {
@@ -33,6 +35,13 @@ const RecordPaymentDrawer = ({ onClose }) => {
     (studentFee) =>
       studentFee.status !== "CANCELLED" && Number(studentFee.dueAmount) > 0,
   );
+  const outstandingBalance = Number(selectedStudentFee?.dueAmount ?? 0);
+
+  const selectStudentFee = (studentFee) => {
+    setSelectedStudentFee(studentFee);
+    setAmount("");
+    setStudentSearch("");
+  };
   return (
     <div className="fixed inset-0 z-50">
       {/* Backdrop */}
@@ -146,6 +155,7 @@ const RecordPaymentDrawer = ({ onClose }) => {
                           <button
                             key={studentFee._id}
                             type="button"
+                            onClick={() => selectStudentFee(studentFee)}
                             className={`flex w-full items-center gap-3 px-3.5 py-3 text-left transition hover:bg-slate-50 ${
                               index > 0 ? "border-t border-slate-100" : ""
                             }`}
