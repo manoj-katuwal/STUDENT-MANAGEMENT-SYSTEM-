@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import {
   X,
   CreditCard,
@@ -15,10 +15,12 @@ import useDebounce from "../../hooks/useDebounce";
 import { usePaymentStudentFees } from "../../features/payments/payment.hooks";
 
 const RecordPaymentDrawer = ({ onClose }) => {
-  const { data: studentFeeData, isLoading: isStudentFeesLoading } =
-    usePaymentStudentFees({
-      search: useDebounce,
-    });
+  const [studentSearch, setStudentSearch] = useState("");
+  const debouncedStudentSearch = useDebounce(studentSearch);
+
+  usePaymentStudentFees({
+    search: debouncedStudentSearch,
+  });
   return (
     <div className="fixed inset-0 z-50">
       {/* Backdrop */}
@@ -85,6 +87,8 @@ const RecordPaymentDrawer = ({ onClose }) => {
                   <input
                     id="student"
                     type="text"
+                    value={studentSearch}
+                    onChange={(event) => setStudentSearch(event.target.value)}
                     placeholder="Search by student name or ID"
                     className="h-11 w-full rounded-xl border border-slate-200 bg-white pl-10 pr-10 text-sm text-slate-900 shadow-sm outline-none transition placeholder:text-slate-400 focus:border-slate-400 focus:ring-4 focus:ring-slate-900/5"
                   />
