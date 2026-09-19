@@ -14,6 +14,7 @@ import {
   getPaymentStats,
 } from "./payment.repository.js";
 import { generateReceiptNumber } from "../receipt/receiptCounter.service.js";
+import { generatePaymentReference } from "./paymentReference.service.js";
 import { createReceiptService } from "../receipt/receipt.service.js";
 import { logActivity } from "../auditLog/auditLog.service.js";
 import Student from "../students/student.model.js";
@@ -73,6 +74,7 @@ export const createOfflinePaymentService = async (paymentData, performedBy) => {
     }
 
     // 6. Create payment
+    const paymentReference = await generatePaymentReference({ session });
     const payment = await createPayment(
       {
         studentFeeId,
@@ -81,6 +83,7 @@ export const createOfflinePaymentService = async (paymentData, performedBy) => {
         paymentType: "OFFLINE",
         paymentStatus: "SUCCESS",
         transactionId: transactionId || null,
+        paymentReference,
         gateway: null,
         paidAt: new Date(),
         remarks: remarks || null,
@@ -107,7 +110,7 @@ export const createOfflinePaymentService = async (paymentData, performedBy) => {
     await updatedStudentFee.save({ session });
 
     const receiptNumber = await generateReceiptNumber({ session });
-    await createReceiptService(
+    const receipt = await createReceiptService(
       {
         paymentId: payment._id,
         studentFeeId: payment.studentFeeId,
@@ -167,7 +170,10 @@ export const createOfflinePaymentService = async (paymentData, performedBy) => {
       });
     }
 
-    return payment;
+    return {
+      ...payment.toObject(),
+      receiptNumber: receipt.receiptNumber,
+    };
   } catch (error) {
     await session.abortTransaction();
     throw error;

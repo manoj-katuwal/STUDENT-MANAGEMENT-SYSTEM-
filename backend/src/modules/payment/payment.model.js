@@ -38,6 +38,12 @@ const paymentSchema = new mongoose.Schema(
       trim: true,
     },
 
+    paymentReference: {
+      type: String,
+      default: null,
+      trim: true,
+    },
+
     gatewayTransactionId: {
       type: String,
       default: null,
@@ -74,6 +80,14 @@ paymentSchema.index({
 
 paymentSchema.index(
   { transactionId: 1 },
+  {
+    unique: true,
+    sparse: true,
+  },
+);
+
+paymentSchema.index(
+  { paymentReference: 1 },
   {
     unique: true,
     sparse: true,
