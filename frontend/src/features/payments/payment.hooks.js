@@ -1,5 +1,4 @@
-import { useQuery } from "@tanstack/react-query";
-import { useMutation } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import {
   createOfflinePayment,
   downloadReceiptPdf,
@@ -36,8 +35,16 @@ export const useStudentFeePayments = (studentFeeId) => {
 };
 
 export const useCreateOfflinePayment = () => {
+  const queryClient = useQueryClient();
+
   return useMutation({
     mutationFn: createOfflinePayment,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["payments"] });
+      queryClient.invalidateQueries({ queryKey: ["payment-stats"] });
+      queryClient.invalidateQueries({ queryKey: ["studentFees"] });
+      queryClient.invalidateQueries({ queryKey: ["payment-student-fees"] });
+    },
   });
 };
 

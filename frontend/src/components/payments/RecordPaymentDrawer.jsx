@@ -12,7 +12,10 @@ import {
   Check,
 } from "lucide-react";
 import useDebounce from "../../hooks/useDebounce";
-import { usePaymentStudentFees } from "../../features/payments/payment.hooks";
+import {
+  useCreateOfflinePayment,
+  usePaymentStudentFees,
+} from "../../features/payments/payment.hooks";
 
 const RecordPaymentDrawer = ({ onClose }) => {
   const [studentSearch, setStudentSearch] = useState("");
@@ -21,7 +24,10 @@ const RecordPaymentDrawer = ({ onClose }) => {
   const [reference, setReference] = useState("");
   const [paymentMethod, setPaymentMethod] = useState("CASH");
   const [remarks, setRemarks] = useState("");
+  const [submitError, setSubmitError] = useState("");
   const debouncedStudentSearch = useDebounce(studentSearch);
+  const { mutateAsync: createOfflinePayment, isPending: isCreatingPayment } =
+    useCreateOfflinePayment();
 
   const {
     data: studentFeeSearch,
@@ -50,6 +56,29 @@ const RecordPaymentDrawer = ({ onClose }) => {
     setSelectedStudentFee(studentFee);
     setAmount("");
     setStudentSearch("");
+    setSubmitError("");
+  };
+
+  const handleRecordPayment = async () => {
+    if (!canSubmit || isCreatingPayment) return;
+
+    setSubmitError("");
+
+    try {
+      await createOfflinePayment({
+        studentFeeId: selectedStudentFee._id,
+        amount: Number(amount),
+        paymentMethod,
+        transactionId: reference.trim() || undefined,
+        remarks: remarks.trim() || undefined,
+      });
+      onClose();
+    } catch (error) {
+      setSubmitError(
+        error.response?.data?.message ||
+          "Unable to record the payment. Please try again.",
+      );
+    }
   };
   return (
     <div className="fixed inset-0 z-50">
@@ -219,6 +248,11 @@ const RecordPaymentDrawer = ({ onClose }) => {
                       </p>
                     </div>
                   </div>
+                )}
+                {!selectedStudentFee && (
+                  <p className="mt-2 text-xs text-slate-400">
+                    Select a student fee to continue.
+                  </p>
                 )}
               </div>
             </section>
@@ -447,6 +481,11 @@ const RecordPaymentDrawer = ({ onClose }) => {
 
         {/* Footer */}
         <div className="border-t border-slate-200 bg-white px-6 py-4">
+          {submitError && (
+            <p className="mb-3 text-right text-xs text-rose-600" role="alert">
+              {submitError}
+            </p>
+          )}
           <div className="flex items-center justify-between gap-4">
             <div className="hidden sm:block">
               <p className="text-[11px] font-medium uppercase tracking-wider text-slate-400">
@@ -466,11 +505,16 @@ const RecordPaymentDrawer = ({ onClose }) => {
 
               <button
                 type="button"
-                disabled
-                className="inline-flex cursor-not-allowed items-center gap-2 rounded-xl bg-slate-200 px-4 py-2.5 text-sm font-semibold text-slate-400 shadow-sm"
+                disabled={!canSubmit || isCreatingPayment}
+                onClick={handleRecordPayment}
+                className={`inline-flex items-center gap-2 rounded-xl px-4 py-2.5 text-sm font-semibold shadow-sm transition focus:outline-none focus-visible:ring-2 focus-visible:ring-slate-900/20 focus-visible:ring-offset-2 ${
+                  canSubmit && !isCreatingPayment
+                    ? "bg-slate-900 text-white hover:bg-slate-800"
+                    : "cursor-not-allowed bg-slate-200 text-slate-400"
+                }`}
               >
                 <Check className="h-4 w-4" />
-                Record Payment
+                {isCreatingPayment ? "Recording..." : "Record Payment"}
               </button>
             </div>
           </div>
