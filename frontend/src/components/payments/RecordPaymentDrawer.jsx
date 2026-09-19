@@ -57,6 +57,20 @@ const RecordPaymentDrawer = ({ onClose }) => {
   const [remarks, setRemarks] = useState("");
   const [submitError, setSubmitError] = useState("");
   const [createdPayment, setCreatedPayment] = useState(null);
+  const referenceDetails =
+    paymentMethod === "BANK_TRANSFER"
+      ? {
+          label: "Transaction ID",
+          placeholder: "e.g. NBL-894321",
+          helpText: "Enter the bank transaction ID.",
+        }
+      : paymentMethod === "CHEQUE"
+        ? {
+            label: "Cheque Number",
+            placeholder: "e.g. CHQ-001245",
+            helpText: "Enter the cheque number.",
+          }
+        : null;
   const debouncedStudentSearch = useDebounce(studentSearch);
   const { mutateAsync: createOfflinePayment, isPending: isCreatingPayment } =
     useCreateOfflinePayment();
@@ -93,6 +107,11 @@ const RecordPaymentDrawer = ({ onClose }) => {
     setStudentSearch("");
     setSubmitError("");
     setCreatedPayment(null);
+  };
+
+  const selectPaymentMethod = (method) => {
+    setPaymentMethod(method);
+    setReference("");
   };
 
   const handleRecordPayment = async () => {
@@ -360,14 +379,14 @@ const RecordPaymentDrawer = ({ onClose }) => {
                   )}
                 </div>
 
-                {/* Transaction / Cheque No */}
-                {paymentMethod !== "CASH" && (
+                {/* Payment reference */}
+                {referenceDetails && (
                 <div>
                   <label
                     htmlFor="reference"
                     className="mb-1.5 block text-sm font-medium text-slate-700"
                   >
-                    Transaction / Cheque No.
+                    {referenceDetails.label}
                   </label>
 
                   <div className="relative">
@@ -378,15 +397,13 @@ const RecordPaymentDrawer = ({ onClose }) => {
                       type="text"
                       value={reference}
                       onChange={(event) => setReference(event.target.value)}
-                      placeholder="e.g. NBL-894321"
+                      placeholder={referenceDetails.placeholder}
                       className="h-11 w-full rounded-xl border border-slate-200 bg-white pl-10 pr-3.5 text-sm text-slate-900 shadow-sm outline-none transition placeholder:text-slate-400 focus:border-slate-400 focus:ring-4 focus:ring-slate-900/5"
                     />
                   </div>
 
                   <p className="mt-1.5 text-xs text-slate-500">
-                    {paymentMethod === "BANK_TRANSFER"
-                        ? "Enter the bank transaction number."
-                        : "Enter the cheque number."}
+                    {referenceDetails.helpText}
                   </p>
                 </div>
                 )}
@@ -400,10 +417,7 @@ const RecordPaymentDrawer = ({ onClose }) => {
                   <div className="grid grid-cols-1 gap-2 sm:grid-cols-3">
                     <button
                       type="button"
-                      onClick={() => {
-                        setPaymentMethod("CASH");
-                        setReference("");
-                      }}
+                      onClick={() => selectPaymentMethod("CASH")}
                       className={`flex items-center gap-3 rounded-xl border px-4 py-3 text-left shadow-sm transition ${
                         paymentMethod === "CASH"
                           ? "border-slate-900 bg-slate-900 text-white"
@@ -428,7 +442,7 @@ const RecordPaymentDrawer = ({ onClose }) => {
 
                     <button
                       type="button"
-                      onClick={() => setPaymentMethod("BANK_TRANSFER")}
+                      onClick={() => selectPaymentMethod("BANK_TRANSFER")}
                       className={`flex items-center gap-3 rounded-xl border px-4 py-3 text-left shadow-sm transition ${
                         paymentMethod === "BANK_TRANSFER"
                           ? "border-slate-900 bg-slate-900 text-white"
@@ -451,7 +465,7 @@ const RecordPaymentDrawer = ({ onClose }) => {
 
                     <button
                       type="button"
-                      onClick={() => setPaymentMethod("CHEQUE")}
+                      onClick={() => selectPaymentMethod("CHEQUE")}
                       className={`flex items-center gap-3 rounded-xl border px-4 py-3 text-left shadow-sm transition ${
                         paymentMethod === "CHEQUE"
                           ? "border-slate-900 bg-slate-900 text-white"
@@ -539,7 +553,11 @@ const RecordPaymentDrawer = ({ onClose }) => {
                 </div>
                 {createdPayment.paymentMethod !== "CASH" && (
                   <div className="flex justify-between gap-3">
-                    <dt className="text-emerald-700">Transaction / Cheque No.</dt>
+                    <dt className="text-emerald-700">
+                      {createdPayment.paymentMethod === "BANK_TRANSFER"
+                        ? "Transaction ID"
+                        : "Cheque Number"}
+                    </dt>
                     <dd className="font-mono font-medium">
                       {createdPayment.transactionId || "—"}
                     </dd>
