@@ -1,3 +1,4 @@
+import { useState } from "react";
 import {
   Eye,
   Download,
@@ -10,9 +11,45 @@ import {
   User,
   Inbox,
   AlertCircle,
+  LoaderCircle,
 } from "lucide-react";
+import { useDownloadPaymentReceipt } from "../../features/payments/payment.hooks";
 
 const PaymentTable = ({ payment = [], isLoading, isError, onView  }) => {
+  const [downloadError, setDownloadError] = useState("");
+  const {
+    mutateAsync: downloadPaymentReceipt,
+    isPending: isDownloading,
+    variables: downloadingPaymentId,
+  } = useDownloadPaymentReceipt();
+
+  const handleDownloadReceipt = async (paymentId) => {
+    setDownloadError("");
+
+    try {
+      const { blob, receiptNumber } = await downloadPaymentReceipt(paymentId);
+
+      if (!blob || blob.size === 0) {
+        throw new Error("Received an empty receipt file.");
+      }
+
+      const url = window.URL.createObjectURL(blob);
+      const link = document.createElement("a");
+
+      link.href = url;
+      link.download = `${receiptNumber || "receipt"}.pdf`;
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
+      window.URL.revokeObjectURL(url);
+    } catch (error) {
+      setDownloadError(
+        error.response?.data?.message ||
+          "Could not download the receipt. Please try again.",
+      );
+    }
+  };
+
   // Status badge र Icon dynamic बनाउने
   const renderStatus = (status = "") => {
     switch (status.toLowerCase()) {
@@ -83,6 +120,11 @@ const PaymentTable = ({ payment = [], isLoading, isError, onView  }) => {
 
   return (
     <div className="w-full overflow-hidden rounded-2xl border border-slate-200/80 bg-white shadow-xs">
+      {downloadError && (
+        <p className="border-b border-rose-100 bg-rose-50 px-6 py-3 text-sm text-rose-700" role="alert">
+          {downloadError}
+        </p>
+      )}
       <div className="overflow-x-auto">
         <table className="w-full min-w-180 border-collapse text-left text-sm">
           <thead>
@@ -185,6 +227,10 @@ const PaymentTable = ({ payment = [], isLoading, isError, onView  }) => {
                 const admissionNo =
                   item.studentFeeId?.studentId?.admissionNumber || "N/A";
                 const transactionId = item.transactionId ?? "";
+                const canDownloadReceipt =
+                  item.paymentStatus?.toUpperCase() === "SUCCESS";
+                const isDownloadingThisReceipt =
+                  isDownloading && downloadingPaymentId === item._id;
 
                 return (
                   <tr
@@ -265,10 +311,25 @@ const PaymentTable = ({ payment = [], isLoading, isError, onView  }) => {
                         </button>
                         <button
                           type="button"
-                          title="Download Receipt"
-                          className="rounded-lg p-2 text-slate-400 hover:bg-slate-100 hover:text-emerald-600 transition-all cursor-pointer"
+                          title={
+                            canDownloadReceipt
+                              ? "Download Receipt"
+                              : "Receipts are available for successful payments only"
+                          }
+                          disabled={!canDownloadReceipt || isDownloading}
+                          onClick={() => handleDownloadReceipt(item._id)}
+                          aria-label={`Download receipt for ${studentName}`}
+                          className={`rounded-lg p-2 transition-all ${
+                            canDownloadReceipt && !isDownloading
+                              ? "cursor-pointer text-slate-400 hover:bg-slate-100 hover:text-emerald-600"
+                              : "cursor-not-allowed text-slate-300"
+                          }`}
                         >
-                          <Download className="h-4 w-4" />
+                          {isDownloadingThisReceipt ? (
+                            <LoaderCircle className="h-4 w-4 animate-spin" />
+                          ) : (
+                            <Download className="h-4 w-4" />
+                          )}
                         </button>
                       </div>
                     </td>

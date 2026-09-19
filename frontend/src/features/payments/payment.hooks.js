@@ -69,6 +69,17 @@ export const useDownloadReceiptPdf = () => {
   });
 };
 
+export const useDownloadPaymentReceipt = () => {
+  return useMutation({
+    mutationFn: async (paymentId) => {
+      const receipt = await getReceiptByPaymentId(paymentId);
+      const blob = await downloadReceiptPdf(receipt._id);
+
+      return { blob, receiptNumber: receipt.receiptNumber };
+    },
+  });
+};
+
 export const usePaymentStudentFees = (params = {}) => {
   return useQuery({
     queryKey: ["payment-student-fees", params],
