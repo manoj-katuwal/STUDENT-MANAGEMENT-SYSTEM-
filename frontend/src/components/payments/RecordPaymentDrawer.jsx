@@ -182,29 +182,35 @@ const RecordPaymentDrawer = ({ onClose }) => {
                   </div>
                 )}
                 {/* Selected student preview */}
-                <div className="mt-3 flex items-center gap-3 rounded-xl border border-slate-200 bg-slate-50/70 p-3.5">
-                  <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-slate-900 text-xs font-semibold tracking-wide text-white">
-                    AS
+                {selectedStudentFee && (
+                  <div className="mt-3 flex items-center gap-3 rounded-xl border border-slate-200 bg-slate-50/70 p-3.5">
+                    <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-slate-900 text-xs font-semibold tracking-wide text-white">
+                      {selectedStudentFee.studentId?.name
+                        ?.split(" ")
+                        .filter(Boolean)
+                        .slice(0, 2)
+                        .map((part) => part[0])
+                        .join("")
+                        .toUpperCase() || "S"}
+                    </div>
+                    <div className="min-w-0 flex-1">
+                      <p className="truncate text-sm font-medium text-slate-900">
+                        {selectedStudentFee.studentId?.name ?? "Unknown student"}
+                      </p>
+                      <p className="truncate text-xs text-slate-500">
+                        {selectedStudentFee.feeStructureId?.feeType ?? "Fee"} · ID: {selectedStudentFee.studentId?.admissionNumber ?? "N/A"}
+                      </p>
+                    </div>
+                    <div className="shrink-0 text-right">
+                      <p className="text-[10px] font-semibold uppercase tracking-wider text-slate-400">
+                        Outstanding
+                      </p>
+                      <p className="text-sm font-semibold text-slate-900">
+                        Rs. {outstandingBalance.toLocaleString("en-IN")}
+                      </p>
+                    </div>
                   </div>
-
-                  <div className="min-w-0 flex-1">
-                    <p className="truncate text-sm font-medium text-slate-900">
-                      Aarav Sharma
-                    </p>
-                    <p className="truncate text-xs text-slate-500">
-                      Grade 10 · Section A · ID: STU-2041
-                    </p>
-                  </div>
-
-                  <div className="shrink-0 text-right">
-                    <p className="text-[10px] font-semibold uppercase tracking-wider text-slate-400">
-                      Outstanding
-                    </p>
-                    <p className="text-sm font-semibold text-slate-900">
-                      Rs. 450.00
-                    </p>
-                  </div>
-                </div>
+                )}
               </div>
             </section>
 
@@ -240,7 +246,17 @@ const RecordPaymentDrawer = ({ onClose }) => {
                       id="amount"
                       type="number"
                       inputMode="decimal"
-                      placeholder="0.00"
+                      min="0"
+                      max={selectedStudentFee ? outstandingBalance : undefined}
+                      step="0.01"
+                      value={amount}
+                      onChange={(event) => setAmount(event.target.value)}
+                      placeholder={
+                        selectedStudentFee
+                          ? outstandingBalance.toLocaleString("en-IN")
+                          : "Select a student fee"
+                      }
+                      disabled={!selectedStudentFee}
                       className="h-11 w-full rounded-xl border border-slate-200 bg-white pl-8 pr-3.5 text-sm font-semibold text-slate-900 shadow-sm outline-none transition placeholder:font-normal placeholder:text-slate-400 focus:border-slate-400 focus:ring-4 focus:ring-slate-900/5"
                     />
                   </div>
@@ -248,7 +264,7 @@ const RecordPaymentDrawer = ({ onClose }) => {
                   <p className="mt-1.5 flex items-center justify-between text-xs text-slate-500">
                     <span>Outstanding balance</span>
                     <span className="font-semibold text-slate-700">
-                      Rs. 450.00
+                      Rs. {outstandingBalance.toLocaleString("en-IN")}
                     </span>
                   </p>
                 </div>
