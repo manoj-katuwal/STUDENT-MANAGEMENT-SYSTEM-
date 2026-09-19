@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import {
   X,
   CreditCard,
@@ -18,9 +18,21 @@ const RecordPaymentDrawer = ({ onClose }) => {
   const [studentSearch, setStudentSearch] = useState("");
   const debouncedStudentSearch = useDebounce(studentSearch);
 
-  usePaymentStudentFees({
+  const {
+    data: studentFeeSearch,
+    isLoading: isStudentFeesLoading,
+    isFetching: isStudentFeesFetching,
+    isError: isStudentFeesError,
+  } = usePaymentStudentFees({
     search: debouncedStudentSearch,
+    limit: 10,
   });
+
+  const hasSearchTerm = Boolean(studentSearch.trim());
+  const studentFees = (studentFeeSearch?.studentFees ?? []).filter(
+    (studentFee) =>
+      studentFee.status !== "CANCELLED" && Number(studentFee.dueAmount) > 0,
+  );
   return (
     <div className="fixed inset-0 z-50">
       {/* Backdrop */}
@@ -96,6 +108,70 @@ const RecordPaymentDrawer = ({ onClose }) => {
                 </div>
 
                 {/* Search Results */}
+                {hasSearchTerm && (
+                  <div className="mt-2 overflow-hidden rounded-xl border border-slate-200 bg-white shadow-lg">
+                    {isStudentFeesLoading || isStudentFeesFetching ? (
+                      <div className="space-y-3 p-3.5 animate-pulse">
+                        {[1, 2].map((item) => (
+                          <div key={item} className="flex items-center gap-3">
+                            <div className="h-9 w-9 rounded-full bg-slate-200" />
+                            <div className="flex-1 space-y-2">
+                              <div className="h-3 w-1/3 rounded bg-slate-200" />
+                              <div className="h-2.5 w-2/3 rounded bg-slate-100" />
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    ) : isStudentFeesError ? (
+                      <p className="px-3.5 py-4 text-center text-xs text-rose-600">
+                        Could not load matching student fees. Please try again.
+                      </p>
+                    ) : studentFees.length === 0 ? (
+                      <p className="px-3.5 py-4 text-center text-xs text-slate-500">
+                        No outstanding student fees found for “{studentSearch.trim()}”.
+                      </p>
+                    ) : (
+                      studentFees.map((studentFee, index) => {
+                        const student = studentFee.studentId;
+                        const name = student?.name ?? "Unknown student";
+                        const initials = name
+                          .split(" ")
+                          .filter(Boolean)
+                          .slice(0, 2)
+                          .map((part) => part[0])
+                          .join("")
+                          .toUpperCase();
+
+                        return (
+                          <button
+                            key={studentFee._id}
+                            type="button"
+                            className={`flex w-full items-center gap-3 px-3.5 py-3 text-left transition hover:bg-slate-50 ${
+                              index > 0 ? "border-t border-slate-100" : ""
+                            }`}
+                          >
+                            <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-slate-900 text-xs font-semibold text-white">
+                              {initials || "S"}
+                            </div>
+                            <div className="min-w-0 flex-1">
+                              <p className="truncate text-sm font-medium text-slate-900">{name}</p>
+                              <p className="truncate text-xs text-slate-500">
+                                ID: {student?.admissionNumber ?? "N/A"} · {studentFee.feeStructureId?.feeType ?? "Fee"}
+                              </p>
+                            </div>
+                            <div className="shrink-0 text-right">
+                              <p className="text-[10px] font-semibold uppercase tracking-wider text-slate-400">Due</p>
+                              <p className="text-sm font-semibold text-slate-900">
+                                Rs. {Number(studentFee.dueAmount ?? 0).toLocaleString("en-IN")}
+                              </p>
+                            </div>
+                          </button>
+                        );
+                      })
+                    )}
+                  </div>
+                )}
+                {Boolean(import.meta.env.VITE_SHOW_MOCK_SEARCH_RESULTS) && (
                 <div className="mt-2 overflow-hidden rounded-xl border border-slate-200 bg-white shadow-lg">
                   <button
                     type="button"
@@ -151,6 +227,7 @@ const RecordPaymentDrawer = ({ onClose }) => {
                     </div>
                   </button>
                 </div>
+                )}
 
                 {/* Selected student preview */}
                 <div className="mt-3 flex items-center gap-3 rounded-xl border border-slate-200 bg-slate-50/70 p-3.5">

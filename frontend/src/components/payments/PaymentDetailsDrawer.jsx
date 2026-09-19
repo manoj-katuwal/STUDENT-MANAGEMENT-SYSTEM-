@@ -1,4 +1,4 @@
-import React from "react";
+import { useEffect } from "react";
 import {
   X,
   User,
@@ -14,7 +14,6 @@ import {
   RefreshCw,
   Download,
   CreditCard,
-  CloudSnow,
 } from "lucide-react";
 import {
   useDownloadReceiptPdf,
