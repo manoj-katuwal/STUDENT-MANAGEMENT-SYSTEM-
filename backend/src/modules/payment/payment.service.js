@@ -176,6 +176,13 @@ export const createOfflinePaymentService = async (paymentData, performedBy) => {
     };
   } catch (error) {
     await session.abortTransaction();
+
+    // The pre-insert lookup provides a helpful error in normal use, while the
+    // unique index remains the final guard for concurrent submissions.
+    if (error?.code === 11000 && error?.keyPattern?.transactionId) {
+      throw new AppError("Transaction ID already exists", 409);
+    }
+
     throw error;
   } finally {
     await session.endSession();
