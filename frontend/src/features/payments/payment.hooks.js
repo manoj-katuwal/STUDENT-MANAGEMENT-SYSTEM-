@@ -73,6 +73,6 @@ export const usePaymentStudentFees = (params = {}) => {
   return useQuery({
     queryKey: ["payment-student-fees", params],
     queryFn: () => getStudentFees(params),
-    enabled: Boolean(params.search?.trim()),
+    enabled: params.search?.trim().length >= 2,
   });
 };

@@ -17,7 +17,7 @@ const PaymentsPage = () => {
   const [paymentType, setPaymentType] = useState("");
   const [page, setPage] = useState(1);
   const [selectedPaymentId, setSelectedPaymentId] = useState(null);
-  const [isRecordPaymentOpen , setIsRecordPaymentOpen] = useState(false);
+  const [isRecordPaymentOpen, setIsRecordPaymentOpen] = useState(false);
 
   const debouncedSearch = useDebounce(search, 700);
   const { data, isLoading, isError } = usePayments({
@@ -48,8 +48,6 @@ const PaymentsPage = () => {
     setPage(1);
   };
 
-  console.log("Payments:", data);
-  console.log("Pagination:", data?.pagination);
   return (
     <div className="min-h-full p-6 lg:p-8 space-y-6">
       <PaymentContextBar />
@@ -62,8 +60,8 @@ const PaymentsPage = () => {
         onPaymentMethodChange={handlePaymentMethodChange}
         paymentStatus={paymentStatus}
         onPaymentStatusChange={handlePaymentStatusChange}
-        paymentType={handlePaymentTypeChange}
-        onPaymentTypeChange={setPaymentType}
+        paymentType={paymentType}
+        onPaymentTypeChange={handlePaymentTypeChange}
         onReset={() => {
           setSearch("");
           setPaymentMethod("");

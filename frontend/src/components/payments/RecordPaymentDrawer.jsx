@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import {
   X,
   CreditCard,
@@ -16,6 +16,8 @@ import {
   useCreateOfflinePayment,
   usePaymentStudentFees,
 } from "../../features/payments/payment.hooks";
+
+const AMOUNT_INPUT_PATTERN = /^\d*(?:\.\d{0,2})?$/;
 
 const getPaymentErrorMessage = (error) => {
   const status = error.response?.status;
@@ -85,21 +87,50 @@ const RecordPaymentDrawer = ({ onClose }) => {
     limit: 10,
   });
 
-  const hasSearchTerm = Boolean(studentSearch.trim());
+  const hasSearchTerm = studentSearch.trim().length >= 2;
   const studentFees = (studentFeeSearch?.studentFees ?? []).filter(
     (studentFee) =>
       studentFee.status !== "CANCELLED" && Number(studentFee.dueAmount) > 0,
   );
   const outstandingBalance = Number(selectedStudentFee?.dueAmount ?? 0);
+  const amountValue = Number(amount);
+  const isAmountFormatValid =
+    amount.trim() !== "" && AMOUNT_INPUT_PATTERN.test(amount);
   const isAmountValid =
-    amount.trim() !== "" &&
-    Number(amount) > 0 &&
-    Number(amount) <= (selectedStudentFee?.dueAmount ?? 0);
+    isAmountFormatValid &&
+    Number.isFinite(amountValue) &&
+    amountValue > 0 &&
+    amountValue <= (selectedStudentFee?.dueAmount ?? 0);
+  const amountError =
+    amount && !isAmountFormatValid
+      ? "Enter a valid amount with up to two decimal places."
+      : amount && !Number.isFinite(amountValue)
+        ? "Enter a valid amount."
+        : amount && amountValue <= 0
+          ? "Amount must be greater than zero."
+        : amount && amountValue > outstandingBalance
+          ? "Amount cannot exceed the outstanding balance."
+          : "";
   const canSubmit =
     Boolean(selectedStudentFee) &&
     isAmountValid &&
     Boolean(paymentMethod) &&
     !createdPayment;
+
+  useEffect(() => {
+    const previousBodyOverflow = document.body.style.overflow;
+    const handleKeyDown = (event) => {
+      if (event.key === "Escape") onClose();
+    };
+
+    document.body.style.overflow = "hidden";
+    window.addEventListener("keydown", handleKeyDown);
+
+    return () => {
+      document.body.style.overflow = previousBodyOverflow;
+      window.removeEventListener("keydown", handleKeyDown);
+    };
+  }, [onClose]);
 
   const selectStudentFee = (studentFee) => {
     setSelectedStudentFee(studentFee);
@@ -112,6 +143,27 @@ const RecordPaymentDrawer = ({ onClose }) => {
   const selectPaymentMethod = (method) => {
     setPaymentMethod(method);
     setReference("");
+  };
+
+  const handleStudentSearchChange = (event) => {
+    const nextSearch = event.target.value;
+
+    setStudentSearch(nextSearch);
+
+    if (selectedStudentFee) {
+      setSelectedStudentFee(null);
+      setAmount("");
+      setSubmitError("");
+      setCreatedPayment(null);
+    }
+  };
+
+  const handleAmountChange = (event) => {
+    const nextAmount = event.target.value;
+
+    if (nextAmount === "" || AMOUNT_INPUT_PATTERN.test(nextAmount)) {
+      setAmount(nextAmount);
+    }
   };
 
   const handleRecordPayment = async () => {
@@ -200,7 +252,7 @@ const RecordPaymentDrawer = ({ onClose }) => {
                     id="student"
                     type="text"
                     value={studentSearch}
-                    onChange={(event) => setStudentSearch(event.target.value)}
+                    onChange={handleStudentSearchChange}
                     placeholder="Search by student name or ID"
                     className="h-11 w-full rounded-xl border border-slate-200 bg-white pl-10 pr-10 text-sm text-slate-900 shadow-sm outline-none transition placeholder:text-slate-400 focus:border-slate-400 focus:ring-4 focus:ring-slate-900/5"
                   />
@@ -208,6 +260,11 @@ const RecordPaymentDrawer = ({ onClose }) => {
                 </div>
 
                 {/* Search Results */}
+                {studentSearch.trim().length === 1 && (
+                  <p className="mt-2 text-xs text-slate-400">
+                    Enter at least 2 characters to search.
+                  </p>
+                )}
                 {hasSearchTerm && (
                   <div className="mt-2 overflow-hidden rounded-xl border border-slate-200 bg-white shadow-lg">
                     {isStudentFeesLoading || isStudentFeesFetching ? (
@@ -340,19 +397,22 @@ const RecordPaymentDrawer = ({ onClose }) => {
                     </span>
                     <input
                       id="amount"
-                      type="number"
+                      type="text"
                       inputMode="decimal"
-                      min="0"
-                      max={selectedStudentFee ? outstandingBalance : undefined}
-                      step="0.01"
+                      pattern="[0-9]*[.]?[0-9]{0,2}"
+                      autoComplete="off"
                       value={amount}
-                      onChange={(event) => setAmount(event.target.value)}
+                      onChange={handleAmountChange}
                       placeholder={
                         selectedStudentFee
                           ? outstandingBalance.toLocaleString("en-IN")
                           : "Select a student fee"
                       }
                       disabled={!selectedStudentFee}
+                      aria-invalid={Boolean(amountError)}
+                      aria-describedby={
+                        amountError ? "amount-help amount-error" : "amount-help"
+                      }
                       className={`h-11 w-full rounded-xl border bg-white pl-8 pr-3.5 text-sm font-semibold text-slate-900 shadow-sm outline-none transition placeholder:font-normal placeholder:text-slate-400 focus:ring-4 ${
                         amount && !isAmountValid
                           ? "border-rose-300 focus:border-rose-400 focus:ring-rose-500/5"
@@ -361,20 +421,18 @@ const RecordPaymentDrawer = ({ onClose }) => {
                     />
                   </div>
 
-                  <p className="mt-1.5 flex items-center justify-between text-xs text-slate-500">
+                  <p
+                    id="amount-help"
+                    className="mt-1.5 flex items-center justify-between text-xs text-slate-500"
+                  >
                     <span>Outstanding balance</span>
                     <span className="font-semibold text-slate-700">
                       Rs. {outstandingBalance.toLocaleString("en-IN")}
                     </span>
                   </p>
-                  {amount && Number(amount) <= 0 && (
-                    <p className="mt-1.5 text-xs text-rose-500">
-                      Amount must be greater than zero.
-                    </p>
-                  )}
-                  {amount && Number(amount) > outstandingBalance && (
-                    <p className="mt-1.5 text-xs text-rose-500">
-                      Amount cannot exceed the outstanding balance.
+                  {amountError && (
+                    <p id="amount-error" className="mt-1.5 text-xs text-rose-500">
+                      {amountError}
                     </p>
                   )}
                 </div>
@@ -577,7 +635,9 @@ const RecordPaymentDrawer = ({ onClose }) => {
               <p className="text-[11px] font-medium uppercase tracking-wider text-slate-400">
                 Total Amount
               </p>
-              <p className="text-sm font-semibold text-slate-900">Rs. 0.00</p>
+              <p className="text-sm font-semibold text-slate-900">
+                Rs. {Number.isFinite(amountValue) ? amountValue.toLocaleString("en-IN", { minimumFractionDigits: 2, maximumFractionDigits: 2 }) : "0.00"}
+              </p>
             </div>
 
             <div className="flex flex-1 items-center justify-end gap-3">
