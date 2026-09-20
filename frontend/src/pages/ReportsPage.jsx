@@ -1,7 +1,9 @@
+import ReportContextBar from "../components/reports/ReportContextBar";
+
 function ReportsPage() {
   return (
-    <div className="p-10">
-      <h1 className="text-3xl font-bold">Reports — ADMIN & PRINCIPAL</h1>
+    <div className="min-h-full p-6 lg:p-8 space-y-6">
+      <ReportContextBar />
     </div>
   );
 }
