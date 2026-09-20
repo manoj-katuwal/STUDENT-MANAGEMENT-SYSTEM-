@@ -11,6 +11,21 @@ export const getPayments = async (params = {}) => {
   };
 };
 
+export const exportPaymentsCsv = async (params = {}) => {
+  const cleanParams = Object.fromEntries(
+    Object.entries(params).filter(
+      ([, value]) => value !== undefined && value !== null && value !== "",
+    ),
+  );
+
+  const response = await apiClient.get("/payments/export/csv", {
+    params: cleanParams,
+    responseType: "blob",
+  });
+
+  return response.data;
+};
+
 export const getPaymentById = async (paymentId) => {
   const response = await apiClient.get(`/payments/${paymentId}`);
 

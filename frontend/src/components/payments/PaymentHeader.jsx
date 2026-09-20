@@ -1,7 +1,7 @@
 import React from "react";
 import { Download, Plus } from "lucide-react";
 
-const PaymentHeader = ({onRecordPayment}) => {
+const PaymentHeader = ({ onRecordPayment, onExport, isExporting = false }) => {
   return (
     <div className="bg-white border border-slate-200 rounded-xl shadow-sm px-5 py-4 md:px-6 md:py-5">
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
@@ -25,10 +25,12 @@ const PaymentHeader = ({onRecordPayment}) => {
         <div className="flex items-center gap-2.5 shrink-0">
           <button
             type="button"
+            onClick={onExport}
+            disabled={isExporting}
             className="inline-flex items-center gap-1.5 px-3.5 py-2 border border-slate-200 bg-white hover:bg-slate-50 active:bg-slate-100 text-slate-700 text-sm font-medium rounded-lg shadow-sm transition-colors cursor-pointer"
           >
             <Download className="w-3.5 h-3.5 text-slate-500" />
-            <span>Export CSV</span>
+            <span>{isExporting ? "Exporting..." : "Export CSV"}</span>
           </button>
 
           <button

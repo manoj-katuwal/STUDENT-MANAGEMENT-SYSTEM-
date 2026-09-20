@@ -4,7 +4,10 @@ import PaymentContextBar from "../components/payments/PaymentContextBar";
 import PaymentStats from "../components/payments/PaymentStats";
 import PaymentFilters from "../components/payments/PaymentFilters";
 import PaymentTable from "../components/payments/PaymentTable";
-import { usePayments } from "../features/payments/payment.hooks";
+import {
+  useExportPaymentsCsv,
+  usePayments,
+} from "../features/payments/payment.hooks";
 import PaymentDetailsDrawer from "../components/payments/PaymentDetailsDrawer";
 import useDebounce from "../hooks/useDebounce";
 import PaymentPagination from "../components/payments/PaymentPagination";
@@ -18,6 +21,7 @@ const PaymentsPage = () => {
   const [page, setPage] = useState(1);
   const [selectedPaymentId, setSelectedPaymentId] = useState(null);
   const [isRecordPaymentOpen, setIsRecordPaymentOpen] = useState(false);
+  const exportPaymentsMutation = useExportPaymentsCsv();
 
   const debouncedSearch = useDebounce(search, 700);
   const { data, isLoading, isError } = usePayments({
@@ -28,6 +32,24 @@ const PaymentsPage = () => {
     paymentStatus,
     paymentType,
   });
+
+  const handleExportCsv = async () => {
+    const blob = await exportPaymentsMutation.mutateAsync({
+      search: debouncedSearch,
+      paymentMethod,
+      paymentStatus,
+      paymentType,
+    });
+
+    const url = window.URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = "payments.csv";
+    document.body.appendChild(link);
+    link.click();
+    link.remove();
+    window.URL.revokeObjectURL(url);
+  };
 
   const handleSearchChange = (value) => {
     setSearch(value);
@@ -51,7 +73,11 @@ const PaymentsPage = () => {
   return (
     <div className="min-h-full p-6 lg:p-8 space-y-6">
       <PaymentContextBar />
-      <PaymentHeader onRecordPayment={() => setIsRecordPaymentOpen(true)} />
+      <PaymentHeader
+        onRecordPayment={() => setIsRecordPaymentOpen(true)}
+        onExport={handleExportCsv}
+        isExporting={exportPaymentsMutation.isPending}
+      />
       <PaymentStats />
       <PaymentFilters
         search={search}

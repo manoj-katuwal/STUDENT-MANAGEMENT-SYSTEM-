@@ -2,6 +2,7 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import {
   createOfflinePayment,
   downloadReceiptPdf,
+  exportPaymentsCsv,
   getPaymentStats,
   getReceiptByPaymentId,
 } from "./payment.api";
@@ -15,6 +16,12 @@ export const usePayments = (params = {}) => {
     queryKey: ["payments", params],
     queryFn: () => getPayments(params),
     placeholderData: (previousData) => previousData,
+  });
+};
+
+export const useExportPaymentsCsv = () => {
+  return useMutation({
+    mutationFn: exportPaymentsCsv,
   });
 };
 
