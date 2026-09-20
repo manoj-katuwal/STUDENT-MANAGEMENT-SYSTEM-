@@ -6,6 +6,7 @@ import {
   getPaymentByIdController,
   getStudentFeePaymentHistoryController,
   getPaymentsController,
+  getPaymentsCsvController,
   getPaymentStatsController,
 } from "./payment.controller.js";
 import {
@@ -34,6 +35,13 @@ router.get(
 );
 
 router.get("/stats", getPaymentStatsController);
+
+router.get(
+  "/export/csv",
+  authenticate,
+  authorize("ADMIN", "ACCOUNTANT"),
+  getPaymentsCsvController,
+);
 
 router.get(
   "/:paymentId",

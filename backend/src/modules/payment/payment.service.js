@@ -270,6 +270,61 @@ export const getPaymentsService = async ({
   };
 };
 
+const escapeCsvValue = (value) => {
+  const text = value == null ? "" : String(value);
+  return `"${text.replaceAll('"', '""')}"`;
+};
+
+export const getPaymentsCsvService = async ({
+  paymentMethod,
+  paymentType,
+  paymentStatus,
+  gateway,
+  search,
+}) => {
+  const filter = {};
+
+  if (paymentMethod) filter.paymentMethod = paymentMethod;
+  if (paymentType) filter.paymentType = paymentType;
+  if (paymentStatus) filter.paymentStatus = paymentStatus;
+  if (gateway) filter.gateway = gateway;
+
+  const payments = await findPayments({
+    filter,
+    search,
+    limit: 0,
+  });
+
+  const rows = [
+    [
+      "Payment ID",
+      "Student Name",
+      "Admission Number",
+      "Transaction ID",
+      "Amount",
+      "Payment Method",
+      "Payment Type",
+      "Payment Status",
+      "Gateway",
+      "Paid At",
+    ],
+    ...payments.map((payment) => [
+      payment._id,
+      payment.studentFeeId?.studentId?.name,
+      payment.studentFeeId?.studentId?.admissionNumber,
+      payment.transactionId,
+      payment.amount,
+      payment.paymentMethod,
+      payment.paymentType,
+      payment.paymentStatus,
+      payment.gateway,
+      payment.paidAt ?? payment.createdAt,
+    ]),
+  ];
+
+  return rows.map((row) => row.map(escapeCsvValue).join(",")).join("\r\n");
+};
+
 export const getPaymentStatsService = async () => {
   const [stats] = await getPaymentStats();
 

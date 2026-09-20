@@ -5,6 +5,7 @@ import {
   getPaymentByIdService,
   getPaymentsService,
   getPaymentStatsService,
+  getPaymentsCsvService,
   getStudentFeePaymentHistoryService,
 } from "./payment.service.js";
 
@@ -76,6 +77,21 @@ export const getPaymentsController = asyncHandler(async (req, res) => {
     data: result.payments,
     meta: result.meta,
   });
+});
+
+export const getPaymentsCsvController = asyncHandler(async (req, res) => {
+  const csv = await getPaymentsCsvService({
+    paymentMethod: req.query.paymentMethod,
+    paymentType: req.query.paymentType,
+    paymentStatus: req.query.paymentStatus,
+    gateway: req.query.gateway,
+    search: req.query.search,
+  });
+
+  res.setHeader("Content-Type", "text/csv; charset=utf-8");
+  res.setHeader("Content-Disposition", 'attachment; filename="payments.csv"');
+
+  return res.status(200).send(csv);
 });
 
 export const getPaymentStatsController = asyncHandler(async (req, res) => {
