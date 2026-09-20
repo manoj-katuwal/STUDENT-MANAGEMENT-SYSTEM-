@@ -8,33 +8,38 @@ import {
   getStudentDueList,
   getTodayCollection,
 } from "./reports.repository.js";
+import {
+  findAcademicYearById,
+  findCurrentAcademicYear,
+} from "../academicYear/academicYear.repository.js";
+import AppError from "../../shared/utils/error/AppError.js";
 
-export const getTodayCollectionService = async () => {
-  const totalCollection = await getTodayCollection();
-
-  return {
-    totalCollection,
-  };
-};
-
-export const getMonthlyCollectionService = async () => {
-  const totalCollection = await getMonthlyCollection();
+export const getTodayCollectionService = async (academicYearId) => {
+  const totalCollection = await getTodayCollection(academicYearId);
 
   return {
     totalCollection,
   };
 };
 
-export const getPendingFeeTotalService = async () => {
-  const totalPending = await getPendingFeeTotal();
+export const getMonthlyCollectionService = async (academicYearId) => {
+  const totalCollection = await getMonthlyCollection(academicYearId);
+
+  return {
+    totalCollection,
+  };
+};
+
+export const getPendingFeeTotalService = async (academicYearId) => {
+  const totalPending = await getPendingFeeTotal(academicYearId);
 
   return {
     totalPending,
   };
 };
 
-export const getOverdueFeeTotalService = async () => {
-  const totalOverdue = await getOverdueFeeTotal();
+export const getOverdueFeeTotalService = async (academicYearId) => {
+  const totalOverdue = await getOverdueFeeTotal(academicYearId);
 
   return {
     totalOverdue,
@@ -50,27 +55,32 @@ export const getStudentDueListService = async ({ page = 1, limit = 10 }) => {
   return data;
 };
 
-export const getPaymentMethodCollectionService = async () => {
-  const data = await getPaymentMethodCollection();
-
-  console.log("2. Service completed:", data);
-
-  return data;
+export const getPaymentMethodCollectionService = async (academicYearId) => {
+  return await getPaymentMethodCollection(academicYearId);
 };
 
-export const getRecentPaymentsService = async (limit = 5) => {
-  const payments = await getRecentPayments(Number(limit));
+export const getRecentPaymentsService = async (limit = 5, academicYearId) => {
+  const payments = await getRecentPayments(Number(limit), academicYearId);
 
   return payments;
 };
 
-export const getAcademicYearCollectionSummaryService = async () => {
-  const data = await getAcademicYearCollectionSummary();
+export const getAcademicYearCollectionSummaryService = async (academicYearId) => {
+  const data = await getAcademicYearCollectionSummary(academicYearId);
 
   return data;
 };
 
-export const getDashboardSummaryService = async () => {
+export const getDashboardSummaryService = async (academicYearId) => {
+  const academicYear = academicYearId
+    ? await findAcademicYearById(academicYearId)
+    : await findCurrentAcademicYear();
+
+  if (academicYearId && !academicYear) {
+    throw new AppError("Academic year not found", 404);
+  }
+
+  const selectedAcademicYearId = academicYear?._id;
   const [
     todayCollection,
     monthlyCollection,
@@ -80,13 +90,13 @@ export const getDashboardSummaryService = async () => {
     recentPayments,
     academicYearSummary,
   ] = await Promise.all([
-    getTodayCollectionService(),
-    getMonthlyCollectionService(),
-    getPendingFeeTotalService(),
-    getOverdueFeeTotalService(),
-    getPaymentMethodCollectionService(),
-    getRecentPaymentsService(),
-    getAcademicYearCollectionSummaryService(),
+    getTodayCollectionService(selectedAcademicYearId),
+    getMonthlyCollectionService(selectedAcademicYearId),
+    getPendingFeeTotalService(selectedAcademicYearId),
+    getOverdueFeeTotalService(selectedAcademicYearId),
+    getPaymentMethodCollectionService(selectedAcademicYearId),
+    getRecentPaymentsService(5, selectedAcademicYearId),
+    getAcademicYearCollectionSummaryService(selectedAcademicYearId),
   ]);
 
   return {
@@ -97,5 +107,6 @@ export const getDashboardSummaryService = async () => {
     paymentMethods,
     recentPayments,
     academicYearSummary,
+    academicYear,
   };
 };

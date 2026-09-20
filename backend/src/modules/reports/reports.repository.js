@@ -2,7 +2,24 @@ import Payment from "../payment/payment.model.js";
 import StudentFee from "../studentFee/studentFee.model.js";
 import Student from "../students/student.model.js";
 
-export const getTodayCollection = async () => {
+const academicYearPaymentStages = (academicYearId) => {
+  if (!academicYearId) return [];
+
+  return [
+    {
+      $lookup: {
+        from: "studentfees",
+        localField: "studentFeeId",
+        foreignField: "_id",
+        as: "studentFee",
+      },
+    },
+    { $unwind: "$studentFee" },
+    { $match: { "studentFee.academicYearId": academicYearId } },
+  ];
+};
+
+export const getTodayCollection = async (academicYearId) => {
   const startOfDay = new Date();
   startOfDay.setHours(0, 0, 0, 0);
 
@@ -19,6 +36,7 @@ export const getTodayCollection = async () => {
         },
       },
     },
+    ...academicYearPaymentStages(academicYearId),
     {
       $group: {
         _id: null,
@@ -32,7 +50,7 @@ export const getTodayCollection = async () => {
   return result[0]?.totalCollection || 0;
 };
 
-export const getMonthlyCollection = async () => {
+export const getMonthlyCollection = async (academicYearId) => {
   const startOfMonth = new Date();
   startOfMonth.setDate(1);
   startOfMonth.setHours(0, 0, 0, 0);
@@ -52,6 +70,7 @@ export const getMonthlyCollection = async () => {
         },
       },
     },
+    ...academicYearPaymentStages(academicYearId),
     {
       $group: {
         _id: null,
@@ -65,13 +84,14 @@ export const getMonthlyCollection = async () => {
   return result[0]?.totalCollection || 0;
 };
 
-export const getPendingFeeTotal = async () => {
+export const getPendingFeeTotal = async (academicYearId) => {
   const result = await StudentFee.aggregate([
     {
       $match: {
         dueAmount: {
           $gt: 0,
         },
+        ...(academicYearId && { academicYearId }),
       },
     },
     {
@@ -87,7 +107,7 @@ export const getPendingFeeTotal = async () => {
   return result[0]?.totalPending || 0;
 };
 
-export const getOverdueFeeTotal = async () => {
+export const getOverdueFeeTotal = async (academicYearId) => {
   const today = new Date();
 
   const result = await StudentFee.aggregate([
@@ -99,6 +119,7 @@ export const getOverdueFeeTotal = async () => {
         dueDate: {
           $lt: today,
         },
+        ...(academicYearId && { academicYearId }),
       },
     },
     {
@@ -171,13 +192,14 @@ export const getStudentDueList = async ({ page = 1, limit = 10 }) => {
   return result;
 };
 
-export const getPaymentMethodCollection = async () => {
+export const getPaymentMethodCollection = async (academicYearId) => {
   return await Payment.aggregate([
     {
       $match: {
         paymentStatus: "SUCCESS",
       },
     },
+    ...academicYearPaymentStages(academicYearId),
     {
       $group: {
         _id: "$paymentMethod",
@@ -196,9 +218,14 @@ export const getPaymentMethodCollection = async () => {
   ]);
 };
 
-export const getRecentPayments = async (limit = 5) => {
+export const getRecentPayments = async (limit = 5, academicYearId) => {
+  const studentFeeIds = academicYearId
+    ? await StudentFee.find({ academicYearId }).distinct("_id")
+    : null;
+
   return await Payment.find({
     paymentStatus: "SUCCESS",
+    ...(studentFeeIds && { studentFeeId: { $in: studentFeeIds } }),
   })
     .sort({ paidAt: -1 })
     .limit(limit)
@@ -213,7 +240,7 @@ export const getRecentPayments = async (limit = 5) => {
     .lean();
 };
 
-export const getAcademicYearCollectionSummary = async () => {
+export const getAcademicYearCollectionSummary = async (academicYearId) => {
   return await Payment.aggregate([
     {
       $match: {
@@ -233,6 +260,9 @@ export const getAcademicYearCollectionSummary = async () => {
     {
       $unwind: "$studentFee",
     },
+    ...(academicYearId
+      ? [{ $match: { "studentFee.academicYearId": academicYearId } }]
+      : []),
 
     {
       $group: {

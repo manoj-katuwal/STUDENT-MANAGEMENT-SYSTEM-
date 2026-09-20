@@ -42,7 +42,12 @@ router.get(
   getAcademicYearByIdController,
 );
 
-router.get("/", authenticate, authorize("ADMIN"), getAcademicYearsController);
+router.get(
+  "/",
+  authenticate,
+  authorize("ADMIN", "ACCOUNTANT", "PRINCIPAL"),
+  getAcademicYearsController,
+);
 
 router.patch(
   "/:academicYearId",

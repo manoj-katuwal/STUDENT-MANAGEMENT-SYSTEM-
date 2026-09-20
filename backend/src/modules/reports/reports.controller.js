@@ -110,7 +110,7 @@ export const getAcademicYearCollectionSummary = asyncHandler(
 );
 
 export const getDashboardSummary = asyncHandler(async (req, res) => {
-  const data = await getDashboardSummaryService();
+  const data = await getDashboardSummaryService(req.query.academicYearId);
 
   return successResponse({
     res,
