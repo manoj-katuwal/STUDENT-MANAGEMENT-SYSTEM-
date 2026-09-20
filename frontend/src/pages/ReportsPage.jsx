@@ -8,11 +8,6 @@ import { useDashboardSummary } from "../features/reports/report.hooks";
 function ReportsPage() {
   const { data, isLoading, isError, refetch, isFetching } =
     useDashboardSummary();
-  console.log(data);
-  console.log("Payment methods:", data?.paymentMethods);
-  console.log("Academic year summary:", data?.academicYearSummary);
-
-  const paymentMethodData = data?.paymentMethods ?? [];
   return (
     <div className="min-h-full p-6 lg:p-8 space-y-6">
       <ReportContextBar />
@@ -25,17 +20,10 @@ function ReportsPage() {
         isError={isError}
       />
 
-      <div>
-        {paymentMethodData.map((item) => (
-          <div key={item.paymentMethod}>
-            {item.paymentMethod}: Rs.{" "}
-            {Number(item.totalCollection).toLocaleString("en-IN")}
-          </div>
-        ))}
+      <div className="grid grid-cols-1 gap-6 xl:grid-cols-2">
+        <PaymentMethodChart data={data?.paymentMethods ?? []} isLoading={isLoading} />
+        <AcademicYearChart data={data?.academicYearSummary ?? []} isLoading={isLoading} />
       </div>
-
-      <PaymentMethodChart data={data?.paymentMethods ?? []} />
-      <AcademicYearChart data={data?.academicYearSummary ?? []} />
     </div>
   );
 }

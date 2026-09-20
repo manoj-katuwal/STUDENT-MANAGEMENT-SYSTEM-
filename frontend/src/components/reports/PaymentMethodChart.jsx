@@ -1,18 +1,7 @@
-import React from "react";
-import {
-  BarChart,
-  Bar,
-  CartesianGrid,
-  ResponsiveContainer,
-  Tooltip,
-  XAxis,
-  YAxis,
-  Cell,
-} from "recharts";
+import { Cell, Pie, PieChart, ResponsiveContainer, Tooltip } from "recharts";
 import { CreditCard, Wallet } from "lucide-react";
 import { formatCurrency } from "../../utils/formatCurrency";
 
-// Custom Tooltip component for a polished hover UI
 const CustomTooltip = ({ active, payload }) => {
   if (active && payload && payload.length) {
     const data = payload[0].payload;
@@ -36,10 +25,12 @@ const CustomTooltip = ({ active, payload }) => {
 };
 
 const PaymentMethodChart = ({ data = [], isLoading = false }) => {
-  // Color palette for individual bars
   const colors = ["#0284C7", "#0D9488", "#6366F1", "#8B5CF6", "#F59E0B"];
+  const totalCollection = data.reduce(
+    (total, item) => total + Number(item.totalCollection ?? 0),
+    0,
+  );
 
-  // Skeleton loading state
   if (isLoading) {
     return (
       <div className="rounded-2xl border border-slate-100 bg-white p-6 shadow-xs animate-pulse">
@@ -57,7 +48,6 @@ const PaymentMethodChart = ({ data = [], isLoading = false }) => {
 
   return (
     <div className="rounded-2xl border border-slate-100 bg-white p-6 shadow-xs transition-all duration-200 hover:shadow-md">
-      {/* Header */}
       <div className="mb-6 flex items-start justify-between gap-4">
         <div>
           <h2 className="text-base font-bold tracking-tight text-slate-900">
@@ -72,7 +62,6 @@ const PaymentMethodChart = ({ data = [], isLoading = false }) => {
         </div>
       </div>
 
-      {/* Chart Area */}
       <div className="h-72 w-full">
         {data.length === 0 ? (
           <div className="flex h-full flex-col items-center justify-center rounded-xl border border-dashed border-slate-200 bg-slate-50/50">
@@ -83,53 +72,63 @@ const PaymentMethodChart = ({ data = [], isLoading = false }) => {
           </div>
         ) : (
           <ResponsiveContainer width="100%" height="100%">
-            <BarChart
-              data={data}
-              margin={{ top: 10, right: 10, left: -20, bottom: 0 }}
-            >
-              <CartesianGrid
-                vertical={false}
-                strokeDasharray="3 3"
-                stroke="#F1F5F9"
-              />
-
-              <XAxis
-                dataKey="paymentMethod"
-                axisLine={false}
-                tickLine={false}
-                tick={{ fill: "#64748B", fontSize: 12, fontWeight: 500 }}
-                dy={8}
-              />
-
-              <YAxis
-                axisLine={false}
-                tickLine={false}
-                tick={{ fill: "#94A3B8", fontSize: 11 }}
-                tickFormatter={(val) => (val >= 1000 ? `${val / 1000}k` : val)}
-              />
-
+            <PieChart>
               <Tooltip
                 content={<CustomTooltip />}
-                cursor={{ fill: "#F8FAFC", radius: 8 }}
               />
-
-              <Bar
+              <Pie
                 dataKey="totalCollection"
-                name="Collection"
-                radius={[8, 8, 0, 0]}
-                barSize={38}
+                data={data}
+                nameKey="paymentMethod"
+                cx="50%"
+                cy="50%"
+                innerRadius="58%"
+                outerRadius="82%"
+                paddingAngle={3}
+                stroke="none"
               >
-                {data.map((entry, index) => (
+                {data.map((_, index) => (
                   <Cell
                     key={`cell-${index}`}
                     fill={colors[index % colors.length]}
                   />
                 ))}
-              </Bar>
-            </BarChart>
+              </Pie>
+              <text
+                x="50%"
+                y="47%"
+                textAnchor="middle"
+                className="fill-slate-400 text-xs font-medium"
+              >
+                Total collection
+              </text>
+              <text
+                x="50%"
+                y="56%"
+                textAnchor="middle"
+                className="fill-slate-900 text-sm font-bold"
+              >
+                {formatCurrency(totalCollection)}
+              </text>
+            </PieChart>
           </ResponsiveContainer>
         )}
       </div>
+      {data.length > 0 && (
+        <div className="mt-2 grid grid-cols-2 gap-x-4 gap-y-2 border-t border-slate-100 pt-4 sm:grid-cols-3">
+          {data.map((item, index) => (
+            <div key={item.paymentMethod} className="flex min-w-0 items-center gap-2">
+              <span
+                className="h-2.5 w-2.5 shrink-0 rounded-full"
+                style={{ backgroundColor: colors[index % colors.length] }}
+              />
+              <span className="truncate text-xs font-medium text-slate-600">
+                {item.paymentMethod}
+              </span>
+            </div>
+          ))}
+        </div>
+      )}
     </div>
   );
 };
