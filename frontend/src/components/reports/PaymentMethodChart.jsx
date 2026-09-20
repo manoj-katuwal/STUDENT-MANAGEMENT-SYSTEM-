@@ -33,7 +33,7 @@ const PaymentMethodChart = ({ data = [], isLoading = false }) => {
 
   if (isLoading) {
     return (
-      <div className="h-[380px] w-full animate-pulse rounded-2xl border border-slate-100 bg-slate-50/50 p-6">
+      <div className="h-95 w-full animate-pulse rounded-2xl border border-slate-100 bg-slate-50/50 p-6">
         <div className="flex items-center justify-between">
           <div className="space-y-2">
             <div className="h-5 w-48 rounded-lg bg-slate-200" />
