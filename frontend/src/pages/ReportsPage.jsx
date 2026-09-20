@@ -9,7 +9,6 @@ import { useDashboardSummary } from "../features/reports/report.hooks";
 function ReportsPage() {
   const { data, isLoading, isError, refetch, isFetching } =
     useDashboardSummary();
-    console.log("Recent payments:", data?.recentPayments);
   return (
     <div className="min-h-full p-6 lg:p-8 space-y-6">
       <ReportContextBar />
@@ -33,7 +32,13 @@ function ReportsPage() {
         />
       </div>
 
-      <RecentPayments data={data?.recentPayments ?? []} isLoading={isLoading} />
+      <RecentPayments
+        data={data?.recentPayments ?? []}
+        isLoading={isLoading}
+        isError={isError}
+        onRetry={refetch}
+        isRetrying={isFetching}
+      />
     </div>
   );
 }
