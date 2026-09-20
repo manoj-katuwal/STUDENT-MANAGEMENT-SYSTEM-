@@ -1,5 +1,5 @@
-import { useQuery } from "@tanstack/react-query";
-import { getDashboardSummary } from "./report.api";
+import { useMutation, useQuery } from "@tanstack/react-query";
+import { exportDashboardReportCsv, getDashboardSummary } from "./report.api";
 
 export const useDashboardSummary = (academicYearId) => {
   return useQuery({
@@ -7,3 +7,6 @@ export const useDashboardSummary = (academicYearId) => {
     queryFn: () => getDashboardSummary(academicYearId),
   });
 };
+
+export const useExportDashboardReportCsv = () =>
+  useMutation({ mutationFn: exportDashboardReportCsv });

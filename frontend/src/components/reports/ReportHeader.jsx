@@ -6,6 +6,8 @@ const ReportsHeader = ({
   academicYears = [],
   selectedAcademicYearId,
   onAcademicYearChange,
+  onExport,
+  isExporting = false,
   isLoading = false,
 }) => {
   const [isOpen, setIsOpen] = useState(false);
@@ -108,10 +110,12 @@ const ReportsHeader = ({
         {/* Export Button (Single-line to prevent squishing) */}
         <button
           type="button"
+          onClick={onExport}
+          disabled={isExporting || isLoading}
           className="flex items-center gap-2 bg-[#1B2537] hover:bg-[#111827] text-white px-4 py-3 rounded-xl font-medium text-xs shadow-xs transition-colors cursor-pointer whitespace-nowrap"
         >
-          <Download className="w-4 h-4 shrink-0" />
-          <span className="font-semibold tracking-wide">Export Report</span>
+          <Download className={`w-4 h-4 shrink-0 ${isExporting ? "animate-bounce" : ""}`} />
+          <span className="font-semibold tracking-wide">{isExporting ? "Exporting..." : "Export Report"}</span>
         </button>
       </div>
     </div>

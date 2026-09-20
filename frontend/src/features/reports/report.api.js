@@ -7,3 +7,12 @@ export const getDashboardSummary = async (academicYearId) => {
 
   return response.data.data;
 };
+
+export const exportDashboardReportCsv = async (academicYearId) => {
+  const response = await apiClient.get("/reports/export/csv", {
+    params: academicYearId ? { academicYearId } : {},
+    responseType: "blob",
+  });
+
+  return response.data;
+};

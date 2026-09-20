@@ -5,7 +5,10 @@ import RecentPayments from "../components/reports/RecentPayments";
 import ReportContextBar from "../components/reports/ReportContextBar";
 import ReportHeader from "../components/reports/ReportHeader";
 import ReportSummaryCards from "../components/reports/ReportSummaryCards";
-import { useDashboardSummary } from "../features/reports/report.hooks";
+import {
+  useDashboardSummary,
+  useExportDashboardReportCsv,
+} from "../features/reports/report.hooks";
 import { useAcademicYears } from "../features/academicYear/academicYear.hooks";
 
 function ReportsPage() {
@@ -14,6 +17,18 @@ function ReportsPage() {
     useDashboardSummary(academicYearId || undefined);
   const { data: academicYearsData, isLoading: isAcademicYearsLoading } =
     useAcademicYears({ page: 1, limit: 100 });
+  const exportReportMutation = useExportDashboardReportCsv();
+
+  const handleExport = async () => {
+    const activeAcademicYearId = academicYearId || data?.academicYear?._id;
+    const csv = await exportReportMutation.mutateAsync(activeAcademicYearId);
+    const downloadUrl = URL.createObjectURL(new Blob([csv], { type: "text/csv;charset=utf-8" }));
+    const link = document.createElement("a");
+    link.href = downloadUrl;
+    link.download = `fee-report-${data?.academicYear?.name ?? "academic-year"}.csv`;
+    link.click();
+    URL.revokeObjectURL(downloadUrl);
+  };
 
   return (
     <div className="min-h-full p-6 lg:p-8 space-y-6">
@@ -24,6 +39,8 @@ function ReportsPage() {
         selectedAcademicYearId={academicYearId || data?.academicYear?._id || ""}
         onAcademicYearChange={setAcademicYearId}
         isLoading={isLoading || isAcademicYearsLoading}
+        onExport={handleExport}
+        isExporting={exportReportMutation.isPending}
       />
       <ReportSummaryCards
         data={data}
