@@ -119,3 +119,53 @@ export const getDashboardSummary = asyncHandler(async (req, res) => {
     data,
   });
 });
+
+const escapeCsvValue = (value) => {
+  if (value === null || value === undefined) return "";
+  const stringValue = String(value);
+  return /[",\r\n]/.test(stringValue)
+    ? `"${stringValue.replace(/"/g, '""')}"`
+    : stringValue;
+};
+
+export const exportDashboardReportCsv = asyncHandler(async (req, res) => {
+  const report = await getDashboardSummaryService(req.query.academicYearId);
+  const rows = [
+    ["Report", "Academic Year", report.academicYear?.name ?? "Not configured"],
+    [],
+    ["Summary", "Amount"],
+    ["Today's Collection", report.todayCollection?.totalCollection ?? 0],
+    ["Monthly Collection", report.monthlyCollection?.totalCollection ?? 0],
+    ["Pending Fees", report.pendingFee?.totalPending ?? 0],
+    ["Overdue Fees", report.overdueFee?.totalOverdue ?? 0],
+    [],
+    ["Payment Method", "Collection"],
+    ...report.paymentMethods.map((item) => [
+      item.paymentMethod,
+      item.totalCollection,
+    ]),
+    [],
+    ["Academic Year", "Collection"],
+    ...report.academicYearSummary.map((item) => [
+      item.academicYear?.name,
+      item.totalCollection,
+    ]),
+    [],
+    ["Recent Payments"],
+    ["Student", "Admission No.", "Amount", "Method", "Paid At", "Status"],
+    ...report.recentPayments.map((payment) => [
+      payment.studentFeeId?.studentId?.name ?? "N/A",
+      payment.studentFeeId?.studentId?.admissionNumber ?? "",
+      payment.amount ?? 0,
+      payment.paymentMethod ?? "",
+      payment.paidAt ? new Date(payment.paidAt).toISOString() : "",
+      payment.paymentStatus ?? "",
+    ]),
+  ];
+  const csv = rows.map((row) => row.map(escapeCsvValue).join(",")).join("\r\n");
+  const filename = `fee-report-${(report.academicYear?.name ?? "current").replace(/[^a-z0-9]+/gi, "-").toLowerCase()}.csv`;
+
+  res.setHeader("Content-Type", "text/csv; charset=utf-8");
+  res.setHeader("Content-Disposition", `attachment; filename="${filename}"`);
+  return res.status(200).send(csv);
+});

@@ -1,6 +1,7 @@
 import express from "express";
 import {
   getAcademicYearCollectionSummary,
+  exportDashboardReportCsv,
   getDashboardSummary,
   getMonthlyCollection,
   getOverdueFeeTotal,
@@ -68,6 +69,13 @@ router.get(
   authenticate,
   authorize("ADMIN", "ACCOUNTANT", "PRINCIPAL"),
   getAcademicYearCollectionSummary,
+);
+
+router.get(
+  "/export/csv",
+  authenticate,
+  authorize("ADMIN", "ACCOUNTANT", "PRINCIPAL"),
+  exportDashboardReportCsv,
 );
 
 router.get(
