@@ -1,3 +1,4 @@
+import AcademicYearChart from "../components/reports/AcademicYearChart";
 import PaymentMethodChart from "../components/reports/PaymentMethodChart";
 import ReportContextBar from "../components/reports/ReportContextBar";
 import ReportHeader from "../components/reports/ReportHeader";
@@ -34,6 +35,7 @@ function ReportsPage() {
       </div>
 
       <PaymentMethodChart data={data?.paymentMethods ?? []} />
+      <AcademicYearChart data={data?.academicYearSummary ?? []} />
     </div>
   );
 }

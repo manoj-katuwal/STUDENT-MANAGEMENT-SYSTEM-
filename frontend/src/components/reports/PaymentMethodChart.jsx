@@ -68,7 +68,7 @@ const PaymentMethodChart = ({ data = [], isLoading = false }) => {
           </p>
         </div>
         <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-blue-50 text-blue-600">
-          <Wallet className="h-5 w-5 stroke-[2]" />
+          <Wallet className="h-5 w-5 stroke-2" />
         </div>
       </div>
 
