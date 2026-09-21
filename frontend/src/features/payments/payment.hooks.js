@@ -5,6 +5,7 @@ import {
   exportPaymentsCsv,
   getPaymentStats,
   getReceiptByPaymentId,
+  reversePayment,
 } from "./payment.api";
 import { getPayments } from "./payment.api";
 import { getPaymentById } from "./payment.api";
@@ -93,5 +94,36 @@ export const usePaymentStudentFees = (params = {}) => {
     queryKey: ["payment-student-fees", params],
     queryFn: () => getStudentFees(params),
     enabled: params.search?.trim().length >= 2,
+  });
+};
+
+
+export const useReversePayment = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: ({ paymentId, reason }) => reversePayment(paymentId, reason),
+
+    onSuccess: (_, variables) => {
+      queryClient.invalidateQueries({
+        queryKey: ["payment", variables.paymentId],
+      });
+
+      queryClient.invalidateQueries({
+        queryKey: ["payments"],
+      });
+
+      queryClient.invalidateQueries({
+        queryKey: ["payment-stats"],
+      });
+
+      queryClient.invalidateQueries({
+        queryKey: ["student-fees"],
+      });
+
+      queryClient.invalidateQueries({
+        queryKey: ["dashboard"],
+      });
+    },
   });
 };

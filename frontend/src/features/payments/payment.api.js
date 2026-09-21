@@ -63,3 +63,11 @@ export const downloadReceiptPdf = async (receiptId) => {
 
   return response.data;
 };
+
+export const reversePayment = async (paymentId, reason) => {
+  const response = await apiClient.post(`/payments/${paymentId}/reverse`, {
+    reason,
+  });
+
+  return response.data.data;
+};
