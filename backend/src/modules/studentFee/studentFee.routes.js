@@ -25,7 +25,7 @@ router.post(
 router.get(
   "/",
   authenticate,
-  authorize("ADMIN", "ACCOUNTANT", "PRINCIPAL"),
+  authorize("ADMIN", "ACCOUNTANT"),
   getStudentFeesController,
 );
 
@@ -33,21 +33,21 @@ router.get(
 router.get(
   "/summary",
   authenticate,
-  authorize("ADMIN", "ACCOUNTANT", "PRINCIPAL"),
+  authorize("ADMIN", "ACCOUNTANT"),
   getStudentFeeLedgerSummary,
 );
 
 router.get(
   "/summary/:studentId",
   authenticate,
-  authorize("ADMIN", "ACCOUNTANT", "PRINCIPAL"),
+  authorize("ADMIN", "ACCOUNTANT"),
   getStudentFeeSummaryController,
 );
 
 router.get(
   "/:studentFeeId",
   authenticate,
-  authorize("ADMIN", "ACCOUNTANT", "PRINCIPAL"),
+  authorize("ADMIN", "ACCOUNTANT"),
   getStudentFeeByIdController,
 );
 
