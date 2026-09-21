@@ -37,7 +37,12 @@ const Router = () => {
               <Route
                 element={
                   <RoleRoute
-                    allowedRoles={["ADMIN", "ACCOUNTANT", "PRINCIPAL"]}
+                    allowedRoles={[
+                      "ADMIN",
+                      "ACCOUNTANT",
+                      "PRINCIPAL",
+                      "STUDENT",
+                    ]}
                   />
                 }
               >

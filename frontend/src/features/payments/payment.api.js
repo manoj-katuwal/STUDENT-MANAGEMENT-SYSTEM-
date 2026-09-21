@@ -71,3 +71,16 @@ export const reversePayment = async (paymentId, reason) => {
 
   return response.data.data;
 };
+
+export const getMyPayments = async () => {
+  const response = await apiClient.get("/payments/my-payments");
+  return response.data.data;
+};
+
+export const initiateEsewaPayment = async (paymentData) => {
+  const response = await apiClient.post(
+    "/payments/online/esewa/initiate",
+    paymentData,
+  );
+  return response.data.data;
+};

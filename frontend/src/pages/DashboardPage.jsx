@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useAuth } from "../features/auth/auth.context";
 import { useDashboardData } from "../hooks/useDashboardData";
 import PaymentMethods from "../components/dashboard/PaymentMethods";
 import RecentPayments from "../components/dashboard/RecentPayments";
@@ -8,16 +9,12 @@ import DashboardError from "../components/dashboard/DashboardError";
 import DashboardHeader from "../components/dashboard/DashboardHeader";
 import DashboardStats from "../components/dashboard/DashboardStats";
 import RecordPaymentDrawer from "../components/payments/RecordPaymentDrawer";
+import StudentDashboard from "../components/dashboard/StudentDashboard";
 
-function DashboardPage() {
+function AdminDashboardContent() {
   const [isRecordPaymentOpen, setIsRecordPaymentOpen] = useState(false);
 
-  const {
-    data: dashboard,
-    isLoading,
-    isError,
-    refetch,
-  } = useDashboardData();
+  const { data: dashboard, isLoading, isError, refetch } = useDashboardData();
 
   if (isLoading) {
     return <DashboardLoading />;
@@ -47,6 +44,16 @@ function DashboardPage() {
       )}
     </div>
   );
+}
+
+function DashboardPage() {
+  const { user } = useAuth();
+
+  if (user?.role === "STUDENT") {
+    return <StudentDashboard />;
+  }
+
+  return <AdminDashboardContent />;
 }
 
 export default DashboardPage;

@@ -3,13 +3,15 @@ import {
   createOfflinePayment,
   downloadReceiptPdf,
   exportPaymentsCsv,
+  getMyPayments,
+  getPaymentById,
   getPaymentStats,
+  getPayments,
+  getPaymentsByStudentFee,
   getReceiptByPaymentId,
+  initiateEsewaPayment,
   reversePayment,
 } from "./payment.api";
-import { getPayments } from "./payment.api";
-import { getPaymentById } from "./payment.api";
-import { getPaymentsByStudentFee } from "./payment.api";
 import { getStudentFees } from "../studentFee/studentFee.api";
 
 export const usePayments = (params = {}) => {
@@ -97,7 +99,6 @@ export const usePaymentStudentFees = (params = {}) => {
   });
 };
 
-
 export const useReversePayment = () => {
   const queryClient = useQueryClient();
 
@@ -125,5 +126,18 @@ export const useReversePayment = () => {
         queryKey: ["dashboard"],
       });
     },
+  });
+};
+
+export const useMyPayments = () => {
+  return useQuery({
+    queryKey: ["myPayments"],
+    queryFn: getMyPayments,
+  });
+};
+
+export const useInitiateEsewaPayment = () => {
+  return useMutation({
+    mutationFn: initiateEsewaPayment,
   });
 };

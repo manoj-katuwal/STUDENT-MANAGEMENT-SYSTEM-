@@ -8,6 +8,7 @@ import {
   createStudent,
   exportStudentsCsv,
   getStudentById,
+  getStudentMe,
   getStudents,
   getStudentStats,
   updateStudent,
@@ -78,7 +79,6 @@ export const useCreateStudent = () => {
   });
 };
 
-
 export const useUpdateStudentStatus = () => {
   const queryClient = useQueryClient();
 
@@ -103,9 +103,15 @@ export const useUpdateStudentStatus = () => {
   });
 };
 
-
 export const useExportStudentsCsv = () => {
   return useMutation({
     mutationFn: exportStudentsCsv,
+  });
+};
+
+export const useStudentMe = () => {
+  return useQuery({
+    queryKey: ["student-me"],
+    queryFn: getStudentMe,
   });
 };

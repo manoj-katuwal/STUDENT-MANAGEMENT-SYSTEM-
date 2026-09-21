@@ -19,7 +19,7 @@ export const NAV_ITEMS = [
     path: "/dashboard",
     icon: LayoutDashboard,
     group: null,
-    allowedRoles: ["ADMIN", "ACCOUNTANT", "PRINCIPAL"],
+    allowedRoles: ["ADMIN", "ACCOUNTANT", "PRINCIPAL", "STUDENT"],
   },
 
   // Administration

@@ -62,3 +62,20 @@ export const getStudentFeeLedgerSummary = async () => {
   const response = await apiClient.get("/student-fees/summary");
   return response.data.data;
 };
+
+export const getMyStudentFees = async (params = {}) => {
+  const response = await apiClient.get("/student-fees/my-fees", {
+    params,
+  });
+  return response.data.data;
+};
+
+export const getMyStudentFeeSummary = async () => {
+  const response = await apiClient.get("/student-fees/my-summary");
+  return response.data.data;
+};
+
+export const getMyStudentFeeById = async (studentFeeId) => {
+  const response = await apiClient.get(`/student-fees/my-fees/${studentFeeId}`);
+  return response.data.data;
+};

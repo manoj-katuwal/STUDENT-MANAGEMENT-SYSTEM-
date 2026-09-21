@@ -57,3 +57,8 @@ export const exportStudentsCsv = async (params = {}) => {
 
   return response.data;
 };
+
+export const getStudentMe = async () => {
+  const response = await apiClient.get("/students/me");
+  return response.data.data;
+};

@@ -7,6 +7,9 @@ import {
 import {
   cancelStudentFee,
   createStudentFee,
+  getMyStudentFeeById,
+  getMyStudentFees,
+  getMyStudentFeeSummary,
   getStudentFeeById,
   getStudentFeeLedgerSummary,
   getStudentFees,
@@ -95,5 +98,28 @@ export const useStudentFeeLedgerSummary = () => {
   return useQuery({
     queryKey: ["studentFeeLedgerSummary"],
     queryFn: getStudentFeeLedgerSummary,
+  });
+};
+
+export const useMyStudentFees = (params = {}) => {
+  return useQuery({
+    queryKey: ["myStudentFees", params],
+    queryFn: () => getMyStudentFees(params),
+    placeholderData: keepPreviousData,
+  });
+};
+
+export const useMyStudentFeeSummary = () => {
+  return useQuery({
+    queryKey: ["myStudentFeeSummary"],
+    queryFn: getMyStudentFeeSummary,
+  });
+};
+
+export const useMyStudentFeeById = (studentFeeId) => {
+  return useQuery({
+    queryKey: ["myStudentFee", studentFeeId],
+    queryFn: () => getMyStudentFeeById(studentFeeId),
+    enabled: Boolean(studentFeeId),
   });
 };
