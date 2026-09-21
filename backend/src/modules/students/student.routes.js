@@ -26,23 +26,28 @@ const router = express.Router();
 router.post(
   "/",
   authenticate,
-  authorize("ADMIN"),
+  authorize("ADMIN", "ACCOUNTANT"),
   validate(createStudentSchema),
   createStudentController,
 );
 
-router.get("/", authenticate, authorize("ADMIN"), getStudentsController);
+router.get(
+  "/",
+  authenticate,
+  authorize("ADMIN", "ACCOUNTANT"),
+  getStudentsController,
+);
 
 router.get(
   "/stats",
   authenticate,
-  authorize("ADMIN"),
+  authorize("ADMIN", "ACCOUNTANT"),
   getStudentStatsController,
 );
 router.get(
   "/export/csv",
   authenticate,
-  authorize("ADMIN"),
+  authorize("ADMIN", "ACCOUNTANT"),
   validateQuery(exportStudentsQuerySchema),
   getStudentsCsvController,
 );
@@ -50,21 +55,21 @@ router.get(
 router.get(
   "/:id",
   authenticate,
-  authorize("ADMIN"),
+  authorize("ADMIN", "ACCOUNTANT"),
   // No query validation needed for fetching a single student by ID
   getStudentByIdController,
 );
 router.patch(
   "/:id",
   authenticate,
-  authorize("ADMIN"),
+  authorize("ADMIN", "ACCOUNTANT"),
   validate(updateStudentSchema),
   updateStudentController,
 );
 router.patch(
   "/:id/status",
   authenticate,
-  authorize("ADMIN"),
+  authorize("ADMIN", "ACCOUNTANT"),
   validate(updateStudentStatusSchema),
   updateStudentStatusController,
 );

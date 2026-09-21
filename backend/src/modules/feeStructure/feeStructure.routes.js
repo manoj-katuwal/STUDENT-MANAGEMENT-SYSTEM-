@@ -24,12 +24,17 @@ router.post(
   createFeeStructureController,
 );
 
-router.get("/", authenticate, authorize("ADMIN"), getFeeStructuresController);
+router.get(
+  "/",
+  authenticate,
+  authorize("ADMIN", "ACCOUNTANT"),
+  getFeeStructuresController,
+);
 router.get("/stats", authenticate, authorize("ADMIN"), getFeeStructureStatsController);
 router.get(
   "/export/csv",
   authenticate,
-  authorize("ADMIN"),
+  authorize("ADMIN", "ACCOUNTANT"),
   getFeeStructuresCsvController,
 );
 router.get(
