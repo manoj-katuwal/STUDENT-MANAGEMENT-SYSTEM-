@@ -13,6 +13,7 @@ import {
 } from "lucide-react";
 
 export const NAV_ITEMS = [
+  // Dashboard
   {
     label: "Dashboard",
     path: "/dashboard",
@@ -21,6 +22,7 @@ export const NAV_ITEMS = [
     allowedRoles: ["ADMIN", "ACCOUNTANT", "PRINCIPAL", "STUDENT"],
   },
 
+  // Administration
   {
     label: "Users",
     path: "/users",
@@ -29,6 +31,51 @@ export const NAV_ITEMS = [
     allowedRoles: ["ADMIN"],
   },
 
+  // Academic
+  {
+    label: "Students",
+    path: "/students",
+    icon: Users2,
+    group: "Academic",
+    allowedRoles: ["ADMIN", "ACCOUNTANT", "PRINCIPAL"],
+  },
+  {
+    label: "Classes",
+    path: "/classes",
+    icon: GraduationCap,
+    group: "Academic",
+    allowedRoles: ["ADMIN"],
+  },
+  {
+    label: "Sections",
+    path: "/sections",
+    icon: Layers3,
+    group: "Academic",
+    allowedRoles: ["ADMIN"],
+  },
+  {
+    label: "Academic Years",
+    path: "/academic-years",
+    icon: CalendarDays,
+    group: "Academic",
+    allowedRoles: ["ADMIN"],
+  },
+
+  // Finance
+  {
+    label: "Fee Structures",
+    path: "/fee-structures",
+    icon: ReceiptText,
+    group: "Finance",
+    allowedRoles: ["ADMIN"],
+  },
+  {
+    label: "Student Fees",
+    path: "/student-fees",
+    icon: Receipt,
+    group: "Finance",
+    allowedRoles: ["ADMIN", "ACCOUNTANT", "PRINCIPAL"],
+  },
   {
     label: "Payments",
     path: "/payments",
@@ -36,69 +83,21 @@ export const NAV_ITEMS = [
     group: "Finance",
     allowedRoles: ["ADMIN", "ACCOUNTANT"],
   },
-
   {
     label: "Reports",
     path: "/reports",
     icon: BarChart3,
     group: "Finance",
-    allowedRoles: ["ADMIN", "PRINCIPAL"],
+    allowedRoles: ["ADMIN", "ACCOUNTANT", "PRINCIPAL"],
   },
 
+  // Student
   {
     label: "My Fees",
     path: "/my-fees",
     icon: Wallet,
     group: null,
     allowedRoles: ["STUDENT"],
-  },
-
-  {
-    label: "Students",
-    path: "/students",
-    icon: Users2,
-    group: "null",
-    allowedRoles: ["ADMIN", "ACCOUNTANT", "PRINCIPAL"],
-  },
-
-  {
-    label: "Classes",
-    path: "/classes",
-    icon: GraduationCap,
-    group: "null",
-    allowedRoles: ["ADMIN"],
-  },
-
-  {
-    label: "Sections",
-    path: "/sections",
-    icon: Layers3,
-    group: null,
-    allowedRoles: ["ADMIN"],
-  },
-
-  {
-    label: "Academic Years",
-    path: "/academic-years",
-    icon: CalendarDays,
-    group: null,
-    allowedRoles: ["ADMIN"],
-  },
-
-  {
-    label: "Fee Structures",
-    path: "/fee-structures",
-    icon: ReceiptText,
-    group: null,
-    allowedRoles: ["ADMIN"],
-  },
-
-  {
-    label: "Student Fees",
-    path: "/student-fees",
-    icon: Receipt,
-    group: null,
-    allowedRoles: ["ADMIN"],
   },
 ];
 

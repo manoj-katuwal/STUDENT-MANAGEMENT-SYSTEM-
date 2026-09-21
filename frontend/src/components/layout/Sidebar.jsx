@@ -8,9 +8,42 @@ const Sidebar = () => {
   const { user, logout } = useAuth();
 
   const allowedNavigationItems = getNavItemsForRole(user?.role);
+  const ungroupedItems = allowedNavigationItems.filter((item) => !item.group);
+  const groupedItems = allowedNavigationItems.reduce((groups, item) => {
+    if (!item.group) return groups;
+
+    if (!groups[item.group]) {
+      groups[item.group] = [];
+    }
+
+    groups[item.group].push(item);
+    return groups;
+  }, {});
+
+  const renderNavItem = (item) => {
+    const Icon = item.icon;
+
+    return (
+      <li key={item.path}>
+        <NavLink
+          to={item.path}
+          className={({ isActive }) =>
+            `flex items-center gap-3 rounded-lg px-4 py-3 font-medium transition-all ${
+              isActive
+                ? "bg-white/10 text-parchment shadow-sm"
+                : "text-slate hover:bg-white/5 hover:text-parchment"
+            }`
+          }
+        >
+          {Icon && <Icon className="h-5 w-5 shrink-0" />}
+          <span>{item.label}</span>
+        </NavLink>
+      </li>
+    );
+  };
 
   return (
-    <aside className="flex min-h-screen w-64 flex-col bg-ink text-parchment p-6">
+    <aside className="flex h-screen w-64 flex-col overflow-hidden bg-ink p-6 text-parchment">
       {/* Brand Header */}
       <div className="mb-10">
         <h1 className="font-display text-2xl font-semibold tracking-wide text-parchment">
@@ -20,29 +53,18 @@ const Sidebar = () => {
       </div>
 
       {/* Main Navigation */}
-      <nav className="flex-1">
+      <nav className="min-h-0 flex-1 overflow-y-auto pr-1">
         <ul className="space-y-1 font-body text-sm">
-          {allowedNavigationItems.map((item) => {
-            const Icon = item.icon;
+          {ungroupedItems.map(renderNavItem)}
 
-            return (
-              <li key={item.path}>
-                <NavLink
-                  to={item.path}
-                  className={({ isActive }) =>
-                    `flex items-center gap-3 rounded-lg px-4 py-3 font-medium transition-all ${
-                      isActive
-                        ? "bg-white/10 text-parchment shadow-sm"
-                        : "text-slate hover:bg-white/5 hover:text-parchment"
-                    }`
-                  }
-                >
-                  {Icon && <Icon className="h-5 w-5 shrink-0" />}
-                  <span>{item.label}</span>
-                </NavLink>
-              </li>
-            );
-          })}
+          {Object.entries(groupedItems).map(([groupName, items]) => (
+            <li key={groupName} className="pt-5">
+              <p className="px-4 pb-2 text-xs font-semibold uppercase tracking-wider text-slate/70">
+                {groupName}
+              </p>
+              <ul className="space-y-1">{items.map(renderNavItem)}</ul>
+            </li>
+          ))}
         </ul>
       </nav>
 
