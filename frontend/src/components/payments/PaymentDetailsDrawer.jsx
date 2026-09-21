@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import {
   X,
   User,
@@ -12,6 +12,7 @@ import {
   Clock,
   XCircle,
   RefreshCw,
+  RotateCcw,
   Download,
   CreditCard,
 } from "lucide-react";
@@ -19,6 +20,7 @@ import {
   useDownloadReceiptPdf,
   usePayment,
   useReceiptByPaymentId,
+  useReversePayment,
 } from "../../features/payments/payment.hooks";
 
 const formatAmount = (amount) =>
@@ -77,19 +79,31 @@ const PaymentDetailsDrawer = ({ onClose, paymentId }) => {
   const { mutateAsync: downloadReceipt, isPending: isDownloading } =
     useDownloadReceiptPdf();
 
-    useEffect(() => {
-      const handleEscape = (event) => {
-        if (event.key === "Escape") {
-          onClose();
-        }
-      };
 
-      document.addEventListener("keydown", handleEscape);
+  const { mutate: reversePayment, isPending: isReversing } =
+    useReversePayment();
+  const [isReverseDialogOpen, setIsReverseDialogOpen] = useState(false);
+  const [reverseReason, setReverseReason] = useState("");
+  const [reverseError, setReverseError] = useState("");
 
-      return () => {
-        document.removeEventListener("keydown", handleEscape);
-      };
-    }, [onClose]);
+  useEffect(() => {
+    const handleEscape = (event) => {
+      if (event.key !== "Escape") return;
+
+      if (isReverseDialogOpen) {
+        if (!isReversing) setIsReverseDialogOpen(false);
+        return;
+      }
+
+      onClose();
+    };
+
+    document.addEventListener("keydown", handleEscape);
+
+    return () => {
+      document.removeEventListener("keydown", handleEscape);
+    };
+  }, [isReverseDialogOpen, isReversing, onClose]);
 
   const studentFee = payment?.studentFeeId;
   const student = studentFee?.studentId;
@@ -118,6 +132,40 @@ const PaymentDetailsDrawer = ({ onClose, paymentId }) => {
     } catch (error) {
       console.error("Failed to download receipt:", error);
     }
+  };
+
+  const closeReverseDialog = (force = false) => {
+    if (isReversing && !force) return;
+
+    setIsReverseDialogOpen(false);
+    setReverseReason("");
+    setReverseError("");
+  };
+
+  const handleReversePayment = () => {
+    const reason = reverseReason.trim();
+
+    if (reason.length < 5) {
+      setReverseError("Please enter a reversal reason of at least 5 characters.");
+      return;
+    }
+
+    setReverseError("");
+    reversePayment(
+      { paymentId, reason },
+      {
+        onSuccess: () => {
+          closeReverseDialog(true);
+          refetch();
+        },
+        onError: (error) => {
+          setReverseError(
+            error.response?.data?.message ||
+              "Payment could not be reversed. Please try again.",
+          );
+        },
+      },
+    );
   };
 
   const renderContent = () => {
@@ -332,6 +380,16 @@ const PaymentDetailsDrawer = ({ onClose, paymentId }) => {
           {payment?.paymentStatus === "SUCCESS" && (
             <button
               type="button"
+              onClick={() => setIsReverseDialogOpen(true)}
+              className="flex h-10 w-full items-center justify-center gap-2 rounded-xl border border-rose-200 bg-rose-50 text-xs font-semibold text-rose-700 transition hover:bg-rose-100"
+            >
+              <RotateCcw className="h-4 w-4" />
+              Reverse Payment
+            </button>
+          )}
+          {payment?.paymentStatus === "SUCCESS" && (
+            <button
+              type="button"
               disabled={isDownloading || isReceiptLoading}
               className="flex h-10 w-full items-center justify-center gap-2 rounded-xl bg-slate-900 text-xs font-semibold text-white shadow-xs transition hover:bg-slate-800 active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed"
               onClick={downloadReceiptFile}
@@ -349,6 +407,79 @@ const PaymentDetailsDrawer = ({ onClose, paymentId }) => {
           </button>
         </div>
       </aside>
+
+      {isReverseDialogOpen && (
+        <div className="absolute inset-0 z-10 flex items-center justify-center bg-slate-950/50 p-4">
+          <div
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="reverse-payment-title"
+            className="w-full max-w-md rounded-2xl bg-white p-6 shadow-2xl"
+          >
+            <div className="flex items-start gap-3">
+              <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-rose-100 text-rose-600">
+                <RotateCcw className="h-5 w-5" />
+              </div>
+              <div>
+                <h3 id="reverse-payment-title" className="text-base font-bold text-slate-900">
+                  Reverse payment?
+                </h3>
+                <p className="mt-1 text-sm text-slate-500">
+                  This will reverse {formatAmount(payment?.amount)} and restore
+                  the amount to the student&apos;s outstanding fee.
+                </p>
+              </div>
+            </div>
+
+            <label htmlFor="reverse-reason" className="mt-5 block text-sm font-medium text-slate-700">
+              Reversal reason <span className="text-rose-500">*</span>
+            </label>
+            <textarea
+              id="reverse-reason"
+              value={reverseReason}
+              onChange={(event) => {
+                setReverseReason(event.target.value);
+                if (reverseError) setReverseError("");
+              }}
+              maxLength={300}
+              rows={4}
+              autoFocus
+              disabled={isReversing}
+              placeholder="Explain why this payment is being reversed..."
+              className="mt-2 w-full resize-none rounded-xl border border-slate-200 px-3 py-2.5 text-sm text-slate-900 outline-none transition placeholder:text-slate-400 focus:border-rose-400 focus:ring-4 focus:ring-rose-500/10 disabled:bg-slate-50"
+            />
+            <div className="mt-1 flex justify-between text-xs text-slate-400">
+              <span>Minimum 5 characters</span>
+              <span>{reverseReason.length}/300</span>
+            </div>
+            {reverseError && (
+              <p className="mt-3 text-sm text-rose-600" role="alert">
+                {reverseError}
+              </p>
+            )}
+
+            <div className="mt-6 flex justify-end gap-3">
+              <button
+                type="button"
+                onClick={closeReverseDialog}
+                disabled={isReversing}
+                className="rounded-xl border border-slate-200 px-4 py-2.5 text-sm font-semibold text-slate-600 transition hover:bg-slate-50 disabled:cursor-not-allowed disabled:opacity-50"
+              >
+                Cancel
+              </button>
+              <button
+                type="button"
+                onClick={handleReversePayment}
+                disabled={isReversing || reverseReason.trim().length < 5}
+                className="inline-flex items-center gap-2 rounded-xl bg-rose-600 px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-rose-700 disabled:cursor-not-allowed disabled:opacity-50"
+              >
+                <RotateCcw className="h-4 w-4" />
+                {isReversing ? "Reversing..." : "Reverse Payment"}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
