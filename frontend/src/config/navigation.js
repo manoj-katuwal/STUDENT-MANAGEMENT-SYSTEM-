@@ -19,7 +19,7 @@ export const NAV_ITEMS = [
     path: "/dashboard",
     icon: LayoutDashboard,
     group: null,
-    allowedRoles: ["ADMIN", "ACCOUNTANT", "PRINCIPAL", "STUDENT"],
+    allowedRoles: ["ADMIN", "ACCOUNTANT", "PRINCIPAL"],
   },
 
   // Administration
@@ -37,7 +37,7 @@ export const NAV_ITEMS = [
     path: "/students",
     icon: Users2,
     group: "Academic",
-    allowedRoles: ["ADMIN", "ACCOUNTANT", "PRINCIPAL"],
+    allowedRoles: ["ADMIN", "ACCOUNTANT"],
   },
   {
     label: "Classes",
@@ -74,7 +74,7 @@ export const NAV_ITEMS = [
     path: "/student-fees",
     icon: Receipt,
     group: "Finance",
-    allowedRoles: ["ADMIN", "ACCOUNTANT", "PRINCIPAL"],
+    allowedRoles: ["ADMIN", "ACCOUNTANT"],
   },
   {
     label: "Payments",

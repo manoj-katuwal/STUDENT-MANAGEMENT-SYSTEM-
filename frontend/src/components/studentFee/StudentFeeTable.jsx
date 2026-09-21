@@ -170,7 +170,7 @@ const StudentFeeTable = ({
                     </div>
                     <div>
                       <span className="font-semibold text-slate-900 block">
-                        {row.studentId.name}
+                        {row.studentId?.name || "Unknown Student"}
                       </span>
                     </div>
                   </div>

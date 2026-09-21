@@ -21,8 +21,10 @@ import StudentFeeViewModal from "../components/studentFee/StudentFeeViewModel";
 import StudentFeeEditModal from "../components/studentFee/StudentFeeEditModel";
 import StudentFeeCancelModal from "../components/studentFee/StudentFeeCancelModel";
 import StudentFeeAssignModal from "../components/studentFee/StudentFeeAssignModal";
+import { useAuth } from "../features/auth/auth.context";
 
 const StudentFeePage = () => {
+  const { user } = useAuth();
   const initialFilters = {
     search: "",
     academicYearId: "",
@@ -68,6 +70,8 @@ const StudentFeePage = () => {
     link.remove();
     window.URL.revokeObjectURL(url);
   };
+
+  console.log("Student Fee role:", user?.role);
 
   return (
     <div className="min-h-full p-6 lg:p-8 space-y-6">

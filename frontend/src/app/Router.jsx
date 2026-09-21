@@ -34,7 +34,15 @@ const Router = () => {
           <Route path="/unauthorized" element={<UnauthorizedPage />} />
           <Route element={<ProtectedRoute />}>
             <Route element={<AppLayout />}>
-              <Route path="/dashboard" element={<DashboardPage />} />
+              <Route
+                element={
+                  <RoleRoute
+                    allowedRoles={["ADMIN", "ACCOUNTANT", "PRINCIPAL"]}
+                  />
+                }
+              >
+                <Route path="/dashboard" element={<DashboardPage />} />
+              </Route>
               {/* ADMIN */}
               <Route element={<RoleRoute allowedRoles={["ADMIN"]} />}>
                 <Route path="/users" element={<UsersPage />} />
@@ -43,7 +51,7 @@ const Router = () => {
               <Route
                 element={
                   <RoleRoute
-                    allowedRoles={["ADMIN", "ACCOUNTANT", "PRINCIPAL"]}
+                    allowedRoles={["ADMIN", "ACCOUNTANT"]}
                   />
                 }
               >
@@ -108,7 +116,7 @@ const Router = () => {
               <Route
                 element={
                   <RoleRoute
-                    allowedRoles={["ADMIN", "ACCOUNTANT", "PRINCIPAL"]}
+                    allowedRoles={["ADMIN", "ACCOUNTANT"]}
                   />
                 }
               >

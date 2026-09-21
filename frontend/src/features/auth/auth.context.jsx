@@ -38,8 +38,7 @@ export const AuthProvider = ({ children }) => {
       try {
         const refreshResponse = await refreshAccessToken();
 
-        const newAccessToken =
-          refreshResponse.data.accessToken;
+        const newAccessToken = refreshResponse.data.data.accessToken;
 
         authStore.setAccessToken(newAccessToken);
 
