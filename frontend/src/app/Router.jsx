@@ -98,9 +98,13 @@ const Router = () => {
               >
                 <Route path="/payments" element={<PaymentsPage />} />
               </Route>
-              {/* ADMIN AND PRINCIPAL  */}
+              {/* ADMIN, ACCOUNTANT AND PRINCIPAL */}
               <Route
-                element={<RoleRoute allowedRoles={["ADMIN", "PRINCIPAL"]} />}
+                element={
+                  <RoleRoute
+                    allowedRoles={["ADMIN", "ACCOUNTANT", "PRINCIPAL"]}
+                  />
+                }
               >
                 <Route path="/reports" element={<ReportsPage />} />
               </Route>

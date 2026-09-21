@@ -37,7 +37,7 @@ export const NAV_ITEMS = [
     path: "/students",
     icon: Users2,
     group: "Academic",
-    allowedRoles: ["ADMIN", "ACCOUNTANT", "PRINCIPAL"],
+    allowedRoles: ["ADMIN", "PRINCIPAL"],
   },
   {
     label: "Classes",
@@ -74,7 +74,7 @@ export const NAV_ITEMS = [
     path: "/student-fees",
     icon: Receipt,
     group: "Finance",
-    allowedRoles: ["ADMIN", "ACCOUNTANT", "PRINCIPAL"],
+    allowedRoles: ["ADMIN"],
   },
   {
     label: "Payments",
@@ -102,7 +102,11 @@ export const NAV_ITEMS = [
 ];
 
 export const getNavItemsForRole = (role) => {
-  if (!role) return [];
+  const normalizedRole = role?.trim().toUpperCase();
 
-  return NAV_ITEMS.filter((item) => item.allowedRoles.includes(role));
+  if (!normalizedRole) return [];
+
+  return NAV_ITEMS.filter((item) =>
+    item.allowedRoles.includes(normalizedRole),
+  );
 };

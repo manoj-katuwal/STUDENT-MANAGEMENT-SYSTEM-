@@ -9,7 +9,9 @@ function RoleRoute({ allowedRoles, children }) {
     return <Navigate to="/login" replace />;
   }
 
-  if (!allowedRoles.includes(user.role)) {
+  const normalizedRole = user.role?.trim().toUpperCase();
+
+  if (!allowedRoles.includes(normalizedRole)) {
     return <Navigate to="/unauthorized" replace />;
   }
 
