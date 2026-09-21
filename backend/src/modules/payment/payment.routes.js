@@ -3,6 +3,7 @@ import authenticate from "../../middleware/authenticate.js";
 import authorize from "../../middleware/authorize.js";
 import {
   createOfflinePaymentController,
+  getMyPaymentsController,
   getPaymentByIdController,
   getStudentFeePaymentHistoryController,
   getPaymentsController,
@@ -20,6 +21,7 @@ import { reversePayment } from "../paymentReversal/paymentReversal.controller.js
 
 const router = express.Router();
 
+// --- Offline Payment Recording (Admin & Accountant only) ---
 router.post(
   "/offline",
   authenticate,
@@ -27,13 +29,23 @@ router.post(
   createOfflinePaymentController,
 );
 
+// --- Student Payment History by StudentFee (Ownership checked in service for Student) ---
 router.get(
   "/student-fee/:studentFeeId",
   authenticate,
-  authorize("ADMIN", "ACCOUNTANT"),
+  authorize("ADMIN", "ACCOUNTANT", "STUDENT"),
   getStudentFeePaymentHistoryController,
 );
 
+// --- Student Personal Payment List ---
+router.get(
+  "/my-payments",
+  authenticate,
+  authorize("STUDENT"),
+  getMyPaymentsController,
+);
+
+// --- Administrative Statistics and Exports ---
 router.get(
   "/stats",
   authenticate,
@@ -49,19 +61,13 @@ router.get(
 );
 
 router.get(
-  "/:paymentId",
-  authenticate,
-  authorize("ADMIN", "ACCOUNTANT"),
-  getPaymentByIdController,
-);
-
-router.get(
   "/",
   authenticate,
   authorize("ADMIN", "ACCOUNTANT"),
   getPaymentsController,
 );
 
+// --- Online Payment Gateway: eSewa ---
 router.post(
   "/online/esewa/initiate",
   authenticate,
@@ -71,6 +77,16 @@ router.post(
 
 router.get("/online/esewa/success", esewaSuccessController);
 router.get("/online/esewa/failure", esewaFailureController);
+
+// --- Single Payment Lookup (Ownership checked in service for Student) ---
+router.get(
+  "/:paymentId",
+  authenticate,
+  authorize("ADMIN", "ACCOUNTANT", "STUDENT"),
+  getPaymentByIdController,
+);
+
+// --- Payment Reversals (Admin & Accountant only) ---
 router.post(
   "/:id/reverse",
   authenticate,
@@ -78,4 +94,5 @@ router.post(
   validate(reversePaymentSchema),
   reversePayment,
 );
+
 export default router;

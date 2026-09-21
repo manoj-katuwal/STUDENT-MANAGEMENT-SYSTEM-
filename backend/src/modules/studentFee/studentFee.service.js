@@ -8,7 +8,10 @@ import {
   getStudentFeeSummary,
   updateStudentFee,
 } from "./studentFee.repository.js";
-import { findStudentById } from "../students/student.repository.js";
+import {
+  findStudentById,
+  findStudentByUserId,
+} from "../students/student.repository.js";
 import { findAcademicYearById } from "../academicYear/academicYear.repository.js";
 import { findFeeStructureById } from "../feeStructure/feeStructure.repository.js";
 import Student from "../students/student.model.js";
@@ -344,4 +347,98 @@ export const getStudentFeeLedgerSummaryService = async () => {
       paidFees: 0,
     }
   );
+};
+
+export const getMyStudentFeesService = async (
+  userId,
+  { page = 1, limit = 10, academicYearId, status } = {},
+) => {
+  const student = await findStudentByUserId(userId);
+
+  if (!student) {
+    throw new AppError("Student profile not found", 404);
+  }
+
+  const filter = {
+    studentId: student._id,
+  };
+
+  if (academicYearId) {
+    filter.academicYearId = academicYearId;
+  }
+
+  if (status) {
+    filter.status = status;
+  }
+
+  const pageNumber = Number(page);
+  const limitNumber = Number(limit);
+  const skip = (pageNumber - 1) * limitNumber;
+
+  const [studentFees, total] = await Promise.all([
+    findStudentFees({
+      filter,
+      skip,
+      limit: limitNumber,
+    }),
+    countStudentFees(filter),
+  ]);
+
+  const totalPages = Math.ceil(total / limitNumber);
+
+  return {
+    studentFees,
+    pagination: {
+      total,
+      page: pageNumber,
+      limit: limitNumber,
+      totalPages,
+      hasNextPage: pageNumber < totalPages,
+      hasPreviousPage: pageNumber > 1,
+    },
+  };
+};
+
+export const getMyStudentFeeSummaryService = async (userId) => {
+  const student = await findStudentByUserId(userId);
+
+  if (!student) {
+    throw new AppError("Student profile not found", 404);
+  }
+
+  const summary = await getStudentFeeSummary(student._id);
+
+  return {
+    student: {
+      _id: student._id,
+      name: student.name,
+      admissionNumber: student.admissionNumber,
+      class: student.classId?.name,
+      section: student.sectionId?.name,
+    },
+    summary,
+  };
+};
+
+export const getMyStudentFeeByIdService = async (studentFeeId, userId) => {
+  const student = await findStudentByUserId(userId);
+
+  if (!student) {
+    throw new AppError("Student profile not found", 404);
+  }
+
+  const studentFee = await findStudentFeeById(studentFeeId);
+
+  if (!studentFee) {
+    throw new AppError("Student fee record not found", 404);
+  }
+
+  if (
+    String(studentFee.studentId._id || studentFee.studentId) !==
+    String(student._id)
+  ) {
+    throw new AppError("You are not authorized to view this fee record", 403);
+  }
+
+  return studentFee;
 };

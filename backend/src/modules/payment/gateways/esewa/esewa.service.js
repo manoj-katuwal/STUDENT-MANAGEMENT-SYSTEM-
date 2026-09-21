@@ -13,9 +13,10 @@ import {
 } from "../../payment.repository.js";
 import { generateReceiptNumber } from "../../../receipt/receiptCounter.service.js";
 import { createReceiptService } from "../../../receipt/receipt.service.js";
+import { findStudentByUserId } from "../../../students/student.repository.js";
 import { logActivity } from "../../../auditLog/auditLog.service.js";
 import logger from "../../../../config/logger.js";
-import axios from "axios"
+import axios from "axios";
 
 export const generateEsewaSignature = ({ totalAmount, transactionUuid }) => {
   const message = `total_amount=${totalAmount},transaction_uuid=${transactionUuid},product_code=${esewaConfig.productCode}`;
@@ -77,6 +78,23 @@ export const initiateEsewaPaymentService = async (
 
   if (!studentFee) {
     throw new AppError("Student fee not found", 404);
+  }
+
+  // Security: If performedBy is provided, verify student ownership
+  if (performedBy) {
+    const student = await findStudentByUserId(performedBy);
+    if (!student) {
+      throw new AppError("Student profile not found", 404);
+    }
+    if (
+      String(studentFee.studentId._id || studentFee.studentId) !==
+      String(student._id)
+    ) {
+      throw new AppError(
+        "You are not authorized to make payment for this fee record",
+        403,
+      );
+    }
   }
 
   if (studentFee.status === "CANCELLED") {
@@ -198,22 +216,21 @@ export const handleEsewaSuccessService = async (encodedData) => {
     throw new AppError("eSewa payment was not completed", 400);
   }
 
+  const verification = await verifyEsewaTransaction({
+    transactionUuid,
+    totalAmount,
+  });
 
- const verification = await verifyEsewaTransaction({
-  transactionUuid,
-  totalAmount,
-});
+  if (verification.status !== "COMPLETE") {
+    throw new AppError("eSewa payment verification failed", 400);
+  }
 
-if (verification.status !== "COMPLETE") {
-  throw new AppError("eSewa payment verification failed", 400);
-}
-
-if (
-  Number(verification.total_amount) !== Number(totalAmount) ||
-  verification.transaction_uuid !== transactionUuid
-) {
-  throw new AppError("eSewa transaction verification mismatch", 400);
-}
+  if (
+    Number(verification.total_amount) !== Number(totalAmount) ||
+    verification.transaction_uuid !== transactionUuid
+  ) {
+    throw new AppError("eSewa transaction verification mismatch", 400);
+  }
 
   const session = await mongoose.startSession();
 
@@ -330,8 +347,6 @@ export const verifyEsewaTransaction = async ({
   transactionUuid,
   totalAmount,
 }) => {
-
-
   const response = await axios.get(esewaConfig.statusUrl, {
     params: {
       product_code: esewaConfig.productCode,

@@ -3,6 +3,7 @@ import { successResponse } from "../../shared/utils/response/apiResponse.js";
 import {
   createStudentService,
   getStudentByIdService,
+  getStudentMeService,
   getStudentsForExportService,
   getStudentsService,
   getStudentStatsService,
@@ -52,6 +53,17 @@ export const getStudentByIdController = asyncHandler(async (req, res) => {
     res,
     statusCode: 200,
     message: "Student fetched successfully",
+    data: student,
+  });
+});
+
+export const getStudentMeController = asyncHandler(async (req, res) => {
+  const student = await getStudentMeService(req.user.id);
+
+  return successResponse({
+    res,
+    statusCode: 200,
+    message: "Student profile fetched successfully",
     data: student,
   });
 });

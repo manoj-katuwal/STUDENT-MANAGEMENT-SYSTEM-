@@ -1,7 +1,17 @@
 import asyncHandler from "../../shared/utils/asyncHandler.js";
 import { successResponse } from "../../shared/utils/response/apiResponse.js";
-import { cancelStudentFeeService, createStudentFeeService, getStudentFeeByIdService, getStudentFeeLedgerSummaryService, getStudentFeesService, getStudentFeeSummaryService, updateStudentFeeService } from "./studentFee.service.js";
-
+import {
+  cancelStudentFeeService,
+  createStudentFeeService,
+  getMyStudentFeeByIdService,
+  getMyStudentFeesService,
+  getMyStudentFeeSummaryService,
+  getStudentFeeByIdService,
+  getStudentFeeLedgerSummaryService,
+  getStudentFeesService,
+  getStudentFeeSummaryService,
+  updateStudentFeeService,
+} from "./studentFee.service.js";
 
 export const createStudentFeeController = asyncHandler(async (req, res) => {
   const studentFee = await createStudentFeeService(req.body, req.user.id);
@@ -13,6 +23,7 @@ export const createStudentFeeController = asyncHandler(async (req, res) => {
     data: studentFee,
   });
 });
+
 export const getStudentFeeByIdController = asyncHandler(async (req, res) => {
   const studentFee = await getStudentFeeByIdService(req.params.studentFeeId);
 
@@ -59,7 +70,10 @@ export const updateStudentFeeController = asyncHandler(async (req, res) => {
 });
 
 export const cancelStudentFeeController = asyncHandler(async (req, res) => {
-  const studentFee = await cancelStudentFeeService(req.params.studentFeeId, req.user.id);
+  const studentFee = await cancelStudentFeeService(
+    req.params.studentFeeId,
+    req.user.id,
+  );
 
   return successResponse({
     res,
@@ -88,5 +102,49 @@ export const getStudentFeeLedgerSummary = asyncHandler(async (req, res) => {
     statusCode: 200,
     message: "Student fee summary fetched successfully",
     data: summary,
+  });
+});
+
+export const getMyStudentFeesController = asyncHandler(async (req, res) => {
+  const result = await getMyStudentFeesService(req.user.id, {
+    page: req.query.page,
+    limit: req.query.limit,
+    academicYearId: req.query.academicYearId,
+    status: req.query.status,
+  });
+
+  return successResponse({
+    res,
+    statusCode: 200,
+    message: "Your fee records fetched successfully",
+    data: result.studentFees,
+    meta: result.pagination,
+  });
+});
+
+export const getMyStudentFeeSummaryController = asyncHandler(
+  async (req, res) => {
+    const data = await getMyStudentFeeSummaryService(req.user.id);
+
+    return successResponse({
+      res,
+      statusCode: 200,
+      message: "Your fee summary fetched successfully",
+      data,
+    });
+  },
+);
+
+export const getMyStudentFeeByIdController = asyncHandler(async (req, res) => {
+  const studentFee = await getMyStudentFeeByIdService(
+    req.params.studentFeeId,
+    req.user.id,
+  );
+
+  return successResponse({
+    res,
+    statusCode: 200,
+    message: "Fee details fetched successfully",
+    data: studentFee,
   });
 });

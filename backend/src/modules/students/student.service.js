@@ -5,6 +5,7 @@ import {
   createStudent,
   findStudentByAdmissionNumber,
   findStudentById,
+  findStudentByUserId,
   findStudents,
   findStudentsForExport,
   getStudentStats,
@@ -192,6 +193,16 @@ export const getStudentByIdService = async (studentId) => {
 
   if (!student) {
     throw new AppError("Student not found", 404);
+  }
+
+  return student;
+};
+
+export const getStudentMeService = async (userId) => {
+  const student = await findStudentByUserId(userId);
+
+  if (!student) {
+    throw new AppError("Student profile not found", 404);
   }
 
   return student;

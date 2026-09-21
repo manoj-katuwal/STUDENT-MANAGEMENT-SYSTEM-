@@ -2,6 +2,7 @@ import AppError from "../../shared/utils/error/AppError.js";
 import mongoose from "mongoose";
 import {
   findStudentFeeById,
+  findStudentFeeIdsByStudentIds,
   updatePaymentStatus,
 } from "../studentFee/studentFee.repository.js";
 import {
@@ -18,6 +19,7 @@ import { generatePaymentReference } from "./paymentReference.service.js";
 import { createReceiptService } from "../receipt/receipt.service.js";
 import { logActivity } from "../auditLog/auditLog.service.js";
 import Student from "../students/student.model.js";
+import { findStudentByUserId } from "../students/student.repository.js";
 import { sendNotification } from "../notification/notification.service.js";
 import logger from "../../config/logger.js";
 
@@ -59,7 +61,10 @@ export const createOfflinePaymentService = async (paymentData, performedBy) => {
 
     // 4. Cannot pay cancelled fee
     if (studentFee.status === "CANCELLED") {
-      throw new AppError("Cannot make payment for a cancelled student fee", 400);
+      throw new AppError(
+        "Cannot make payment for a cancelled student fee",
+        400,
+      );
     }
 
     // 5. Transaction ID validation
@@ -122,13 +127,16 @@ export const createOfflinePaymentService = async (paymentData, performedBy) => {
       },
       { session },
     );
-    await logActivity({
-      entityType: "Payment",
-      entityId: payment._id,
-      action: "CREATED",
-      description: "Offline payment recorded",
-      performedBy,
-    }, { session });
+    await logActivity(
+      {
+        entityType: "Payment",
+        entityId: payment._id,
+        action: "CREATED",
+        description: "Offline payment recorded",
+        performedBy,
+      },
+      { session },
+    );
 
     await session.commitTransaction();
 
@@ -189,11 +197,28 @@ export const createOfflinePaymentService = async (paymentData, performedBy) => {
   }
 };
 
-export const getStudentFeePaymentHistoryService = async (studentFeeId) => {
+export const getStudentFeePaymentHistoryService = async (
+  studentFeeId,
+  user,
+) => {
   const studentFee = await findStudentFeeById(studentFeeId);
 
   if (!studentFee) {
     throw new AppError("Student fee not found", 404);
+  }
+
+  if (user?.role === "STUDENT") {
+    const student = await findStudentByUserId(user.id);
+    if (
+      !student ||
+      String(studentFee.studentId._id || studentFee.studentId) !==
+        String(student._id)
+    ) {
+      throw new AppError(
+        "You are not authorized to view this payment history",
+        403,
+      );
+    }
   }
 
   const payments = await findPaymentsByStudentFeeId(studentFeeId);
@@ -201,14 +226,53 @@ export const getStudentFeePaymentHistoryService = async (studentFeeId) => {
   return payments;
 };
 
-export const getPaymentByIdService = async (paymentId) => {
+export const getPaymentByIdService = async (paymentId, user) => {
   const payment = await findPaymentById(paymentId);
 
   if (!payment) {
     throw new AppError("Payment not found", 404);
   }
 
+  if (user?.role === "STUDENT") {
+    const student = await findStudentByUserId(user.id);
+    const studentFee = await findStudentFeeById(payment.studentFeeId);
+    if (
+      !student ||
+      !studentFee ||
+      String(studentFee.studentId._id || studentFee.studentId) !==
+        String(student._id)
+    ) {
+      throw new AppError(
+        "You are not authorized to view this payment record",
+        403,
+      );
+    }
+  }
+
   return payment;
+};
+
+export const getMyPaymentsService = async (userId) => {
+  const student = await findStudentByUserId(userId);
+
+  if (!student) {
+    throw new AppError("Student profile not found", 404);
+  }
+
+  const studentFeeIds = await findStudentFeeIdsByStudentIds([student._id]);
+
+  if (!studentFeeIds.length) {
+    return [];
+  }
+
+  const payments = await findPayments({
+    filter: {
+      studentFeeId: { $in: studentFeeIds },
+    },
+    limit: 100,
+  });
+
+  return payments;
 };
 
 export const getPaymentsService = async ({

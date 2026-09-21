@@ -3,6 +3,7 @@ import express from "express";
 import {
   createStudentController,
   getStudentByIdController,
+  getStudentMeController,
   getStudentsController,
   getStudentsCsvController,
   getStudentStatsController,
@@ -15,7 +16,6 @@ import validate from "../../middleware/validate.js";
 import {
   createStudentSchema,
   exportStudentsQuerySchema,
-  listStudentsQuerySchema,
   updateStudentSchema,
   updateStudentStatusSchema,
 } from "./student.validation.js";
@@ -34,31 +34,35 @@ router.post(
 router.get(
   "/",
   authenticate,
-  authorize("ADMIN", "ACCOUNTANT"),
+  authorize("ADMIN", "ACCOUNTANT", "PRINCIPAL"),
   getStudentsController,
 );
 
 router.get(
   "/stats",
   authenticate,
-  authorize("ADMIN", "ACCOUNTANT"),
+  authorize("ADMIN", "ACCOUNTANT", "PRINCIPAL"),
   getStudentStatsController,
 );
+
 router.get(
   "/export/csv",
   authenticate,
-  authorize("ADMIN", "ACCOUNTANT"),
+  authorize("ADMIN", "ACCOUNTANT", "PRINCIPAL"),
   validateQuery(exportStudentsQuerySchema),
   getStudentsCsvController,
 );
 
+// IMPORTANT: static /me route before /:id param route
+router.get("/me", authenticate, authorize("STUDENT"), getStudentMeController);
+
 router.get(
   "/:id",
   authenticate,
-  authorize("ADMIN", "ACCOUNTANT"),
-  // No query validation needed for fetching a single student by ID
+  authorize("ADMIN", "ACCOUNTANT", "PRINCIPAL"),
   getStudentByIdController,
 );
+
 router.patch(
   "/:id",
   authenticate,
@@ -66,6 +70,7 @@ router.patch(
   validate(updateStudentSchema),
   updateStudentController,
 );
+
 router.patch(
   "/:id/status",
   authenticate,

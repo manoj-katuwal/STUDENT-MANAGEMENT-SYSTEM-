@@ -8,7 +8,7 @@ export const createStudent = async (studentData, options = {}) => {
 
 export const findStudentById = async (studentId) => {
   return await Student.findById(studentId)
-    .populate("userId", "email")
+    .populate("userId", "name email role")
     .populate("classId", "name code")
     .populate("sectionId", "name");
 };
@@ -18,12 +18,11 @@ export const findStudentByAdmissionNumber = async (admissionNumber) => {
 };
 
 export const findStudentByUserId = async (userId) => {
-  return await Student.findOne({ userId });
+  return await Student.findOne({ userId })
+    .populate("userId", "name email role")
+    .populate("classId", "name code")
+    .populate("sectionId", "name");
 };
-
-// export const findStudents = async (filter = {}) => {
-//   return await Student.find(filter);
-// };
 
 export const updateStudent = async (studentId, updateData) => {
   return await Student.findByIdAndUpdate(studentId, updateData, {

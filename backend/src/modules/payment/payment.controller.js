@@ -2,13 +2,13 @@ import asyncHandler from "../../shared/utils/asyncHandler.js";
 import { successResponse } from "../../shared/utils/response/apiResponse.js";
 import {
   createOfflinePaymentService,
+  getMyPaymentsService,
   getPaymentByIdService,
   getPaymentsService,
   getPaymentStatsService,
   getPaymentsCsvService,
   getStudentFeePaymentHistoryService,
 } from "./payment.service.js";
-
 
 export const createOfflinePaymentController = asyncHandler(async (req, res) => {
   const payment = await createOfflinePaymentService(req.body, req.user.id);
@@ -22,7 +22,7 @@ export const createOfflinePaymentController = asyncHandler(async (req, res) => {
 });
 
 export const getPaymentByIdController = asyncHandler(async (req, res) => {
-  const payment = await getPaymentByIdService(req.params.paymentId);
+  const payment = await getPaymentByIdService(req.params.paymentId, req.user);
 
   return successResponse({
     res,
@@ -36,6 +36,7 @@ export const getStudentFeePaymentHistoryController = asyncHandler(
   async (req, res) => {
     const payments = await getStudentFeePaymentHistoryService(
       req.params.studentFeeId,
+      req.user,
     );
 
     return successResponse({
@@ -46,6 +47,17 @@ export const getStudentFeePaymentHistoryController = asyncHandler(
     });
   },
 );
+
+export const getMyPaymentsController = asyncHandler(async (req, res) => {
+  const payments = await getMyPaymentsService(req.user.id);
+
+  return successResponse({
+    res,
+    statusCode: 200,
+    message: "Your payment history fetched successfully",
+    data: payments,
+  });
+});
 
 export const getPaymentsController = asyncHandler(async (req, res) => {
   const {
