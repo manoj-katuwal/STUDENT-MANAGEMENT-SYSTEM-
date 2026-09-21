@@ -51,6 +51,7 @@ export const useCreateOfflinePayment = () => {
       queryClient.invalidateQueries({ queryKey: ["payment-stats"] });
       queryClient.invalidateQueries({ queryKey: ["studentFees"] });
       queryClient.invalidateQueries({ queryKey: ["payment-student-fees"] });
+      queryClient.invalidateQueries({ queryKey: ["dashboard"] });
     },
   });
 };

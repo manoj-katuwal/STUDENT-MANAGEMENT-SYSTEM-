@@ -1,6 +1,4 @@
-import { useNavigate } from "react-router-dom";
-import { useAuth } from "../features/auth/auth.context";
-import { useLogout } from "../features/auth/auth.hooks";
+import { useState } from "react";
 import { useDashboardData } from "../hooks/useDashboardData";
 import PaymentMethods from "../components/dashboard/PaymentMethods";
 import RecentPayments from "../components/dashboard/RecentPayments";
@@ -9,11 +7,10 @@ import DashboardLoading from "../components/dashboard/DashboardLoading";
 import DashboardError from "../components/dashboard/DashboardError";
 import DashboardHeader from "../components/dashboard/DashboardHeader";
 import DashboardStats from "../components/dashboard/DashboardStats";
+import RecordPaymentDrawer from "../components/payments/RecordPaymentDrawer";
 
 function DashboardPage() {
-  const navigate = useNavigate();
-  const { user } = useAuth();
-  const { mutate: logout, isPending } = useLogout();
+  const [isRecordPaymentOpen, setIsRecordPaymentOpen] = useState(false);
 
   const {
     data: dashboard,
@@ -22,14 +19,6 @@ function DashboardPage() {
     error,
     refetch,
   } = useDashboardData();
-
-  const handleLogout = () => {
-    logout(undefined, {
-      onSuccess: () => {
-        navigate("/login", { replace: true });
-      },
-    });
-  };
 
   if (isLoading) {
     return <DashboardLoading />;
@@ -41,7 +30,7 @@ function DashboardPage() {
 
   return (
     <div className="min-h-full p-6 lg:p-8">
-      <DashboardHeader />
+      <DashboardHeader onCollectFee={() => setIsRecordPaymentOpen(true)} />
 
       <DashboardStats data={dashboard} />
 
@@ -53,6 +42,10 @@ function DashboardPage() {
       <div className="mt-8">
         <AcademicYearSummary summaries={dashboard?.academicYearSummary} />
       </div>
+
+      {isRecordPaymentOpen && (
+        <RecordPaymentDrawer onClose={() => setIsRecordPaymentOpen(false)} />
+      )}
     </div>
   );
 }

@@ -1,4 +1,3 @@
-import React from "react";
 import { Sparkles, Plus, Calendar } from "lucide-react";
 import { useAuth } from "../../features/auth/auth.context";
 
@@ -16,7 +15,7 @@ const getFormattedDate = () =>
     day: "numeric",
   });
 
-const DashboardHeader = () => {
+const DashboardHeader = ({ onCollectFee }) => {
   const { user } = useAuth();
 
   const firstName = user?.name ? user.name.split(" ")[0] : "there";
@@ -48,6 +47,7 @@ const DashboardHeader = () => {
         {/* Primary Action Button */}
         <button
           type="button"
+          onClick={onCollectFee}
           className="flex items-center gap-2 rounded-xl bg-blue-600 px-4 py-2 text-xs font-semibold text-white shadow-sm shadow-blue-600/20 hover:bg-blue-700 hover:shadow-md hover:shadow-blue-600/30 transition-all active:scale-95 cursor-pointer"
         >
           <Plus className="h-4 w-4" aria-hidden="true" />
