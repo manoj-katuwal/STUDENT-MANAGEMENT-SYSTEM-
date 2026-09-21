@@ -1,102 +1,117 @@
+import mongoose from "mongoose";
+
 import AppError from "../../shared/utils/error/AppError.js";
+import { logActivity } from "../auditLog/auditLog.service.js";
 import { findPaymentById } from "../payment/payment.repository.js";
 import { findStudentFeeById } from "../studentFee/studentFee.repository.js";
 import Student from "../students/student.model.js";
-import PaymentReversal from "./paymentReversal.model.js";
-import { createPaymentReversal, findReversalById } from "./paymentReversal.repository.js";
-import { logActivity } from "../auditLog/auditLog.service.js";
 import { sendNotification } from "../notification/notification.service.js";
 import logger from "../../config/logger.js";
-
+import {
+  createPaymentReversal,
+  findReversalById,
+} from "./paymentReversal.repository.js";
 
 export const reversePaymentService = async (
   paymentId,
   reason,
   reversedByUserId,
 ) => {
-  const payment = await findPaymentById(paymentId);
-  if (!payment) {
-    throw new AppError("Payment not found", 404);
-  }
-
-  if (payment.paymentStatus !== "SUCCESS") {
-    throw new AppError(
-      `Cannot reverse a payment with status ${payment.paymentStatus}`,
-      400,
-    );
-  }
-
-  const studentFee = await findStudentFeeById(payment.studentFeeId);
-  if (!studentFee) {
-    throw new AppError("Associated student fee record not found", 404);
-  }
-
-  const newPaidAmount = studentFee.paidAmount - payment.amount;
-  if (newPaidAmount < 0) {
-    throw new AppError(
-      "Reversal amount exceeds recorded paid amount for this fee",
-      400,
-    );
-  }
-
-
+  const session = await mongoose.startSession();
+  let payment;
+  let studentFee;
   let reversal;
+
   try {
-    reversal = await createPaymentReversal({
-      paymentId: payment._id,
-      studentFeeId: studentFee._id,
-      amount: payment.amount,
-      reason,
-      reversedBy: reversedByUserId,
+    session.startTransaction();
+
+    // Every record involved in the reversal is read and changed in the same
+    // transaction, so a failure leaves the payment and fee untouched.
+    payment = await findPaymentById(paymentId, { session });
+    if (!payment) {
+      throw new AppError("Payment not found", 404);
+    }
+
+    if (payment.paymentStatus !== "SUCCESS") {
+      throw new AppError(
+        `Cannot reverse a payment with status ${payment.paymentStatus}`,
+        400,
+      );
+    }
+
+    const studentFeeId = payment.studentFeeId?._id ?? payment.studentFeeId;
+    studentFee = await findStudentFeeById(studentFeeId, {
+      session,
     });
-  } catch (err) {
-    if (err.code === 11000) {
+    if (!studentFee) {
+      throw new AppError("Associated student fee record not found", 404);
+    }
+
+    const newPaidAmount = studentFee.paidAmount - payment.amount;
+    if (newPaidAmount < 0) {
+      throw new AppError(
+        "Reversal amount exceeds recorded paid amount for this fee",
+        400,
+      );
+    }
+
+    reversal = await createPaymentReversal(
+      {
+        paymentId: payment._id,
+        studentFeeId: studentFee._id,
+        amount: payment.amount,
+        reason,
+        reversedBy: reversedByUserId,
+      },
+      { session },
+    );
+
+    payment.paymentStatus = "REVERSED";
+    studentFee.paidAmount = newPaidAmount;
+    studentFee.dueAmount = studentFee.netAmount - newPaidAmount;
+    studentFee.status =
+      newPaidAmount === 0
+        ? "PENDING"
+        : newPaidAmount < studentFee.netAmount
+          ? "PARTIAL"
+          : "PAID";
+
+    await payment.save({ session });
+    await studentFee.save({ session });
+    await logActivity(
+      {
+        entityType: "PaymentReversal",
+        entityId: reversal._id,
+        action: "REVERSED",
+        description: "Payment reversed",
+        performedBy: reversedByUserId,
+      },
+      { session },
+    );
+
+    await session.commitTransaction();
+  } catch (error) {
+    await session.abortTransaction();
+
+    if (error?.code === 11000) {
       throw new AppError("This payment has already been reversed", 400);
     }
-    throw err;
-  }
 
-  // Step 2: Payment + StudentFee mutate
-  payment.paymentStatus = "REVERSED";
-
-  studentFee.paidAmount = newPaidAmount;
-  studentFee.dueAmount = studentFee.netAmount - newPaidAmount;
-  studentFee.status =
-    newPaidAmount === 0
-      ? "PENDING"
-      : newPaidAmount < studentFee.netAmount
-        ? "PARTIAL"
-        : "PAID";
-
-  try {
-    await payment.save();
-    await studentFee.save();
-  } catch (err) {
-    // manual rollback — no transactions available on standalone Mongo
-    await PaymentReversal.findByIdAndDelete(reversal._id);
-    throw new AppError(
-      "Failed to complete payment reversal, please retry",
-      500,
-    );
+    throw error;
+  } finally {
+    await session.endSession();
   }
 
   const completedReversal = await findReversalById(reversal._id);
 
-  await logActivity({
-    entityType: "PaymentReversal",
-    entityId: reversal._id,
-    action: "REVERSED",
-    description: "Payment reversed",
-    performedBy: reversedByUserId,
-  });
   logger.info("Payment reversed", {
     paymentId: payment._id,
     paymentReversalId: reversal._id,
     performedBy: reversedByUserId,
   });
 
-  // A notification is a post-reversal side effect: it must not undo a
-  // completed reversal if the student's email cannot be resolved or delivered.
+  // Notification delivery is intentionally after commit: an email failure
+  // must never undo a completed financial reversal.
   try {
     const student = await Student.findById(studentFee.studentId).populate(
       "userId",
@@ -117,16 +132,16 @@ export const reversePaymentService = async (
         },
       });
     } else {
-      logger.warn(
-        "Payment reversal notification skipped: student email unavailable",
-        { paymentId: payment._id, studentId: studentFee.studentId },
-      );
+      logger.warn("Payment reversal notification skipped: student email unavailable", {
+        paymentId: payment._id,
+        studentId: studentFee.studentId,
+      });
     }
-  } catch (err) {
+  } catch (error) {
     logger.error("Payment reversal notification setup failed", {
       paymentId: payment._id,
       paymentReversalId: reversal._id,
-      err,
+      error,
     });
   }
 

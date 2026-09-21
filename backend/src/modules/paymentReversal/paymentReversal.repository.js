@@ -1,7 +1,9 @@
 import PaymentReversal from "./paymentReversal.model.js";
 
-export const createPaymentReversal = async (data) => {
-  return await PaymentReversal.create(data);
+export const createPaymentReversal = async (data, options = {}) => {
+  return await PaymentReversal.create([data], options).then(
+    (result) => result[0],
+  );
 };
 
 export const findReversalByPaymentId = async (paymentId) => {

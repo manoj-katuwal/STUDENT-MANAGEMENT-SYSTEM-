@@ -34,7 +34,12 @@ router.get(
   getStudentFeePaymentHistoryController,
 );
 
-router.get("/stats", getPaymentStatsController);
+router.get(
+  "/stats",
+  authenticate,
+  authorize("ADMIN", "ACCOUNTANT"),
+  getPaymentStatsController,
+);
 
 router.get(
   "/export/csv",

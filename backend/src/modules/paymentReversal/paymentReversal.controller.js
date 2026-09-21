@@ -11,7 +11,7 @@ export const reversePayment = asyncHandler(async (req, res) => {
   return successResponse({
     res,
     statusCode: 200,
-    message: "Payment retreived successfully",
+    message: "Payment reversed successfully",
     data: reversal,
   });
 });
