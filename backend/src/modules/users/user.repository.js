@@ -81,6 +81,7 @@ export const updateUserRole = async (userId, role) => {
     },
     {
       new: true,
+      runValidators: true,
     },
   );
 };
@@ -93,6 +94,7 @@ export const setUserActiveStatus = async (userId, isActive) => {
     },
     {
       new: true,
+      runValidators: true,
     },
   );
 };

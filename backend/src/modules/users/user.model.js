@@ -24,12 +24,15 @@ const userSchema = new mongoose.Schema(
 
     role: {
       type: String,
+      trim: true,
+      uppercase: true,
       enum: ["ADMIN", "ACCOUNTANT", "PRINCIPAL", "STUDENT"],
       default: "ADMIN",
     },
 
     isActive: {
       type: Boolean,
+      required: true,
       default: true,
     },
 
