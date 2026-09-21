@@ -16,7 +16,6 @@ function DashboardPage() {
     data: dashboard,
     isLoading,
     isError,
-    error,
     refetch,
   } = useDashboardData();
 
