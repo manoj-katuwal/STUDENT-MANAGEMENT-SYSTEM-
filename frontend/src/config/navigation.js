@@ -37,7 +37,7 @@ export const NAV_ITEMS = [
     path: "/students",
     icon: Users2,
     group: "Academic",
-    allowedRoles: ["ADMIN", "PRINCIPAL"],
+    allowedRoles: ["ADMIN", "ACCOUNTANT", "PRINCIPAL"],
   },
   {
     label: "Classes",
@@ -74,7 +74,7 @@ export const NAV_ITEMS = [
     path: "/student-fees",
     icon: Receipt,
     group: "Finance",
-    allowedRoles: ["ADMIN"],
+    allowedRoles: ["ADMIN", "ACCOUNTANT", "PRINCIPAL"],
   },
   {
     label: "Payments",

@@ -40,7 +40,13 @@ const Router = () => {
                 <Route path="/users" element={<UsersPage />} />
               </Route>
 
-              <Route element={<RoleRoute allowedRoles={["ADMIN"]} />}>
+              <Route
+                element={
+                  <RoleRoute
+                    allowedRoles={["ADMIN", "ACCOUNTANT", "PRINCIPAL"]}
+                  />
+                }
+              >
                 <Route path="/student-fees"  element={<StudentFeePage />}/>
               </Route>
 
