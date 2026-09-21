@@ -1,8 +1,13 @@
 import { Eye, Edit3, Phone } from "lucide-react";
 import { useNavigate } from "react-router-dom";
+import { useAuth } from "../../features/auth/auth.context";
 
 const StudentsTable = ({ students = [], isLoading = false }) => {
   const navigate = useNavigate();
+  const { user } = useAuth();
+  const canManageStudents =
+    user?.role === "ADMIN" || user?.role === "ACCOUNTANT";
+
   return (
     <div className="w-full overflow-hidden bg-white border border-slate-200 rounded-xl shadow-sm">
       <div className="overflow-x-auto">
@@ -46,6 +51,10 @@ const StudentsTable = ({ students = [], isLoading = false }) => {
                   {/* Section */}
                   <td className="py-3 px-4">
                     <div className="h-4 bg-slate-200 rounded w-12" />
+                  </td>
+                  {/* Email */}
+                  <td className="py-3 px-4">
+                    <div className="h-4 bg-slate-200 rounded w-32" />
                   </td>
                   {/* Phone */}
                   <td className="py-3 px-4">
@@ -159,22 +168,25 @@ const StudentsTable = ({ students = [], isLoading = false }) => {
                       <div className="flex items-center justify-end gap-1">
                         <button
                           type="button"
-                          className="p-1.5 text-slate-500 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
+                          className="p-1.5 text-slate-500 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors cursor-pointer"
                           title="View Details"
                           onClick={() => navigate(`/students/${student._id}`)}
                         >
                           <Eye className="w-4 h-4" />
                         </button>
-                        <button
-                          type="button"
-                          className="p-1.5 text-slate-500 hover:text-amber-600 hover:bg-amber-50 rounded-lg transition-colors"
-                          title="Edit Student"
-                          onClick={() =>
-                            navigate(`/students/${student._id}/edit`)
-                          }
-                        >
-                          <Edit3 className="w-4 h-4" />
-                        </button>
+
+                        {canManageStudents && (
+                          <button
+                            type="button"
+                            className="p-1.5 text-slate-500 hover:text-amber-600 hover:bg-amber-50 rounded-lg transition-colors cursor-pointer"
+                            title="Edit Student"
+                            onClick={() =>
+                              navigate(`/students/${student._id}/edit`)
+                            }
+                          >
+                            <Edit3 className="w-4 h-4" />
+                          </button>
+                        )}
                       </div>
                     </td>
                   </tr>

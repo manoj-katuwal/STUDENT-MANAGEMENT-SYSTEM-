@@ -51,11 +51,11 @@ const Router = () => {
               <Route
                 element={
                   <RoleRoute
-                    allowedRoles={["ADMIN", "ACCOUNTANT"]}
+                    allowedRoles={["ADMIN", "ACCOUNTANT", "PRINCIPAL"]}
                   />
                 }
               >
-                <Route path="/student-fees"  element={<StudentFeePage />}/>
+                <Route path="/student-fees" element={<StudentFeePage />} />
               </Route>
 
               <Route element={<RoleRoute allowedRoles={["ADMIN"]} />}>
@@ -116,7 +116,7 @@ const Router = () => {
               <Route
                 element={
                   <RoleRoute
-                    allowedRoles={["ADMIN", "ACCOUNTANT"]}
+                    allowedRoles={["ADMIN", "ACCOUNTANT", "PRINCIPAL"]}
                   />
                 }
               >

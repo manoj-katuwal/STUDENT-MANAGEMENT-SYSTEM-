@@ -1,5 +1,6 @@
 import React from "react";
 import { Eye, Pencil, AlertCircle, RefreshCw, Layers, Ban } from "lucide-react";
+import { useAuth } from "../../features/auth/auth.context";
 
 const StudentFeeTable = ({
   studentFees = [],
@@ -10,6 +11,9 @@ const StudentFeeTable = ({
   onEdit,
   onCancel,
 }) => {
+  const { user } = useAuth();
+  const canManageFees = user?.role === "ADMIN" || user?.role === "ACCOUNTANT";
+
   const getStatusBadge = (status) => {
     switch (status) {
       case "PAID":
@@ -237,7 +241,7 @@ const StudentFeeTable = ({
                       <Eye className="w-4 h-4" />
                     </button>
 
-                    {row.status !== "CANCELLED" && (
+                    {canManageFees && row.status !== "CANCELLED" && (
                       <button
                         type="button"
                         title="Adjust Concession / Discount"
@@ -248,7 +252,7 @@ const StudentFeeTable = ({
                       </button>
                     )}
 
-                    {row.status !== "CANCELLED" && (
+                    {canManageFees && row.status !== "CANCELLED" && (
                       <button
                         type="button"
                         title={

@@ -12,6 +12,7 @@ import {
   useStudent,
   useUpdateStudentStatus,
 } from "../features/students/student.hooks";
+import { useAuth } from "../features/auth/auth.context";
 import formatDate from "../utils/formatDate";
 
 // Small reusable field for label + value pairs inside a section card
@@ -44,6 +45,9 @@ const SectionCard = ({ icon: Icon, title, children }) => (
 const StudentDetailsPage = () => {
   const { studentId } = useParams();
   const navigate = useNavigate();
+  const { user } = useAuth();
+  const canManageStudents =
+    user?.role === "ADMIN" || user?.role === "ACCOUNTANT";
 
   const {
     data: student,
@@ -149,7 +153,7 @@ const StudentDetailsPage = () => {
       <div className="bg-white border border-slate-200 rounded-xl shadow-sm px-5 py-4">
         <button
           onClick={() => navigate("/students")}
-          className="inline-flex items-center gap-1.5 text-sm font-medium text-slate-500 hover:text-slate-800 transition-colors mb-3"
+          className="inline-flex items-center gap-1.5 text-sm font-medium text-slate-500 hover:text-slate-800 transition-colors mb-3 cursor-pointer"
         >
           <ArrowLeft className="w-4 h-4" />
           <span>Back</span>
@@ -176,36 +180,38 @@ const StudentDetailsPage = () => {
             </p>
           </div>
 
-          <div className="flex items-center gap-2">
-            <button
-              type="button"
-              disabled={updateStatusMutation.isPending}
-              onClick={handleToggleStatus}
-              className={`inline-flex items-center gap-1.5 px-3 py-2 text-sm font-medium rounded-lg transition-colors disabled:opacity-50 ${
-                isActive
-                  ? "bg-rose-50 text-rose-600 hover:bg-rose-100 border border-rose-200"
-                  : "bg-emerald-50 text-emerald-700 hover:bg-emerald-100 border border-emerald-200"
-              }`}
-            >
-              <Power className="w-4 h-4" />
-              <span>
-                {updateStatusMutation.isPending
-                  ? "Updating..."
-                  : isActive
-                    ? "Deactivate Student"
-                    : "Activate Student"}
-              </span>
-            </button>
+          {canManageStudents && (
+            <div className="flex items-center gap-2">
+              <button
+                type="button"
+                disabled={updateStatusMutation.isPending}
+                onClick={handleToggleStatus}
+                className={`inline-flex items-center gap-1.5 px-3 py-2 text-sm font-medium rounded-lg transition-colors disabled:opacity-50 cursor-pointer ${
+                  isActive
+                    ? "bg-rose-50 text-rose-600 hover:bg-rose-100 border border-rose-200"
+                    : "bg-emerald-50 text-emerald-700 hover:bg-emerald-100 border border-emerald-200"
+                }`}
+              >
+                <Power className="w-4 h-4" />
+                <span>
+                  {updateStatusMutation.isPending
+                    ? "Updating..."
+                    : isActive
+                      ? "Deactivate Student"
+                      : "Activate Student"}
+                </span>
+              </button>
 
-            <button
-              type="button"
-              onClick={() => navigate(`/students/${studentId}/edit`)}
-              className="inline-flex items-center gap-1.5 px-3 py-2 text-sm font-medium text-slate-700 bg-slate-100 border border-slate-200 rounded-lg hover:bg-slate-200 transition-colors"
-            >
-              <Pencil className="w-4 h-4" />
-              <span>Edit Student</span>
-            </button>
-          </div>
+              <button
+                type="button"
+                onClick={() => navigate(`/students/${studentId}/edit`)}
+                className="inline-flex items-center gap-1.5 px-3 py-2 text-sm font-medium text-slate-700 bg-slate-100 border border-slate-200 rounded-lg hover:bg-slate-200 transition-colors cursor-pointer"
+              >
+                <Pencil className="w-4 h-4" />
+                <span>Edit Student</span>
+              </button>
+            </div>
+          )}
         </div>
       </div>
 
