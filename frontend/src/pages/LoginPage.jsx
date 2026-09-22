@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useNavigate, Navigate, Link } from "react-router-dom";
-import { Mail, Lock, Eye, EyeOff, Loader2 } from "lucide-react";
+import { Mail, Lock, Eye, EyeOff, Loader2, ArrowLeft } from "lucide-react";
 import { useLogin } from "../features/auth/auth.hooks";
 import { useAuth } from "../features/auth/auth.context";
 
@@ -76,6 +76,17 @@ function LoginPage() {
       {/* Right form panel */}
       <div className="flex w-full lg:w-1/2 items-center justify-center px-6 py-12">
         <div className="w-full max-w-sm">
+          {/* Back to Home Link (Top) */}
+          <div className="mb-6">
+            <Link
+              to="/"
+              className="inline-flex items-center gap-1.5 text-xs font-medium text-slate hover:text-ink transition-colors"
+            >
+              <ArrowLeft className="w-3.5 h-3.5" />
+              <span>Back to Home</span>
+            </Link>
+          </div>
+
           {/* Compact mark for mobile */}
           <div className="lg:hidden mb-8 flex items-center gap-3">
             <div
@@ -193,9 +204,6 @@ function LoginPage() {
                 Register here
               </Link>
             </p>
-            <Link to="/" className="text-slate hover:text-ink mt-2">
-              ← Back to Home
-            </Link>
           </div>
         </div>
       </div>
