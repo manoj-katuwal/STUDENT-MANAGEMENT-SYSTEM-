@@ -1,29 +1,41 @@
 import React, { useState } from "react";
 import { Link } from "react-router-dom";
 import {
-  Wallet,
-  CheckCircle2,
-  ShieldCheck,
-  CreditCard,
-  Download,
-  ArrowRight,
-  School,
+  ArrowUpRight,
   GraduationCap,
-  Users,
-  BarChart3,
-  FileText,
-  Lock,
-  Zap,
-  Sparkles,
-  ChevronRight,
-  HelpCircle,
-  Clock,
-  Layers3,
-  TrendingUp,
+  ShieldCheck,
   Receipt,
-  Eye,
+  BarChart3,
 } from "lucide-react";
 import { useAuth } from "../features/auth/auth.context";
+
+/*
+  Fonts used below: Newsreader (serif — headlines & the ledger numerals),
+  IBM Plex Sans (body/UI), IBM Plex Mono (entry numbers & currency figures).
+  Add this to index.html <head> once:
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;0,6..72,600;1,6..72,400&family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap"
+    rel="stylesheet"
+  >
+*/
+
+const serif = "font-['Newsreader',Georgia,serif]";
+const sans = "font-['IBM_Plex_Sans',ui-sans-serif,system-ui,sans-serif]";
+const mono = "font-['IBM_Plex_Mono',ui-monospace,SFMono-Regular,monospace]";
+
+// Palette (kept as literal values throughout via Tailwind's arbitrary syntax
+// so this file is a drop-in replacement with no tailwind.config changes)
+//   ink        #17233C  primary text / lines
+//   ink-soft   #55618A  secondary text
+//   paper      #F6F3EA  page background
+//   paper-deep #EEE8D8  recessed panels
+//   line       #DAD2BC  hairline rules / borders
+//   brass      #93702F  accents, entry numbers
+//   green      #2F5D4B  paid / collected
+//   rust       #8B3A2B  due / overdue
 
 function HomePage() {
   const { isAuthenticated, user } = useAuth();
@@ -32,145 +44,170 @@ function HomePage() {
   const roles = [
     {
       id: "STUDENT",
-      title: "Student Portal",
-      subtitle: "Personal fee visibility & online payments",
+      title: "Student",
+      subtitle: "Personal ledger & online payment",
       icon: GraduationCap,
-      color: "bg-blue-600 text-white",
-      badge: "Self-Service",
       features: [
-        "View complete fee ledger breakdown (Gross, Discounts, Net)",
-        "Instant online fee payment via eSewa gateway",
-        "Download official PDF payment receipts anytime",
-        "Track upcoming due dates and outstanding balances",
+        "Full fee breakdown — gross, discounts, scholarships, net",
+        "Pay outstanding balances instantly through eSewa",
+        "Download a signed PDF receipt after every payment",
+        "See the next due date before a fine is charged",
       ],
     },
     {
       id: "ADMIN",
       title: "Administrator",
-      subtitle: "Full institution & financial management",
+      subtitle: "Institution & fee-policy control",
       icon: ShieldCheck,
-      color: "bg-indigo-600 text-white",
-      badge: "Full Control",
       features: [
-        "Define custom Fee Structures by Class & Academic Year",
-        "Manage Users, Students, Classes, and Sections",
-        "Assign and customize individual student discounts",
-        "Access comprehensive Audit Logs and payment reversal controls",
+        "Set fee structures per class and academic year",
+        "Manage students, classes, sections, and staff accounts",
+        "Approve individual discounts and scholarship awards",
+        "Read the audit log behind every entry in the ledger",
       ],
     },
     {
       id: "ACCOUNTANT",
-      title: "Accountant Desk",
-      subtitle: "Daily fee collection & counter operations",
+      title: "Accountant",
+      subtitle: "Counter collection & receipting",
       icon: Receipt,
-      color: "bg-emerald-600 text-white",
-      badge: "Counter Operations",
       features: [
-        "Fast offline fee collection (Cash, Cheque, Bank Transfer)",
-        "Instant receipt generation and printing",
-        "Track daily and monthly collection balances",
-        "Export fee ledgers and reports to Excel / CSV",
+        "Record cash, cheque, or bank-transfer payments on the spot",
+        "Print a receipt the moment a payment is entered",
+        "Watch the day's till against the ledger in real time",
+        "Export any collection period to Excel",
       ],
     },
     {
       id: "PRINCIPAL",
-      title: "Principal & Management",
-      subtitle: "Executive financial overview & reporting",
+      title: "Principal",
+      subtitle: "Read-only financial oversight",
       icon: BarChart3,
-      color: "bg-amber-600 text-white",
-      badge: "Executive Analytics",
       features: [
-        "Real-time financial health and revenue analytics",
-        "View academic year collection comparisons",
-        "Monitor student fee dues without modifying financial records",
-        "Export administrative reports for board review",
+        "Compare collection across academic years at a glance",
+        "See which classes are carrying outstanding dues",
+        "Review reports without the power to alter a single entry",
+        "Pull board-ready exports on demand",
       ],
+    },
+  ];
+
+  const ledgerFeatures = [
+    {
+      no: "01",
+      title: "One fee structure per class",
+      body: "Tuition, lab, library, sports, and exam fees are set once per class and academic year, then applied automatically to every student in it.",
+    },
+    {
+      no: "02",
+      title: "eSewa, built in",
+      body: "Students settle a balance in full or in part from their own portal. The ledger reconciles the moment eSewa confirms payment.",
+    },
+    {
+      no: "03",
+      title: "Receipts that don't need reprinting",
+      body: "Every payment — online or at the counter — produces a numbered PDF receipt immediately, ready to download or print.",
+    },
+    {
+      no: "04",
+      title: "Discounts and scholarships, kept separate",
+      body: "A sibling discount and a merit scholarship are recorded as distinct entries against the same fee, so nothing is ever double-counted.",
+    },
+    {
+      no: "05",
+      title: "Fines that respect a grace period",
+      body: "Late fees accrue daily against a configurable policy and cap — never silently, and never past the limit a school has set.",
+    },
+    {
+      no: "06",
+      title: "An audit trail on everything",
+      body: "Every reversal, discount, and adjustment is logged against the fee it touched, so a question about any entry has an answer.",
     },
   ];
 
   const faqs = [
     {
-      q: "How does online fee payment work for students?",
-      a: "Students can log in to their student portal, navigate to 'My Fees', and click 'Pay with eSewa'. They can pay the full amount or a partial installment. Upon payment confirmation, the fee ledger updates in real-time and an official PDF receipt is automatically generated.",
+      q: "How does a student pay online?",
+      a: "From the student portal, under \u201cMy Fees,\u201d they choose full or partial payment and confirm through eSewa. The ledger updates as soon as the gateway confirms, and a receipt is issued automatically.",
     },
     {
-      q: "Can the school record cash and bank payments?",
-      a: "Yes! Accountants and administrators can record offline payments via Cash, Cheque, or Direct Bank Transfer with custom reference IDs, payment notes, and instant receipt generation.",
+      q: "Can the school still take cash at the counter?",
+      a: "Yes. Accountants record cash, cheque, or bank-transfer payments directly against a student's ledger, with a reference note and an instant printed receipt.",
     },
     {
-      q: "How does Role-Based Access Control (RBAC) protect financial data?",
-      a: "The system enforces strict multi-tier permissions. Students can only see their own ledgers, Accountants handle payment collections, Principals get executive read-only analytics, and Admins configure academic and fee policies.",
+      q: "What stops one role from seeing another's data?",
+      a: "Access is enforced by role at the server, not just hidden in the interface. A student can only open their own ledger; a principal can read every ledger but change none of them.",
     },
     {
-      q: "Can fee ledgers and reports be exported?",
-      a: "Yes, reports including daily collections, monthly revenue, pending dues, and full student rosters can be exported as structured CSV files at any time.",
+      q: "Can I get the numbers out for a board meeting?",
+      a: "Collection reports, pending dues, and full student rosters export to Excel from the reports screen, filtered by class, date range, or academic year.",
     },
   ];
 
+  const activeRole = roles.find((r) => r.id === activeRoleTab);
+
   return (
-    <div className="min-h-screen bg-slate-50 text-slate-900 font-body antialiased flex flex-col justify-between selection:bg-blue-600 selection:text-white">
-      {/* 1. Header / Navbar */}
-      <header className="sticky top-0 z-40 w-full border-b border-slate-200/80 bg-white/90 backdrop-blur-md">
-        <div className="max-w-7xl mx-auto flex items-center justify-between px-4 sm:px-6 lg:px-8 h-16">
+    <div
+      className={`min-h-screen bg-[#F6F3EA] text-[#17233C] ${sans} antialiased`}
+    >
+      {/* 1. Header */}
+      <header className="sticky top-0 z-40 w-full border-b border-[#DAD2BC] bg-[#F6F3EA]/95 backdrop-blur-sm">
+        <div className="max-w-6xl mx-auto flex items-center justify-between px-5 sm:px-8 h-16">
           <Link to="/" className="flex items-center gap-2.5">
-            <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-tr from-blue-600 to-indigo-600 text-white font-bold text-base shadow-md">
-              SFM
+            <div
+              className={`flex h-8 w-8 items-center justify-center rounded-sm bg-[#17233C] text-[#F6F3EA] text-sm ${serif}`}
+            >
+              रू
             </div>
-            <div>
-              <span className="font-poppins font-bold text-slate-900 tracking-tight text-lg sm:text-xl block leading-tight">
-                Fee Ledger
-              </span>
-              <span className="text-[10px] text-slate-400 font-medium tracking-wide uppercase block -mt-0.5">
-                School Management System
-              </span>
-            </div>
+            <span
+              className={`${serif} font-medium text-[#17233C] text-lg tracking-tight`}
+            >
+              Fee Ledger
+            </span>
           </Link>
 
-          {/* Desktop Nav Links */}
-          <nav className="hidden md:flex items-center gap-8 text-sm font-medium text-slate-600">
+          <nav className="hidden md:flex items-center gap-7 text-sm text-[#55618A]">
             <a
               href="#features"
-              className="hover:text-blue-600 transition-colors"
+              className="hover:text-[#17233C] transition-colors"
             >
               Features
             </a>
-            <a href="#roles" className="hover:text-blue-600 transition-colors">
-              Portals & Roles
+            <a href="#roles" className="hover:text-[#17233C] transition-colors">
+              Roles
             </a>
             <a
               href="#how-it-works"
-              className="hover:text-blue-600 transition-colors"
+              className="hover:text-[#17233C] transition-colors"
             >
-              Workflow
+              How it works
             </a>
-            <a href="#faq" className="hover:text-blue-600 transition-colors">
+            <a href="#faq" className="hover:text-[#17233C] transition-colors">
               FAQ
             </a>
           </nav>
 
-          {/* Action CTAs */}
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-2">
             {isAuthenticated ? (
               <Link
                 to="/dashboard"
-                className="inline-flex items-center gap-2 rounded-xl bg-blue-600 px-4 py-2 text-xs sm:text-sm font-semibold text-white shadow-md hover:bg-blue-700 transition-all"
+                className="inline-flex items-center gap-1.5 rounded-sm bg-[#17233C] px-4 py-2 text-sm font-medium text-[#F6F3EA] hover:bg-[#232F4B] transition-colors"
               >
-                <span>Dashboard ({user?.role})</span>
-                <ArrowRight className="h-4 w-4" />
+                Dashboard &middot; {user?.role}
               </Link>
             ) : (
               <>
                 <Link
                   to="/login"
-                  className="rounded-xl px-3.5 py-2 text-xs sm:text-sm font-semibold text-slate-700 hover:text-blue-600 hover:bg-slate-100 transition-colors"
+                  className="rounded-sm px-3 py-2 text-sm text-[#55618A] hover:text-[#17233C] transition-colors"
                 >
-                  Sign In
+                  Sign in
                 </Link>
                 <Link
                   to="/register"
-                  className="inline-flex items-center gap-1.5 rounded-xl bg-blue-600 px-4 py-2 text-xs sm:text-sm font-semibold text-white shadow-md hover:bg-blue-700 transition-all"
+                  className="inline-flex items-center gap-1.5 rounded-sm bg-[#17233C] px-4 py-2 text-sm font-medium text-[#F6F3EA] hover:bg-[#232F4B] transition-colors"
                 >
-                  <span>Student Register</span>
+                  Register
                 </Link>
               </>
             )}
@@ -178,445 +215,324 @@ function HomePage() {
         </div>
       </header>
 
-      {/* 2. Hero Section */}
-      <section className="relative overflow-hidden pt-12 pb-20 sm:pt-16 sm:pb-28">
-        {/* Glow gradients in background */}
-        <div className="absolute top-1/4 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[350px] bg-gradient-to-tr from-blue-400/20 via-indigo-400/20 to-emerald-400/10 rounded-full blur-3xl pointer-events-none" />
-
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
-          <div className="text-center max-w-3xl mx-auto">
-            {/* Pill Banner */}
-            <div className="inline-flex items-center gap-2 rounded-full border border-blue-200/80 bg-blue-50/80 px-4 py-1.5 text-xs font-semibold text-blue-700 shadow-2xs backdrop-blur-sm mb-6 animate-in fade-in slide-in-from-top-4 duration-500">
-              <Sparkles className="h-3.5 w-3.5 text-blue-600" />
-              <span>Smart Institutional Fee Ledger with eSewa Integration</span>
-            </div>
-
-            {/* Main Headline */}
-            <h1 className="text-3xl sm:text-5xl lg:text-6xl font-extrabold font-poppins text-slate-900 tracking-tight leading-[1.15]">
-              Intelligent, Transparent & Hassle-Free{" "}
-              <span className="bg-gradient-to-r from-blue-600 via-indigo-600 to-emerald-600 bg-clip-text text-transparent">
-                Student Fee Management
-              </span>
+      {/* 2. Hero */}
+      <section className="max-w-6xl mx-auto px-5 sm:px-8 pt-16 pb-20 sm:pt-24 sm:pb-28">
+        <div className="grid grid-cols-1 lg:grid-cols-[1.05fr_0.95fr] gap-14 lg:gap-10 items-center">
+          {/* Copy */}
+          <div>
+            <h1
+              className={`${serif} text-4xl sm:text-5xl lg:text-[3.4rem] leading-[1.12] text-[#17233C]`}
+            >
+              Every fee recorded.
+              <br />
+              Every rupee receipted.
             </h1>
-
-            <p className="mt-5 text-base sm:text-lg text-slate-600 leading-relaxed max-w-2xl mx-auto">
-              Empower your school administration with automated fee structures,
-              real-time ledger reconciliations, instant eSewa online payments,
-              and role-based access for Admins, Accountants, Principals, and
-              Students.
+            <p className="mt-6 text-base sm:text-[1.05rem] text-[#55618A] leading-relaxed max-w-md">
+              A single ledger for tuition, fines, discounts, and scholarships
+              &mdash; with eSewa payments, instant receipts, and a plain audit
+              trail behind every entry.
             </p>
 
-            {/* Hero CTAs */}
-            <div className="mt-8 flex flex-col sm:flex-row items-center justify-center gap-3.5">
+            <div className="mt-9 flex flex-col sm:flex-row gap-3">
               <Link
                 to={isAuthenticated ? "/dashboard" : "/login"}
-                className="w-full sm:w-auto inline-flex items-center justify-center gap-2 rounded-xl bg-blue-600 px-7 py-3.5 text-sm font-semibold text-white shadow-lg shadow-blue-600/20 hover:bg-blue-700 hover:shadow-xl transition-all"
+                className="inline-flex items-center justify-center gap-1.5 rounded-sm bg-[#17233C] px-6 py-3 text-sm font-medium text-[#F6F3EA] hover:bg-[#232F4B] transition-colors"
               >
-                <span>
-                  {isAuthenticated ? "Go to My Dashboard" : "Access Fee Portal"}
-                </span>
-                <ArrowRight className="h-4 w-4" />
+                {isAuthenticated ? "Open my dashboard" : "Open the ledger"}
+                <ArrowUpRight className="h-4 w-4" />
               </Link>
-
               <Link
                 to="/register"
-                className="w-full sm:w-auto inline-flex items-center justify-center gap-2 rounded-xl border border-slate-300 bg-white px-7 py-3.5 text-sm font-semibold text-slate-700 shadow-xs hover:bg-slate-50 hover:text-blue-600 transition-all"
+                className="inline-flex items-center justify-center gap-1.5 rounded-sm border border-[#17233C]/25 px-6 py-3 text-sm font-medium text-[#17233C] hover:border-[#17233C]/60 transition-colors"
               >
-                <GraduationCap className="h-4 w-4" />
-                <span>Register as Student</span>
+                Register a student
               </Link>
             </div>
 
-            {/* Feature Badges */}
-            <div className="mt-12 flex flex-wrap items-center justify-center gap-x-8 gap-y-3 text-xs font-medium text-slate-500">
-              <div className="flex items-center gap-1.5">
-                <CheckCircle2 className="h-4 w-4 text-emerald-500" />
-                <span>100% Accurate Reconciliations</span>
+            <div className="mt-11 pt-6 border-t border-[#DAD2BC] flex flex-wrap gap-x-8 gap-y-3">
+              <div>
+                <p className={`${mono} text-sm text-[#93702F]`}>eSewa</p>
+                <p className="text-xs text-[#55618A] mt-0.5">
+                  integrated gateway
+                </p>
               </div>
-              <div className="flex items-center gap-1.5">
-                <CheckCircle2 className="h-4 w-4 text-emerald-500" />
-                <span>Instant eSewa Online Pay</span>
+              <div>
+                <p className={`${mono} text-sm text-[#93702F]`}>4 roles</p>
+                <p className="text-xs text-[#55618A] mt-0.5">
+                  admin, accountant, principal, student
+                </p>
               </div>
-              <div className="flex items-center gap-1.5">
-                <CheckCircle2 className="h-4 w-4 text-emerald-500" />
-                <span>Downloadable PDF Receipts</span>
-              </div>
-              <div className="flex items-center gap-1.5">
-                <CheckCircle2 className="h-4 w-4 text-emerald-500" />
-                <span>Granular RBAC Security</span>
-              </div>
-            </div>
-          </div>
-
-          {/* Interactive Hero Visual / Dashboard Preview Card */}
-          <div className="mt-14 rounded-2xl border border-slate-200/80 bg-white p-4 sm:p-6 shadow-2xl">
-            <div className="rounded-xl bg-slate-900 text-white p-4 sm:p-6 shadow-inner">
-              <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 pb-5 border-b border-slate-800">
-                <div className="flex items-center gap-3">
-                  <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-blue-500/20 text-blue-400 ring-1 ring-blue-500/30">
-                    <Wallet className="h-5 w-5" />
-                  </div>
-                  <div>
-                    <h3 className="text-sm sm:text-base font-semibold font-poppins">
-                      Institutional Financial Overview
-                    </h3>
-                    <p className="text-xs text-slate-400">
-                      Academic Year 2081/82 • Live Ledger Tracking
-                    </p>
-                  </div>
-                </div>
-                <div className="flex items-center gap-2">
-                  <span className="inline-flex items-center gap-1.5 rounded-full bg-emerald-500/10 px-3 py-1 text-xs font-semibold text-emerald-400 ring-1 ring-emerald-500/30">
-                    <span className="h-2 w-2 rounded-full bg-emerald-400 animate-pulse" />
-                    eSewa Gateway Active
-                  </span>
-                </div>
-              </div>
-
-              {/* Sample Metrics inside card */}
-              <div className="mt-6 grid grid-cols-2 lg:grid-cols-4 gap-4">
-                <div className="rounded-xl bg-slate-800/80 p-4 border border-slate-700/60">
-                  <p className="text-xs text-slate-400 font-medium">
-                    Total Fees Assigned
-                  </p>
-                  <p className="text-xl sm:text-2xl font-bold font-poppins text-white mt-1">
-                    रू 4,850,000
-                  </p>
-                  <span className="text-[11px] text-blue-400 font-medium mt-1 block">
-                    All Classes Enrolled
-                  </span>
-                </div>
-                <div className="rounded-xl bg-slate-800/80 p-4 border border-slate-700/60">
-                  <p className="text-xs text-slate-400 font-medium">
-                    Collected Revenue
-                  </p>
-                  <p className="text-xl sm:text-2xl font-bold font-poppins text-emerald-400 mt-1">
-                    रू 3,920,000
-                  </p>
-                  <span className="text-[11px] text-emerald-400/80 font-medium mt-1 block">
-                    80.8% Collection Rate
-                  </span>
-                </div>
-                <div className="rounded-xl bg-slate-800/80 p-4 border border-slate-700/60">
-                  <p className="text-xs text-slate-400 font-medium">
-                    Pending Dues
-                  </p>
-                  <p className="text-xl sm:text-2xl font-bold font-poppins text-amber-400 mt-1">
-                    रू 930,000
-                  </p>
-                  <span className="text-[11px] text-amber-400/80 font-medium mt-1 block">
-                    120 Students with dues
-                  </span>
-                </div>
-                <div className="rounded-xl bg-slate-800/80 p-4 border border-slate-700/60">
-                  <p className="text-xs text-slate-400 font-medium">
-                    Auto PDF Receipts
-                  </p>
-                  <p className="text-xl sm:text-2xl font-bold font-poppins text-indigo-300 mt-1">
-                    1,420 Issued
-                  </p>
-                  <span className="text-[11px] text-indigo-400 font-medium mt-1 block">
-                    Instant Verifiable PDF
-                  </span>
-                </div>
+              <div>
+                <p className={`${mono} text-sm text-[#93702F]`}>every entry</p>
+                <p className="text-xs text-[#55618A] mt-0.5">
+                  logged to an audit trail
+                </p>
               </div>
             </div>
           </div>
-        </div>
-      </section>
 
-      {/* 3. Core Features Grid */}
-      <section
-        id="features"
-        className="py-16 sm:py-24 bg-white border-t border-slate-200/80"
-      >
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center max-w-2xl mx-auto mb-14">
-            <h2 className="text-xs font-bold uppercase tracking-widest text-blue-600 font-poppins">
-              Built for Modern Education
-            </h2>
-            <p className="mt-2 text-3xl sm:text-4xl font-extrabold font-poppins text-slate-900 tracking-tight">
-              Everything You Need to Run Fee Operations
-            </p>
-            <p className="mt-3 text-sm sm:text-base text-slate-600">
-              A comprehensive platform addressing the entire lifecycle of
-              educational billing, accounting, and student disbursements.
-            </p>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {/* Feature 1 */}
-            <div className="rounded-2xl border border-slate-200/80 bg-slate-50/50 p-6 transition-all duration-200 hover:bg-white hover:shadow-lg hover:-translate-y-1">
-              <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-emerald-100 text-emerald-700 mb-5">
-                <CreditCard className="h-6 w-6" />
-              </div>
-              <h3 className="text-lg font-bold font-poppins text-slate-900">
-                eSewa Online Payments
-              </h3>
-              <p className="mt-2 text-xs sm:text-sm text-slate-600 leading-relaxed">
-                Direct integration with Nepal's premier digital wallet eSewa.
-                Students can settle dues securely with automatic ledger
-                reconciliations.
-              </p>
+          {/* Ledger visual */}
+          <div className="relative">
+            <div className="absolute -top-3 -right-3 sm:-top-4 sm:-right-4 h-16 w-16 rounded-full border-2 border-[#8B3A2B]/70 flex items-center justify-center rotate-[-12deg] bg-[#F6F3EA]">
+              <span
+                className={`${mono} text-[10px] tracking-wide text-[#8B3A2B] text-center leading-tight`}
+              >
+                VERIFIED
+                <br />
+                ESEWA
+              </span>
             </div>
 
-            {/* Feature 2 */}
-            <div className="rounded-2xl border border-slate-200/80 bg-slate-50/50 p-6 transition-all duration-200 hover:bg-white hover:shadow-lg hover:-translate-y-1">
-              <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-blue-100 text-blue-700 mb-5">
-                <Layers3 className="h-6 w-6" />
+            <div className="rounded-sm border border-[#DAD2BC] bg-white shadow-[0_1px_0_#DAD2BC] rotate-[-0.4deg]">
+              <div className="px-5 sm:px-6 pt-5 pb-4 border-b border-[#DAD2BC]">
+                <p className={`${serif} text-lg text-[#17233C]`}>
+                  Fee Register
+                </p>
+                <p className="text-xs text-[#55618A] mt-0.5">
+                  Academic year 2081/82
+                </p>
               </div>
-              <h3 className="text-lg font-bold font-poppins text-slate-900">
-                Dynamic Fee Structures
-              </h3>
-              <p className="mt-2 text-xs sm:text-sm text-slate-600 leading-relaxed">
-                Configure tuition, lab, library, sports, and exam fees by Class
-                and Academic Year. Assign bulk fees or individual customizations
-                effortlessly.
-              </p>
-            </div>
 
-            {/* Feature 3 */}
-            <div className="rounded-2xl border border-slate-200/80 bg-slate-50/50 p-6 transition-all duration-200 hover:bg-white hover:shadow-lg hover:-translate-y-1">
-              <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-indigo-100 text-indigo-700 mb-5">
-                <Download className="h-6 w-6" />
+              <div
+                className={`grid grid-cols-[2.2rem_1fr_3.2rem_4.2rem] gap-2 px-5 sm:px-6 py-2 text-[11px] text-[#55618A] border-b border-[#DAD2BC] ${mono}`}
+              >
+                <span>No.</span>
+                <span>Student</span>
+                <span>Status</span>
+                <span className="text-right">Amount</span>
               </div>
-              <h3 className="text-lg font-bold font-poppins text-slate-900">
-                Automated PDF Receipts
-              </h3>
-              <p className="mt-2 text-xs sm:text-sm text-slate-600 leading-relaxed">
-                Generate tamper-evident, sequential institutional receipts with
-                official school header, breakdown items, and instant PDF
-                download.
-              </p>
-            </div>
 
-            {/* Feature 4 */}
-            <div className="rounded-2xl border border-slate-200/80 bg-slate-50/50 p-6 transition-all duration-200 hover:bg-white hover:shadow-lg hover:-translate-y-1">
-              <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-amber-100 text-amber-700 mb-5">
-                <BarChart3 className="h-6 w-6" />
-              </div>
-              <h3 className="text-lg font-bold font-poppins text-slate-900">
-                Live Executive Reports
-              </h3>
-              <p className="mt-2 text-xs sm:text-sm text-slate-600 leading-relaxed">
-                Track today's collections, monthly trends, payment method
-                distributions, overdue debts, and academic year summaries.
-              </p>
-            </div>
-
-            {/* Feature 5 */}
-            <div className="rounded-2xl border border-slate-200/80 bg-slate-50/50 p-6 transition-all duration-200 hover:bg-white hover:shadow-lg hover:-translate-y-1">
-              <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-rose-100 text-rose-700 mb-5">
-                <ShieldCheck className="h-6 w-6" />
-              </div>
-              <h3 className="text-lg font-bold font-poppins text-slate-900">
-                Audit Logs & Security
-              </h3>
-              <p className="mt-2 text-xs sm:text-sm text-slate-600 leading-relaxed">
-                Full accountability with immutable audit logs for every payment,
-                cancellation, discount assignment, and payment reversal.
-              </p>
-            </div>
-
-            {/* Feature 6 */}
-            <div className="rounded-2xl border border-slate-200/80 bg-slate-50/50 p-6 transition-all duration-200 hover:bg-white hover:shadow-lg hover:-translate-y-1">
-              <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-teal-100 text-teal-700 mb-5">
-                <Users className="h-6 w-6" />
-              </div>
-              <h3 className="text-lg font-bold font-poppins text-slate-900">
-                Role-Based Architecture
-              </h3>
-              <p className="mt-2 text-xs sm:text-sm text-slate-600 leading-relaxed">
-                Tailored experiences for Admin, Principal, Accountant, and
-                Student roles, ensuring data security and zero unauthorized
-                modifications.
-              </p>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* 4. Roles & Portals Showcase */}
-      <section id="roles" className="py-16 sm:py-24 bg-slate-50">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center max-w-2xl mx-auto mb-12">
-            <h2 className="text-xs font-bold uppercase tracking-widest text-blue-600 font-poppins">
-              Role-Based Portals
-            </h2>
-            <p className="mt-2 text-3xl sm:text-4xl font-extrabold font-poppins text-slate-900 tracking-tight">
-              A Tailored Experience for Every Stakeholder
-            </p>
-            <p className="mt-3 text-sm sm:text-base text-slate-600">
-              Choose a role below to explore its specific capabilities and
-              workflows.
-            </p>
-          </div>
-
-          {/* Role Tabs */}
-          <div className="flex justify-center mb-8">
-            <div className="inline-flex rounded-xl bg-white p-1.5 border border-slate-200 shadow-xs gap-1">
-              {roles.map((r) => (
-                <button
-                  key={r.id}
-                  type="button"
-                  onClick={() => setActiveRoleTab(r.id)}
-                  className={`flex items-center gap-2 rounded-lg px-4 py-2 text-xs sm:text-sm font-semibold transition-all ${
-                    activeRoleTab === r.id
-                      ? "bg-blue-600 text-white shadow-sm"
-                      : "text-slate-600 hover:bg-slate-100"
-                  }`}
+              {[
+                {
+                  no: "014",
+                  name: "Anjali Rai",
+                  status: "Paid",
+                  color: "#2F5D4B",
+                  amount: "12,000",
+                },
+                {
+                  no: "015",
+                  name: "Bikash Thapa",
+                  status: "Due",
+                  color: "#8B3A2B",
+                  amount: "8,500",
+                },
+                {
+                  no: "016",
+                  name: "Sunita Gurung",
+                  status: "Paid",
+                  color: "#2F5D4B",
+                  amount: "12,000",
+                },
+                {
+                  no: "017",
+                  name: "Prakash K.C.",
+                  status: "Partial",
+                  color: "#93702F",
+                  amount: "6,000",
+                },
+              ].map((row) => (
+                <div
+                  key={row.no}
+                  className="grid grid-cols-[2.2rem_1fr_3.2rem_4.2rem] gap-2 px-5 sm:px-6 py-3 text-sm border-b border-[#EFEADC] last:border-b-0"
                 >
-                  <span>{r.title}</span>
-                </button>
+                  <span className={`${mono} text-xs text-[#93702F]`}>
+                    {row.no}
+                  </span>
+                  <span className="text-[#17233C] truncate">{row.name}</span>
+                  <span className="text-xs" style={{ color: row.color }}>
+                    {row.status}
+                  </span>
+                  <span className={`${mono} text-right text-xs text-[#17233C]`}>
+                    {row.amount}
+                  </span>
+                </div>
+              ))}
+
+              <div className="flex items-center justify-between px-5 sm:px-6 py-4 bg-[#EFEADC]/60">
+                <span className="text-xs text-[#55618A]">
+                  Collected this month
+                </span>
+                <span className={`${mono} text-sm text-[#2F5D4B]`}>
+                  &#2352;&#2370; 39,20,000
+                </span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* 3. Features — ledger index */}
+      <section id="features" className="border-t border-[#DAD2BC] bg-white">
+        <div className="max-w-6xl mx-auto px-5 sm:px-8 py-16 sm:py-24">
+          <div className="max-w-xl mb-12">
+            <h2 className={`${serif} text-2xl sm:text-3xl text-[#17233C]`}>
+              What the ledger keeps track of
+            </h2>
+            <p className="mt-3 text-sm sm:text-base text-[#55618A]">
+              Six things a school's fee ledger has to get right, in the order a
+              new admin usually asks about them.
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-12 gap-y-10">
+            {ledgerFeatures.map((f) => (
+              <div key={f.no} className="pt-6 border-t border-[#DAD2BC]">
+                <span className={`${mono} text-xs text-[#93702F]`}>
+                  No. {f.no}
+                </span>
+                <h3 className={`${serif} text-lg text-[#17233C] mt-2`}>
+                  {f.title}
+                </h3>
+                <p className="mt-2 text-sm text-[#55618A] leading-relaxed">
+                  {f.body}
+                </p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* 4. Roles — registrar index */}
+      <section id="roles" className="border-t border-[#DAD2BC]">
+        <div className="max-w-6xl mx-auto px-5 sm:px-8 py-16 sm:py-24">
+          <div className="max-w-xl mb-10">
+            <h2 className={`${serif} text-2xl sm:text-3xl text-[#17233C]`}>
+              Four registers, one ledger
+            </h2>
+            <p className="mt-3 text-sm sm:text-base text-[#55618A]">
+              Everyone touches the same ledger, but only sees the part of it
+              their role is meant to see.
+            </p>
+          </div>
+
+          {/* Tabs styled as index-card tabs */}
+          <div className="flex flex-wrap gap-1">
+            {roles.map((r) => (
+              <button
+                key={r.id}
+                type="button"
+                onClick={() => setActiveRoleTab(r.id)}
+                className={`rounded-t-sm px-4 py-2.5 text-sm border-x border-t transition-colors ${
+                  activeRoleTab === r.id
+                    ? "bg-white border-[#DAD2BC] text-[#17233C] font-medium"
+                    : "bg-[#EFEADC]/60 border-transparent text-[#55618A] hover:text-[#17233C]"
+                }`}
+              >
+                {r.title}
+              </button>
+            ))}
+          </div>
+
+          <div className="rounded-sm rounded-tl-none border border-[#DAD2BC] bg-white p-6 sm:p-9">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-6 border-b border-[#DAD2BC]">
+              <div className="flex items-center gap-3.5">
+                <activeRole.icon
+                  className="h-6 w-6 text-[#93702F]"
+                  strokeWidth={1.75}
+                />
+                <div>
+                  <h3 className={`${serif} text-xl text-[#17233C]`}>
+                    {activeRole.title}
+                  </h3>
+                  <p className="text-sm text-[#55618A]">
+                    {activeRole.subtitle}
+                  </p>
+                </div>
+              </div>
+              <Link
+                to="/login"
+                className="inline-flex items-center gap-1.5 text-sm font-medium text-[#17233C] hover:text-[#93702F] transition-colors"
+              >
+                Sign in as {activeRole.title}
+                <ArrowUpRight className="h-3.5 w-3.5" />
+              </Link>
+            </div>
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-8 gap-y-3.5 mt-6">
+              {activeRole.features.map((feat, idx) => (
+                <div key={idx} className="flex items-baseline gap-2.5">
+                  <span className="text-[#93702F] text-sm leading-none">
+                    &mdash;
+                  </span>
+                  <span className="text-sm text-[#17233C]/85 leading-snug">
+                    {feat}
+                  </span>
+                </div>
               ))}
             </div>
           </div>
-
-          {/* Role Detail Card */}
-          {(() => {
-            const role = roles.find((r) => r.id === activeRoleTab);
-            const Icon = role.icon;
-            return (
-              <div className="rounded-2xl border border-slate-200/80 bg-white p-6 sm:p-10 shadow-lg max-w-4xl mx-auto animate-in fade-in duration-300">
-                <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 pb-6 border-b border-slate-100">
-                  <div className="flex items-center gap-4">
-                    <div
-                      className={`flex h-14 w-14 items-center justify-center rounded-2xl ${role.color} shadow-md`}
-                    >
-                      <Icon className="h-7 w-7" />
-                    </div>
-                    <div>
-                      <span className="inline-flex items-center rounded-full bg-slate-100 px-2.5 py-0.5 text-xs font-medium text-slate-700 mb-1">
-                        {role.badge}
-                      </span>
-                      <h3 className="text-xl sm:text-2xl font-bold font-poppins text-slate-900">
-                        {role.title}
-                      </h3>
-                      <p className="text-xs sm:text-sm text-slate-500">
-                        {role.subtitle}
-                      </p>
-                    </div>
-                  </div>
-                  <Link
-                    to="/login"
-                    className="inline-flex items-center gap-1.5 rounded-xl bg-slate-900 px-4 py-2.5 text-xs font-semibold text-white shadow-xs hover:bg-slate-800 transition-colors"
-                  >
-                    <span>Sign In to {role.title}</span>
-                    <ChevronRight className="h-3.5 w-3.5" />
-                  </Link>
-                </div>
-
-                <div className="mt-8">
-                  <h4 className="text-xs font-bold uppercase tracking-wider text-slate-400 mb-4">
-                    Key Features & Permissions
-                  </h4>
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                    {role.features.map((feat, idx) => (
-                      <div
-                        key={idx}
-                        className="flex items-start gap-3 rounded-xl bg-slate-50 p-4 border border-slate-100"
-                      >
-                        <CheckCircle2 className="h-5 w-5 text-blue-600 shrink-0 mt-0.5" />
-                        <span className="text-xs sm:text-sm font-medium text-slate-700 leading-snug">
-                          {feat}
-                        </span>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              </div>
-            );
-          })()}
         </div>
       </section>
 
-      {/* 5. How It Works / Workflow */}
-      <section
-        id="how-it-works"
-        className="py-16 sm:py-24 bg-white border-t border-slate-200/80"
-      >
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center max-w-2xl mx-auto mb-14">
-            <h2 className="text-xs font-bold uppercase tracking-widest text-blue-600 font-poppins">
-              Simple 3-Step Workflow
+      {/* 5. How it works */}
+      <section id="how-it-works" className="border-t border-[#DAD2BC] bg-white">
+        <div className="max-w-6xl mx-auto px-5 sm:px-8 py-16 sm:py-24">
+          <div className="max-w-xl mb-14">
+            <h2 className={`${serif} text-2xl sm:text-3xl text-[#17233C]`}>
+              Three entries to get started
             </h2>
-            <p className="mt-2 text-3xl sm:text-4xl font-extrabold font-poppins text-slate-900 tracking-tight">
-              Effortless Setup & Daily Operations
-            </p>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 relative">
-            {/* Step 1 */}
-            <div className="relative rounded-2xl bg-slate-50 border border-slate-200/80 p-6 text-center">
-              <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-2xl bg-blue-600 text-white font-bold text-lg shadow-md mb-4">
-                1
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-10 md:gap-0">
+            {[
+              {
+                n: "1",
+                title: "Set the structure",
+                body: "Define academic years, classes, sections, and the fee structure each class carries.",
+              },
+              {
+                n: "2",
+                title: "Assign and collect",
+                body: "Ledgers generate automatically. Students pay through eSewa, or the counter takes cash and cheque.",
+              },
+              {
+                n: "3",
+                title: "Receipt and report",
+                body: "Every payment issues a receipt on the spot, and the dashboard reflects it immediately.",
+              },
+            ].map((step, idx) => (
+              <div
+                key={step.n}
+                className={`md:px-8 ${idx > 0 ? "md:border-l md:border-[#DAD2BC]" : ""} ${idx === 0 ? "md:pl-0" : ""}`}
+              >
+                <div
+                  className={`h-9 w-9 rounded-full border border-[#17233C] flex items-center justify-center ${serif} text-[#17233C] text-sm`}
+                >
+                  {step.n}
+                </div>
+                <h3 className={`${serif} text-lg text-[#17233C] mt-4`}>
+                  {step.title}
+                </h3>
+                <p className="mt-2 text-sm text-[#55618A] leading-relaxed">
+                  {step.body}
+                </p>
               </div>
-              <h3 className="text-lg font-bold font-poppins text-slate-900">
-                Setup Academic Structures
-              </h3>
-              <p className="mt-2 text-xs sm:text-sm text-slate-600">
-                Admin creates academic years, classes, sections, and defines
-                standard fee structures with custom discount policies.
-              </p>
-            </div>
-
-            {/* Step 2 */}
-            <div className="relative rounded-2xl bg-slate-50 border border-slate-200/80 p-6 text-center">
-              <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-2xl bg-indigo-600 text-white font-bold text-lg shadow-md mb-4">
-                2
-              </div>
-              <h3 className="text-lg font-bold font-poppins text-slate-900">
-                Assign & Collect Fees
-              </h3>
-              <p className="mt-2 text-xs sm:text-sm text-slate-600">
-                Fee ledgers are automatically created. Students can pay online
-                via eSewa or visit the counter for cash/cheque settlement.
-              </p>
-            </div>
-
-            {/* Step 3 */}
-            <div className="relative rounded-2xl bg-slate-50 border border-slate-200/80 p-6 text-center">
-              <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-2xl bg-emerald-600 text-white font-bold text-lg shadow-md mb-4">
-                3
-              </div>
-              <h3 className="text-lg font-bold font-poppins text-slate-900">
-                Instant Receipts & Analytics
-              </h3>
-              <p className="mt-2 text-xs sm:text-sm text-slate-600">
-                Receipts are generated immediately in PDF format, and management
-                dashboards update real-time revenue analytics.
-              </p>
-            </div>
+            ))}
           </div>
         </div>
       </section>
 
-      {/* 6. FAQ Section */}
-      <section
-        id="faq"
-        className="py-16 sm:py-24 bg-slate-50 border-t border-slate-200/80"
-      >
-        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center max-w-2xl mx-auto mb-12">
-            <h2 className="text-xs font-bold uppercase tracking-widest text-blue-600 font-poppins">
-              Frequently Asked Questions
-            </h2>
-            <p className="mt-2 text-3xl font-extrabold font-poppins text-slate-900 tracking-tight">
-              Got Questions? We Have Answers
-            </p>
-          </div>
+      {/* 6. FAQ */}
+      <section id="faq" className="border-t border-[#DAD2BC]">
+        <div className="max-w-3xl mx-auto px-5 sm:px-8 py-16 sm:py-24">
+          <h2 className={`${serif} text-2xl sm:text-3xl text-[#17233C] mb-10`}>
+            Questions from the front office
+          </h2>
 
-          <div className="space-y-4">
+          <div>
             {faqs.map((faq, idx) => (
               <div
                 key={idx}
-                className="rounded-xl border border-slate-200/80 bg-white p-5 shadow-xs"
+                className="py-6 border-t border-[#DAD2BC] first:border-t-0"
               >
-                <h3 className="text-base font-semibold font-poppins text-slate-900 flex items-start gap-2.5">
-                  <HelpCircle className="h-5 w-5 text-blue-600 shrink-0 mt-0.5" />
+                <h3 className={`${serif} text-lg text-[#17233C] flex gap-3`}>
+                  <span className={`${mono} text-sm text-[#93702F] pt-0.5`}>
+                    Q{idx + 1}
+                  </span>
                   <span>{faq.q}</span>
                 </h3>
-                <p className="mt-2.5 text-xs sm:text-sm text-slate-600 pl-7 leading-relaxed">
+                <p className="mt-2.5 text-sm text-[#55618A] leading-relaxed pl-8">
                   {faq.a}
                 </p>
               </div>
@@ -625,66 +541,48 @@ function HomePage() {
         </div>
       </section>
 
-      {/* 7. Call To Action Banner */}
-      <section className="py-16 bg-gradient-to-r from-blue-600 via-indigo-600 to-blue-800 text-white">
-        <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          <h2 className="text-2xl sm:text-4xl font-extrabold font-poppins tracking-tight">
-            Ready to Modernize Your Fee Ledger?
+      {/* 7. Closing */}
+      <section className="bg-[#17233C]">
+        <div className="max-w-3xl mx-auto px-5 sm:px-8 py-16 sm:py-20 text-center">
+          <div className="h-px w-10 bg-[#93702F] mx-auto mb-6" />
+          <h2 className={`${serif} text-2xl sm:text-3xl text-[#F6F3EA]`}>
+            Open the ledger for your school
           </h2>
-          <p className="mt-3 text-sm sm:text-base text-blue-100 max-w-xl mx-auto">
-            Experience automated billing, instant receipt generation, and
-            seamless digital fee payments today.
+          <p className="mt-3 text-sm sm:text-base text-[#F6F3EA]/65 max-w-md mx-auto">
+            Set up the fee structure once. Let payments, receipts, and reports
+            take care of themselves after that.
           </p>
-          <div className="mt-8 flex flex-col sm:flex-row items-center justify-center gap-4">
-            <Link
-              to={isAuthenticated ? "/dashboard" : "/login"}
-              className="w-full sm:w-auto inline-flex items-center justify-center gap-2 rounded-xl bg-white px-7 py-3.5 text-sm font-semibold text-blue-700 shadow-lg hover:bg-blue-50 transition-all"
-            >
-              <span>
-                {isAuthenticated ? "Open Dashboard" : "Sign In to Portal"}
-              </span>
-              <ArrowRight className="h-4 w-4" />
-            </Link>
-            <Link
-              to="/register"
-              className="w-full sm:w-auto inline-flex items-center justify-center gap-2 rounded-xl bg-blue-500/30 border border-white/20 px-7 py-3.5 text-sm font-semibold text-white hover:bg-blue-500/40 transition-all"
-            >
-              <span>Student Registration</span>
-            </Link>
-          </div>
+          <Link
+            to={isAuthenticated ? "/dashboard" : "/login"}
+            className="mt-8 inline-flex items-center gap-1.5 rounded-sm bg-[#F6F3EA] px-6 py-3 text-sm font-medium text-[#17233C] hover:bg-white transition-colors"
+          >
+            {isAuthenticated ? "Open my dashboard" : "Sign in to the portal"}
+            <ArrowUpRight className="h-4 w-4" />
+          </Link>
         </div>
       </section>
 
       {/* 8. Footer */}
-      <footer className="bg-slate-900 text-slate-400 py-12 border-t border-slate-800">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-8 pb-8 border-b border-slate-800">
-            {/* Brand column */}
-            <div className="space-y-3">
-              <div className="flex items-center gap-2.5">
-                <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-blue-600 text-white font-bold text-sm">
-                  SFM
-                </div>
-                <span className="font-poppins font-bold text-white text-lg">
-                  Fee Ledger
-                </span>
-              </div>
-              <p className="text-xs text-slate-400 leading-relaxed">
-                Smart, secure, and transparent fee management and digital
-                payment ecosystem for schools and universities.
+      <footer className="bg-[#17233C] border-t border-white/10">
+        <div className="max-w-6xl mx-auto px-5 sm:px-8 py-12">
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-10 pb-8 border-b border-white/10">
+            <div>
+              <span className={`${serif} text-lg text-[#F6F3EA]`}>
+                Fee Ledger
+              </span>
+              <p className="mt-3 text-xs text-[#F6F3EA]/55 leading-relaxed max-w-[22ch]">
+                A fee ledger and payment record for schools, built around eSewa
+                and a full audit trail.
               </p>
             </div>
 
-            {/* Quick Links */}
             <div>
-              <h4 className="text-xs font-bold uppercase tracking-wider text-white mb-3 font-poppins">
-                Quick Navigation
-              </h4>
-              <ul className="space-y-2 text-xs">
+              <h4 className="text-xs text-[#F6F3EA]/40 mb-3">On this page</h4>
+              <ul className="space-y-2 text-sm text-[#F6F3EA]/70">
                 <li>
                   <a
                     href="#features"
-                    className="hover:text-white transition-colors"
+                    className="hover:text-[#F6F3EA] transition-colors"
                   >
                     Features
                   </a>
@@ -692,82 +590,77 @@ function HomePage() {
                 <li>
                   <a
                     href="#roles"
-                    className="hover:text-white transition-colors"
+                    className="hover:text-[#F6F3EA] transition-colors"
                   >
-                    Portals & Roles
+                    Roles
                   </a>
                 </li>
                 <li>
                   <a
                     href="#how-it-works"
-                    className="hover:text-white transition-colors"
+                    className="hover:text-[#F6F3EA] transition-colors"
                   >
-                    Workflow
+                    How it works
                   </a>
                 </li>
                 <li>
-                  <a href="#faq" className="hover:text-white transition-colors">
+                  <a
+                    href="#faq"
+                    className="hover:text-[#F6F3EA] transition-colors"
+                  >
                     FAQ
                   </a>
                 </li>
               </ul>
             </div>
 
-            {/* User Portals */}
             <div>
-              <h4 className="text-xs font-bold uppercase tracking-wider text-white mb-3 font-poppins">
-                User Portals
-              </h4>
-              <ul className="space-y-2 text-xs">
+              <h4 className="text-xs text-[#F6F3EA]/40 mb-3">Portals</h4>
+              <ul className="space-y-2 text-sm text-[#F6F3EA]/70">
                 <li>
                   <Link
                     to="/login"
-                    className="hover:text-white transition-colors"
+                    className="hover:text-[#F6F3EA] transition-colors"
                   >
-                    Student Login
+                    Student login
                   </Link>
                 </li>
                 <li>
                   <Link
                     to="/login"
-                    className="hover:text-white transition-colors"
+                    className="hover:text-[#F6F3EA] transition-colors"
                   >
-                    Staff & Admin Portal
+                    Staff & admin login
                   </Link>
                 </li>
                 <li>
                   <Link
                     to="/register"
-                    className="hover:text-white transition-colors"
+                    className="hover:text-[#F6F3EA] transition-colors"
                   >
-                    Student Registration
+                    Student registration
                   </Link>
                 </li>
               </ul>
             </div>
 
-            {/* Security & Gateway */}
             <div>
-              <h4 className="text-xs font-bold uppercase tracking-wider text-white mb-3 font-poppins">
-                Payment Gateways
-              </h4>
-              <p className="text-xs text-slate-400 mb-3">
-                Securely powered by eSewa digital payment gateway &
-                cryptographic signatures.
-              </p>
-              <div className="inline-flex items-center gap-1.5 rounded-lg bg-emerald-950/60 border border-emerald-500/30 px-3 py-1.5 text-[11px] font-semibold text-emerald-400">
-                <ShieldCheck className="h-4 w-4" />
-                <span>eSewa Verified Partner</span>
+              <h4 className="text-xs text-[#F6F3EA]/40 mb-3">Payments</h4>
+              <div className="flex items-center gap-2 text-sm text-[#F6F3EA]/70">
+                <ShieldCheck
+                  className="h-4 w-4 text-[#93702F]"
+                  strokeWidth={1.75}
+                />
+                <span>eSewa verified merchant</span>
               </div>
             </div>
           </div>
 
-          <div className="mt-8 flex flex-col sm:flex-row items-center justify-between text-xs text-slate-500 gap-4">
-            <p>
-              &copy; {new Date().getFullYear()} Student Fee Management System.
-              All rights reserved.
-            </p>
-            <p>Designed with security, precision, and performance.</p>
+          <div
+            className={`mt-6 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs text-[#F6F3EA]/45 ${mono}`}
+          >
+            <p>&copy; {new Date().getFullYear()} Fee Ledger</p>
+            <p>Every entry logged. Every rupee accounted for.</p>
           </div>
         </div>
       </footer>
