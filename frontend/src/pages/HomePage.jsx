@@ -7,6 +7,9 @@ import {
   Check,
   ChevronDown,
   GraduationCap,
+  Mail,
+  MapPin,
+  Phone,
   Receipt,
   ShieldCheck,
   Sparkles,
@@ -284,73 +287,6 @@ function HomePage() {
 
       <main id="main-content">
         <section className="relative isolate overflow-hidden border-b border-slate-200/70">
-          {/* Background image */}
-          <div
-            className="absolute inset-0 -z-10 bg-cover bg-center"
-            style={{
-              backgroundImage:
-                "url('https://images.unsplash.com/photo-1584697964155-2f03a7caade2?auto=format&fit=crop&w=1600&q=80')",
-            }}
-          />
-          {/* Dark overlay for contrast */}
-          <div className="absolute inset-0 -z-10 bg-black/30" />
-          {/* Decorative gradients */}
-          <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,rgba(37,99,235,0.12),transparent_55%),radial-gradient(ellipse_at_bottom_left,rgba(15,23,42,0.08),transparent_50%)]" />
-
-          <div className="mx-auto max-w-7xl px-6 pb-20 pt-20 sm:pb-28 sm:pt-24 lg:px-8 lg:pb-32 lg:pt-28">
-            <div className="grid items-center gap-12 lg:grid-cols-[1.05fr_0.95fr]">
-              <div>
-                {/* Tagline */}
-                <div className="mb-6 inline-flex items-center gap-2 rounded-full bg-white/30 px-3 py-1.5 text-xs font-medium text-white shadow-sm backdrop-blur">
-                  <Sparkles className="h-3.5 w-3.5 text-blue-400" />
-                  School fee management, simplified
-                </div>
-
-                {/* Hero heading */}
-                <h1
-                  className={`${serif} max-w-2xl text-5xl font-extrabold tracking-tight text-white sm:text-6xl lg:text-7xl`}
-                  style={{ lineHeight: "1.1" }}
-                >
-                  Every fee recorded.
-                  <br />
-                  <span className="block text-2xl font-medium text-gray-200 mt-2">
-                    Every rupee receipted.
-                  </span>
-                </h1>
-
-                {/* Supporting copy */}
-                <p className="mt-8 max-w-xl text-lg text-gray-100 leading-relaxed">
-                  A single ledger for tuition, fines, discounts, and
-                  scholarships — with eSewa payments, instant receipts, and a
-                  transparent audit trail behind every entry.
-                </p>
-
-                {/* Call‑to‑action buttons */}
-                <div className="mt-10 flex flex-col gap-4 sm:flex-row">
-                  <Link
-                    to={isAuthenticated ? "/dashboard" : "/login"}
-                    className="inline-flex items-center justify-center rounded-full bg-blue-600 px-8 py-3 text-sm font-semibold text-white shadow-lg hover:bg-blue-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 transition-colors"
-                  >
-                    {isAuthenticated ? "Open my dashboard" : "Open the ledger"}
-                    <ArrowUpRight className="ml-2 h-4 w-4" />
-                  </Link>
-                  <Link
-                    to="/register"
-                    className="inline-flex items-center justify-center rounded-full border border-white/30 bg-white/10 px-8 py-3 text-sm font-semibold text-white backdrop-blur hover:bg-white/20 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/50 transition-colors"
-                  >
-                    Register a student
-                  </Link>
-                </div>
-              </div>
-
-              {/* Optional visual mockup or illustration placeholder */}
-              <div className="relative hidden lg:block">
-                <div className="w-full h-64 bg-white/10 rounded-lg backdrop-blur-sm border border-white/20" />
-              </div>
-            </div>
-          </div>
-        </section>
-        <section className="relative isolate overflow-hidden border-b border-slate-200/70">
           <div className="pointer-events-none absolute inset-0 -z-10 bg-[radial-gradient(ellipse_at_top_right,rgba(37,99,235,0.08),transparent_55%),radial-gradient(ellipse_at_bottom_left,rgba(15,23,42,0.05),transparent_50%)]" />
           <div className="absolute inset-0 -z-10 bg-[linear-gradient(to_right,rgba(15,23,42,0.03)_1px,transparent_1px),linear-gradient(to_bottom,rgba(15,23,42,0.03)_1px,transparent_1px)] bg-[size:4rem_4rem] [mask-image:radial-gradient(ellipse_at_center,black,transparent_75%)]" />
 
@@ -415,6 +351,13 @@ function HomePage() {
               {/* App preview */}
               <div className="relative mx-auto w-full max-w-xl lg:max-w-none">
                 <div className="absolute -inset-4 -z-10 rounded-[2rem] bg-gradient-to-tr from-blue-600/10 via-slate-900/5 to-transparent blur-2xl" />
+                <div className="absolute -bottom-8 -left-8 z-10 hidden h-28 w-40 overflow-hidden rounded-2xl border-8 border-white shadow-xl shadow-slate-900/15 xl:block">
+                  <img
+                    src="/school.jpg"
+                    alt="School campus"
+                    className="h-full w-full object-cover"
+                  />
+                </div>
 
                 {/* Floating verified badge */}
                 <div className="absolute -right-3 -top-4 z-10 hidden items-center gap-2 rounded-xl border border-slate-200 bg-white px-3 py-2 shadow-lg shadow-slate-900/5 sm:flex">
@@ -761,35 +704,42 @@ function HomePage() {
       </main>
 
       {/* ───────────────────────── Footer ───────────────────────── */}
-      <footer className="border-t border-white/5 bg-slate-900">
-        <div className="mx-auto max-w-7xl px-6 py-14 lg:px-8">
-          <div className="grid gap-10 border-b border-white/10 pb-10 sm:grid-cols-2 lg:grid-cols-4">
+      <footer className="relative overflow-hidden border-t border-slate-800 bg-slate-950 text-white">
+        <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_85%_15%,rgba(37,99,235,0.18),transparent_30%),linear-gradient(135deg,transparent_50%,rgba(15,23,42,0.8))]" />
+        <div className="relative mx-auto max-w-7xl px-6 py-14 lg:px-8 lg:py-16">
+          <div className="grid gap-12 border-b border-white/10 pb-12 lg:grid-cols-[1.25fr_1fr_1fr_1.1fr]">
             <div>
-              <div className="flex items-center gap-2.5">
-                <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-white/10 text-xs text-white">
+              <div className="flex items-center gap-3">
+                <span className="flex h-11 w-11 items-center justify-center rounded-xl bg-blue-600 text-base shadow-lg shadow-blue-600/20">
                   <span className={serif}>रू</span>
                 </span>
-                <span className={`${serif} text-lg text-white`}>
-                  Fee Ledger
-                </span>
+                <div>
+                  <span className={`${serif} block text-xl tracking-tight`}>
+                    Fee Ledger
+                  </span>
+                  <span className={`${mono} text-[9px] uppercase tracking-[0.2em] text-blue-300`}>
+                    School finance, simplified
+                  </span>
+                </div>
               </div>
-              <p className="mt-4 max-w-xs text-xs leading-5 text-slate-400">
-                A fee ledger and payment record for schools, built around eSewa
-                and a full audit trail.
+              <p className="mt-5 max-w-xs text-sm leading-6 text-slate-400">
+                A dependable fee ledger for modern schools — from the first
+                assignment to the final receipt.
               </p>
+              <div className="mt-6 flex items-center gap-2 text-xs text-slate-400">
+                <span className="h-2 w-2 rounded-full bg-emerald-400 shadow-[0_0_0_4px_rgba(52,211,153,0.12)]" />
+                Secure payment records, always available
+              </div>
             </div>
 
             <div>
-              <h3 className="text-[11px] font-semibold uppercase tracking-[0.14em] text-slate-500">
-                On this page
+              <h3 className="text-xs font-semibold uppercase tracking-[0.16em] text-slate-300">
+                Explore
               </h3>
-              <ul className="mt-4 space-y-2.5 text-sm text-slate-400">
+              <ul className="mt-5 space-y-3 text-sm text-slate-400">
                 {navLinks.map(([label, href]) => (
                   <li key={href}>
-                    <a
-                      href={href}
-                      className="transition-colors hover:text-white"
-                    >
+                    <a href={href} className="transition-colors hover:text-white">
                       {label}
                     </a>
                   </li>
@@ -798,56 +748,31 @@ function HomePage() {
             </div>
 
             <div>
-              <h3 className="text-[11px] font-semibold uppercase tracking-[0.14em] text-slate-500">
+              <h3 className="text-xs font-semibold uppercase tracking-[0.16em] text-slate-300">
                 Portals
               </h3>
-              <ul className="mt-4 space-y-2.5 text-sm text-slate-400">
-                <li>
-                  <Link
-                    to="/login"
-                    className="transition-colors hover:text-white"
-                  >
-                    Student login
-                  </Link>
-                </li>
-                <li>
-                  <Link
-                    to="/login"
-                    className="transition-colors hover:text-white"
-                  >
-                    Staff &amp; admin login
-                  </Link>
-                </li>
-                <li>
-                  <Link
-                    to="/register"
-                    className="transition-colors hover:text-white"
-                  >
-                    Student registration
-                  </Link>
-                </li>
+              <ul className="mt-5 space-y-3 text-sm text-slate-400">
+                <li><Link to="/login" className="transition-colors hover:text-white">Student login</Link></li>
+                <li><Link to="/login" className="transition-colors hover:text-white">Staff &amp; admin login</Link></li>
+                <li><Link to="/register" className="transition-colors hover:text-white">Register a student</Link></li>
               </ul>
             </div>
 
             <div>
-              <h3 className="text-[11px] font-semibold uppercase tracking-[0.14em] text-slate-500">
-                Payments
+              <h3 className="text-xs font-semibold uppercase tracking-[0.16em] text-slate-300">
+                Talk to us
               </h3>
-              <div className="mt-4 flex items-center gap-2.5 text-sm text-slate-400">
-                <ShieldCheck
-                  className="h-4 w-4 text-emerald-500"
-                  strokeWidth={1.75}
-                />
-                <span>eSewa verified merchant</span>
+              <div className="mt-5 space-y-3 text-sm text-slate-400">
+                <p className="flex items-center gap-3"><MapPin className="h-4 w-4 text-blue-400" /> Kathmandu, Nepal</p>
+                <p className="flex items-center gap-3"><Mail className="h-4 w-4 text-blue-400" /> hello@feeledger.edu.np</p>
+                <p className="flex items-center gap-3"><Phone className="h-4 w-4 text-blue-400" /> +977 01 555 0101</p>
               </div>
             </div>
           </div>
 
-          <div
-            className={`mt-8 flex flex-col items-center justify-between gap-3 text-xs text-slate-500 sm:flex-row ${mono}`}
-          >
-            <p>© {new Date().getFullYear()} Fee Ledger</p>
-            <p>Every entry logged. Every rupee accounted for.</p>
+          <div className="flex flex-col items-start justify-between gap-4 pt-7 text-xs text-slate-500 sm:flex-row sm:items-center">
+            <p>© {new Date().getFullYear()} Fee Ledger. Built for better school operations.</p>
+            <p className={mono}>Every entry logged. Every rupee accounted for.</p>
           </div>
         </div>
       </footer>
