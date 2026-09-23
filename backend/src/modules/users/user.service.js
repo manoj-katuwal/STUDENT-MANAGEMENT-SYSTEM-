@@ -13,7 +13,12 @@ import {
 } from "./user.repository.js";
 import { createEmailVerificationToken } from "../auth/emailVerification/emailVerification.service.js";
 
-export const registerUser = async ({ name, email, password }) => {
+export const registerUser = async ({
+  name,
+  email,
+  password,
+  role = "STUDENT",
+}) => {
   const existingUser = await findUserByEmail(email);
 
   if (existingUser) {
@@ -26,7 +31,7 @@ export const registerUser = async ({ name, email, password }) => {
     name,
     email,
     password: hashedPassword,
-    role: "STUDENT",
+    role: role || "STUDENT",
   });
 
   const verificationToken = await createEmailVerificationToken(user._id);
@@ -80,7 +85,10 @@ export const changeUserPassword = async (
   await refreshTokenRepository.revokeAllUserRefreshTokens(userId);
 };
 
-export const createNewUser = async ({ name, email, password, role }, options ={}) => {
+export const createNewUser = async (
+  { name, email, password, role },
+  options = {},
+) => {
   const existingUser = await findUserByEmail(email);
 
   if (existingUser) {
@@ -89,12 +97,15 @@ export const createNewUser = async ({ name, email, password, role }, options ={}
 
   const hashedPassword = await bcrypt.hash(password, 12);
 
-  const user = await createUserRecord({
-    name,
-    email,
-    password: hashedPassword,
-    role,
-  }, options);
+  const user = await createUserRecord(
+    {
+      name,
+      email,
+      password: hashedPassword,
+      role,
+    },
+    options,
+  );
 
   return user;
 };
