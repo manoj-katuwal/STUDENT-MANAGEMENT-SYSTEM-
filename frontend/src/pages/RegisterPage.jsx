@@ -10,6 +10,7 @@ import {
   CheckCircle2,
   ArrowRight,
   ArrowLeft,
+  Shield,
 } from "lucide-react";
 import { useRegister } from "../features/auth/auth.hooks";
 import { useAuth } from "../features/auth/auth.context";
@@ -22,6 +23,7 @@ function RegisterPage() {
   const [formData, setFormData] = useState({
     name: "",
     email: "",
+    role: "STUDENT",
     password: "",
     confirmPassword: "",
   });
@@ -68,6 +70,7 @@ function RegisterPage() {
       {
         name: formData.name.trim(),
         email: formData.email.trim(),
+        role: formData.role,
         password: formData.password,
       },
       {
@@ -115,11 +118,11 @@ function RegisterPage() {
           </div>
           <div>
             <p className="text-lg font-display text-white font-semibold mb-2">
-              Student Registration
+              User Registration
             </p>
             <p className="text-sm max-w-xs text-slate-300">
-              Create your institutional account to view assigned fees, make
-              online eSewa payments, and download official receipts.
+              Create an institutional account (Student, Accountant, Principal,
+              or Admin) to access the fee ledger.
             </p>
           </div>
         </div>
@@ -168,7 +171,8 @@ function RegisterPage() {
                 Account Created
               </h2>
               <p className="mt-2 text-sm text-slate">
-                Your student account for{" "}
+                Your <strong className="text-ink">{formData.role}</strong>{" "}
+                account for{" "}
                 <strong className="text-ink">{formData.email}</strong> has been
                 registered successfully.
               </p>
@@ -187,7 +191,7 @@ function RegisterPage() {
                 Register
               </h1>
               <p className="mb-8 text-sm text-slate">
-                Create your student account to access the fee ledger.
+                Create your account to access the fee management system.
               </p>
 
               {(formError || error) && (
@@ -251,6 +255,47 @@ function RegisterPage() {
                       disabled={isPending}
                       className="w-full bg-transparent text-sm outline-none disabled:opacity-60 text-ink"
                     />
+                  </div>
+                </div>
+
+                {/* Role */}
+                <div>
+                  <label
+                    htmlFor="role"
+                    className="mb-2 block text-xs font-medium uppercase tracking-wide text-slate"
+                    style={{ letterSpacing: "0.08em" }}
+                  >
+                    Account Role
+                  </label>
+                  <div className="flex items-center gap-2 pb-2 border-b-2 border-slate/30 focus-within:border-brass transition-colors duration-200">
+                    <Shield className="w-4 h-4 shrink-0 text-slate" />
+                    <select
+                      id="role"
+                      name="role"
+                      value={formData.role}
+                      onChange={handleChange}
+                      disabled={isPending}
+                      className="w-full bg-transparent text-sm outline-none disabled:opacity-60 text-ink cursor-pointer"
+                    >
+                      <option value="STUDENT" className="bg-parchment text-ink">
+                        Student / Parent
+                      </option>
+                      <option
+                        value="ACCOUNTANT"
+                        className="bg-parchment text-ink"
+                      >
+                        Accountant (Finance & Cash Counter)
+                      </option>
+                      <option
+                        value="PRINCIPAL"
+                        className="bg-parchment text-ink"
+                      >
+                        Principal (Executive Read-Only)
+                      </option>
+                      <option value="ADMIN" className="bg-parchment text-ink">
+                        Administrator (Full Control)
+                      </option>
+                    </select>
                   </div>
                 </div>
 
