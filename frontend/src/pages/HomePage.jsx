@@ -344,7 +344,7 @@ function HomePage() {
 
               {/* App preview */}
               <div className="relative mx-auto w-full max-w-xl lg:max-w-none">
-                <div className="absolute -inset-4 -z-10 rounded-[2rem] bg-gradient-to-tr from-blue-600/10 via-slate-900/5 to-transparent blur-2xl" />
+                <div className="absolute -inset-4 -z-10 rounded-4xl bg-linear-to-tr from-blue-600/10 via-slate-900/5 to-transparent blur-2xl" />
                 <div className="absolute -bottom-8 -left-8 z-10 hidden h-28 w-40 overflow-hidden rounded-2xl border-8 border-white shadow-xl shadow-slate-900/15 xl:block">
                   <img
                     src="/school.jpg"
@@ -594,7 +594,7 @@ function HomePage() {
 
             <div className="relative mt-16 grid gap-10 md:grid-cols-3 md:gap-8">
               {/* connector line */}
-              <div className="absolute left-0 right-0 top-6 hidden h-px bg-gradient-to-r from-transparent via-slate-300 to-transparent md:block" />
+              <div className="absolute left-0 right-0 top-6 hidden h-px bg-linear-to-r from-transparent via-slate-300 to-transparent md:block" />
 
               {steps.map((step) => (
                 <article key={step.n} className="relative">
@@ -701,11 +701,11 @@ function HomePage() {
       <footer className="relative overflow-hidden border-t border-slate-200 bg-white text-slate-800">
         <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_top_left,rgba(59,130,246,0.08),transparent_28%),radial-gradient(circle_at_bottom_right,rgba(14,165,233,0.06),transparent_25%)]" />
         <div className="relative mx-auto max-w-7xl px-6 py-16 lg:px-8">
-          <div className="rounded-[2rem] border border-slate-200 bg-slate-50 p-6 shadow-[0_18px_60px_rgba(15,23,42,0.06)] sm:p-8 lg:p-10">
+          <div className="rounded-4xl border border-slate-200 bg-slate-50 p-6 shadow-[0_18px_60px_rgba(15,23,42,0.06)] sm:p-8 lg:p-10">
             <div className="grid gap-10 lg:grid-cols-[1.3fr_0.8fr_0.8fr_1.2fr]">
               <div>
                 <div className="flex items-center gap-3">
-                  <span className="flex h-11 w-11 items-center justify-center rounded-2xl bg-gradient-to-br from-blue-500 to-cyan-400 text-base font-semibold text-white shadow-lg shadow-blue-500/25">
+                  <span className="flex h-11 w-11 items-center justify-center rounded-2xl bg-linear-to-br from-blue-500 to-cyan-400 text-base font-semibold text-white shadow-lg shadow-blue-500/25">
                     <span className={serif}>रू</span>
                   </span>
                   <div>
