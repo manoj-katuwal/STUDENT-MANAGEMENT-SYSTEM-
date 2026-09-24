@@ -712,32 +712,32 @@ function HomePage() {
                     <span className={`${serif} block text-2xl tracking-tight`}>
                       Fee Ledger
                     </span>
-                    <span className={`${mono} text-[9px] uppercase tracking-[0.22em] text-blue-300`}>
+                    <span className={`${mono} text-[9px] uppercase tracking-[0.22em] text-blue-600`}>
                       School finance, simplified
                     </span>
                   </div>
                 </div>
 
-                <p className="mt-5 max-w-sm text-sm leading-7 text-slate-300">
+                <p className="mt-5 max-w-sm text-sm leading-7 text-slate-600">
                   A dependable fee ledger for schools that want cleaner records,
                   faster collections, and complete visibility from assignment to
                   receipt.
                 </p>
 
-                <div className="mt-6 inline-flex items-center gap-2 rounded-full border border-emerald-400/20 bg-emerald-400/10 px-3 py-1.5 text-xs font-medium text-emerald-300">
-                  <span className="h-2 w-2 rounded-full bg-emerald-400 shadow-[0_0_0_4px_rgba(52,211,153,0.12)]" />
+                <div className="mt-6 inline-flex items-center gap-2 rounded-full border border-emerald-200 bg-emerald-50 px-3 py-1.5 text-xs font-medium text-emerald-700">
+                  <span className="h-2 w-2 rounded-full bg-emerald-500 shadow-[0_0_0_4px_rgba(16,185,129,0.12)]" />
                   Secure records, always available
                 </div>
               </div>
 
               <div>
-                <h3 className="text-xs font-semibold uppercase tracking-[0.18em] text-slate-300">
+                <h3 className="text-xs font-semibold uppercase tracking-[0.18em] text-slate-700">
                   Explore
                 </h3>
-                <ul className="mt-5 space-y-3 text-sm text-slate-400">
+                <ul className="mt-5 space-y-3 text-sm text-slate-600">
                   {navLinks.map(([label, href]) => (
                     <li key={href}>
-                      <a href={href} className="transition-colors hover:text-white">
+                      <a href={href} className="transition-colors hover:text-blue-600">
                         {label}
                       </a>
                     </li>
@@ -746,22 +746,22 @@ function HomePage() {
               </div>
 
               <div>
-                <h3 className="text-xs font-semibold uppercase tracking-[0.18em] text-slate-300">
+                <h3 className="text-xs font-semibold uppercase tracking-[0.18em] text-slate-700">
                   Portals
                 </h3>
-                <ul className="mt-5 space-y-3 text-sm text-slate-400">
+                <ul className="mt-5 space-y-3 text-sm text-slate-600">
                   <li>
-                    <Link to="/login" className="transition-colors hover:text-white">
+                    <Link to="/login" className="transition-colors hover:text-blue-600">
                       Student login
                     </Link>
                   </li>
                   <li>
-                    <Link to="/login" className="transition-colors hover:text-white">
+                    <Link to="/login" className="transition-colors hover:text-blue-600">
                       Staff &amp; admin login
                     </Link>
                   </li>
                   <li>
-                    <Link to="/register" className="transition-colors hover:text-white">
+                    <Link to="/register" className="transition-colors hover:text-blue-600">
                       Register a student
                     </Link>
                   </li>
@@ -769,20 +769,20 @@ function HomePage() {
               </div>
 
               <div>
-                <h3 className="text-xs font-semibold uppercase tracking-[0.18em] text-slate-300">
+                <h3 className="text-xs font-semibold uppercase tracking-[0.18em] text-slate-700">
                   Contact
                 </h3>
-                <div className="mt-5 space-y-4 text-sm text-slate-400">
+                <div className="mt-5 space-y-4 text-sm text-slate-600">
                   <p className="flex items-center gap-3">
-                    <MapPin className="h-4 w-4 text-blue-400" />
+                    <MapPin className="h-4 w-4 text-blue-600" />
                     Kathmandu, Nepal
                   </p>
                   <p className="flex items-center gap-3">
-                    <Mail className="h-4 w-4 text-blue-400" />
+                    <Mail className="h-4 w-4 text-blue-600" />
                     hello@feeledger.edu.np
                   </p>
                   <p className="flex items-center gap-3">
-                    <Phone className="h-4 w-4 text-blue-400" />
+                    <Phone className="h-4 w-4 text-blue-600" />
                     +977 01 555 0101
                   </p>
                 </div>
@@ -790,9 +790,9 @@ function HomePage() {
             </div>
           </div>
 
-          <div className="mt-8 flex flex-col items-start justify-between gap-4 border-t border-white/10 pt-6 text-xs text-slate-500 sm:flex-row sm:items-center">
+          <div className="mt-8 flex flex-col items-start justify-between gap-4 border-t border-slate-200 pt-6 text-xs text-slate-500 sm:flex-row sm:items-center">
             <p>© {new Date().getFullYear()} Fee Ledger. Built for better school operations.</p>
-            <p className={`${mono} text-slate-400`}>
+            <p className={`${mono} text-slate-600`}>
               Every entry logged. Every rupee accounted for.
             </p>
           </div>
