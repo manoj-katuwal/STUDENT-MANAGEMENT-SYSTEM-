@@ -698,10 +698,10 @@ function HomePage() {
       </main>
 
       {/* ───────────────────────── Footer ───────────────────────── */}
-      <footer className="relative overflow-hidden border-t border-blue-800/60 bg-[#0b1f3a] text-white">
-        <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_top_left,rgba(96,165,250,0.18),transparent_30%),radial-gradient(circle_at_bottom_right,rgba(34,211,238,0.12),transparent_28%)]" />
+      <footer className="relative overflow-hidden border-t border-slate-200 bg-white text-slate-800">
+        <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_top_left,rgba(59,130,246,0.08),transparent_28%),radial-gradient(circle_at_bottom_right,rgba(14,165,233,0.06),transparent_25%)]" />
         <div className="relative mx-auto max-w-7xl px-6 py-16 lg:px-8">
-          <div className="rounded-[2rem] border border-white/10 bg-slate-900/70 p-6 shadow-[0_18px_60px_rgba(15,23,42,0.5)] backdrop-blur-sm sm:p-8 lg:p-10">
+          <div className="rounded-[2rem] border border-slate-200 bg-slate-50 p-6 shadow-[0_18px_60px_rgba(15,23,42,0.06)] sm:p-8 lg:p-10">
             <div className="grid gap-10 lg:grid-cols-[1.3fr_0.8fr_0.8fr_1.2fr]">
               <div>
                 <div className="flex items-center gap-3">
