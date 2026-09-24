@@ -12,7 +12,6 @@ import {
   Phone,
   Receipt,
   ShieldCheck,
-  Sparkles,
 } from "lucide-react";
 import { useAuth } from "../features/auth/auth.context";
 
@@ -293,11 +292,6 @@ function HomePage() {
           <div className="mx-auto max-w-7xl px-6 pb-20 pt-16 sm:pb-28 sm:pt-24 lg:px-8 lg:pb-32 lg:pt-28">
             <div className="grid items-center gap-16 lg:grid-cols-[1.05fr_0.95fr] lg:gap-12">
               <div>
-                <div className="mb-6 inline-flex items-center gap-2 rounded-full border border-slate-200 bg-white px-3 py-1.5 text-xs font-medium text-slate-600 shadow-sm">
-                  <Sparkles className="h-3.5 w-3.5 text-blue-600" />
-                  School fee management, simplified
-                </div>
-
                 <h1
                   className={`${serif} max-w-2xl text-[2.75rem] leading-[1.04] tracking-[-0.035em] text-slate-900 sm:text-6xl lg:text-[4.25rem]`}
                 >
