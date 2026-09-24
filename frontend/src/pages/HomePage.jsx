@@ -698,75 +698,103 @@ function HomePage() {
       </main>
 
       {/* ───────────────────────── Footer ───────────────────────── */}
-      <footer className="relative overflow-hidden border-t border-slate-800 bg-slate-950 text-white">
-        <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_85%_15%,rgba(37,99,235,0.18),transparent_30%),linear-gradient(135deg,transparent_50%,rgba(15,23,42,0.8))]" />
-        <div className="relative mx-auto max-w-7xl px-6 py-14 lg:px-8 lg:py-16">
-          <div className="grid gap-12 border-b border-white/10 pb-12 lg:grid-cols-[1.25fr_1fr_1fr_1.1fr]">
-            <div>
-              <div className="flex items-center gap-3">
-                <span className="flex h-11 w-11 items-center justify-center rounded-xl bg-blue-600 text-base shadow-lg shadow-blue-600/20">
-                  <span className={serif}>रू</span>
-                </span>
-                <div>
-                  <span className={`${serif} block text-xl tracking-tight`}>
-                    Fee Ledger
+      <footer className="relative overflow-hidden border-t border-slate-200 bg-slate-950 text-white">
+        <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_top_left,rgba(59,130,246,0.2),transparent_32%),radial-gradient(circle_at_bottom_right,rgba(14,165,233,0.12),transparent_30%)]" />
+        <div className="relative mx-auto max-w-7xl px-6 py-16 lg:px-8">
+          <div className="rounded-[2rem] border border-white/10 bg-white/[0.02] p-6 shadow-[0_18px_60px_rgba(15,23,42,0.4)] backdrop-blur-sm sm:p-8 lg:p-10">
+            <div className="grid gap-10 lg:grid-cols-[1.3fr_0.8fr_0.8fr_1.2fr]">
+              <div>
+                <div className="flex items-center gap-3">
+                  <span className="flex h-11 w-11 items-center justify-center rounded-2xl bg-gradient-to-br from-blue-500 to-cyan-400 text-base font-semibold text-white shadow-lg shadow-blue-500/25">
+                    <span className={serif}>रू</span>
                   </span>
-                  <span className={`${mono} text-[9px] uppercase tracking-[0.2em] text-blue-300`}>
-                    School finance, simplified
-                  </span>
+                  <div>
+                    <span className={`${serif} block text-2xl tracking-tight`}>
+                      Fee Ledger
+                    </span>
+                    <span className={`${mono} text-[9px] uppercase tracking-[0.22em] text-blue-300`}>
+                      School finance, simplified
+                    </span>
+                  </div>
+                </div>
+
+                <p className="mt-5 max-w-sm text-sm leading-7 text-slate-300">
+                  A dependable fee ledger for schools that want cleaner records,
+                  faster collections, and complete visibility from assignment to
+                  receipt.
+                </p>
+
+                <div className="mt-6 inline-flex items-center gap-2 rounded-full border border-emerald-400/20 bg-emerald-400/10 px-3 py-1.5 text-xs font-medium text-emerald-300">
+                  <span className="h-2 w-2 rounded-full bg-emerald-400 shadow-[0_0_0_4px_rgba(52,211,153,0.12)]" />
+                  Secure records, always available
                 </div>
               </div>
-              <p className="mt-5 max-w-xs text-sm leading-6 text-slate-400">
-                A dependable fee ledger for modern schools — from the first
-                assignment to the final receipt.
-              </p>
-              <div className="mt-6 flex items-center gap-2 text-xs text-slate-400">
-                <span className="h-2 w-2 rounded-full bg-emerald-400 shadow-[0_0_0_4px_rgba(52,211,153,0.12)]" />
-                Secure payment records, always available
+
+              <div>
+                <h3 className="text-xs font-semibold uppercase tracking-[0.18em] text-slate-300">
+                  Explore
+                </h3>
+                <ul className="mt-5 space-y-3 text-sm text-slate-400">
+                  {navLinks.map(([label, href]) => (
+                    <li key={href}>
+                      <a href={href} className="transition-colors hover:text-white">
+                        {label}
+                      </a>
+                    </li>
+                  ))}
+                </ul>
               </div>
-            </div>
 
-            <div>
-              <h3 className="text-xs font-semibold uppercase tracking-[0.16em] text-slate-300">
-                Explore
-              </h3>
-              <ul className="mt-5 space-y-3 text-sm text-slate-400">
-                {navLinks.map(([label, href]) => (
-                  <li key={href}>
-                    <a href={href} className="transition-colors hover:text-white">
-                      {label}
-                    </a>
+              <div>
+                <h3 className="text-xs font-semibold uppercase tracking-[0.18em] text-slate-300">
+                  Portals
+                </h3>
+                <ul className="mt-5 space-y-3 text-sm text-slate-400">
+                  <li>
+                    <Link to="/login" className="transition-colors hover:text-white">
+                      Student login
+                    </Link>
                   </li>
-                ))}
-              </ul>
-            </div>
+                  <li>
+                    <Link to="/login" className="transition-colors hover:text-white">
+                      Staff &amp; admin login
+                    </Link>
+                  </li>
+                  <li>
+                    <Link to="/register" className="transition-colors hover:text-white">
+                      Register a student
+                    </Link>
+                  </li>
+                </ul>
+              </div>
 
-            <div>
-              <h3 className="text-xs font-semibold uppercase tracking-[0.16em] text-slate-300">
-                Portals
-              </h3>
-              <ul className="mt-5 space-y-3 text-sm text-slate-400">
-                <li><Link to="/login" className="transition-colors hover:text-white">Student login</Link></li>
-                <li><Link to="/login" className="transition-colors hover:text-white">Staff &amp; admin login</Link></li>
-                <li><Link to="/register" className="transition-colors hover:text-white">Register a student</Link></li>
-              </ul>
-            </div>
-
-            <div>
-              <h3 className="text-xs font-semibold uppercase tracking-[0.16em] text-slate-300">
-                Talk to us
-              </h3>
-              <div className="mt-5 space-y-3 text-sm text-slate-400">
-                <p className="flex items-center gap-3"><MapPin className="h-4 w-4 text-blue-400" /> Kathmandu, Nepal</p>
-                <p className="flex items-center gap-3"><Mail className="h-4 w-4 text-blue-400" /> hello@feeledger.edu.np</p>
-                <p className="flex items-center gap-3"><Phone className="h-4 w-4 text-blue-400" /> +977 01 555 0101</p>
+              <div>
+                <h3 className="text-xs font-semibold uppercase tracking-[0.18em] text-slate-300">
+                  Contact
+                </h3>
+                <div className="mt-5 space-y-4 text-sm text-slate-400">
+                  <p className="flex items-center gap-3">
+                    <MapPin className="h-4 w-4 text-blue-400" />
+                    Kathmandu, Nepal
+                  </p>
+                  <p className="flex items-center gap-3">
+                    <Mail className="h-4 w-4 text-blue-400" />
+                    hello@feeledger.edu.np
+                  </p>
+                  <p className="flex items-center gap-3">
+                    <Phone className="h-4 w-4 text-blue-400" />
+                    +977 01 555 0101
+                  </p>
+                </div>
               </div>
             </div>
           </div>
 
-          <div className="flex flex-col items-start justify-between gap-4 pt-7 text-xs text-slate-500 sm:flex-row sm:items-center">
+          <div className="mt-8 flex flex-col items-start justify-between gap-4 border-t border-white/10 pt-6 text-xs text-slate-500 sm:flex-row sm:items-center">
             <p>© {new Date().getFullYear()} Fee Ledger. Built for better school operations.</p>
-            <p className={mono}>Every entry logged. Every rupee accounted for.</p>
+            <p className={`${mono} text-slate-400`}>
+              Every entry logged. Every rupee accounted for.
+            </p>
           </div>
         </div>
       </footer>
