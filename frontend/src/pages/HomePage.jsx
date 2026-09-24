@@ -671,24 +671,24 @@ function HomePage() {
         </section>
 
         {/* ───────────────────────── CTA ───────────────────────── */}
-        <section className="relative isolate overflow-hidden bg-slate-900">
-          <div className="pointer-events-none absolute inset-0 -z-10 bg-[radial-gradient(ellipse_at_top,rgba(37,99,235,0.25),transparent_60%)]" />
+        <section className="relative isolate overflow-hidden border-y border-blue-100 bg-blue-50">
+          <div className="pointer-events-none absolute inset-0 -z-10 bg-[radial-gradient(ellipse_at_top,rgba(37,99,235,0.12),transparent_60%)]" />
           <div className="mx-auto max-w-3xl px-6 py-20 text-center sm:py-24 lg:px-8">
-            <p className="text-xs font-semibold uppercase tracking-[0.18em] text-blue-400">
+            <p className="text-xs font-semibold uppercase tracking-[0.18em] text-blue-600">
               Ready when you are
             </p>
             <h2
-              className={`${serif} mt-4 text-3xl tracking-[-0.02em] text-white sm:text-4xl`}
+              className={`${serif} mt-4 text-3xl tracking-[-0.02em] text-slate-900 sm:text-4xl`}
             >
               Open the ledger for your school.
             </h2>
-            <p className="mx-auto mt-4 max-w-xl text-base leading-7 text-slate-400">
+            <p className="mx-auto mt-4 max-w-xl text-base leading-7 text-slate-600">
               Set up the fee structure once. Let payments, receipts, and reports
               take care of themselves after that.
             </p>
             <Link
               to={isAuthenticated ? "/dashboard" : "/login"}
-              className="mt-9 inline-flex min-h-12 items-center gap-2 rounded-lg bg-white px-6 text-sm font-semibold text-slate-900 shadow-lg transition-colors hover:bg-slate-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 focus-visible:ring-offset-slate-900"
+              className="mt-9 inline-flex min-h-12 items-center gap-2 rounded-lg bg-blue-600 px-6 text-sm font-semibold text-white shadow-lg shadow-blue-600/20 transition-colors hover:bg-blue-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 focus-visible:ring-offset-blue-50"
             >
               {isAuthenticated ? "Open my dashboard" : "Sign in to the portal"}
               <ArrowUpRight className="h-4 w-4" />
