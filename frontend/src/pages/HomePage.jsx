@@ -616,20 +616,34 @@ function HomePage() {
         </section>
 
         {/* ───────────────────────── Features ───────────────────────── */}
-        <section id="features" className="border-b border-[#DAD4C3]">
+        <section
+          id="features"
+          className="border-b border-[#DAD4C3] bg-[#FBF9F4]"
+        >
           <div className="mx-auto max-w-7xl px-6 py-20 sm:py-24 lg:px-10">
             <SectionHeading
               tag="The ledger"
               title="The details that make a fee system trustworthy."
               body="A production-ready fee workflow needs more than a payment button. Every amount, adjustment, and receipt should remain understandable after the transaction is over."
             />
-            <div className="mt-10 border-t border-[#DAD4C3]">
+            <div className="mt-12 border-t border-[#DAD4C3]">
               {ledgerFeatures.map((f, i) => (
-                <LedgerFeatureRow
+                <div
                   key={f.no}
-                  {...f}
-                  last={i === ledgerFeatures.length - 1}
-                />
+                  className={`group grid grid-cols-[3rem_1fr] gap-6 border-b border-[#DAD4C3] py-7 transition-colors hover:bg-[#F6F3EB] sm:grid-cols-[4rem_1fr_1fr] sm:gap-10 ${
+                    i === ledgerFeatures.length - 1 ? "border-b-0" : ""
+                  }`}
+                >
+                  <span className="pt-1 font-mono text-sm tabular-nums text-[#9A9284]">
+                    {String(f.no).padStart(2, "0")}
+                  </span>
+                  <h3 className="pt-0.5 text-lg font-medium text-[#1F1B16]">
+                    {f.title}
+                  </h3>
+                  <p className="text-sm leading-relaxed text-[#5C564C] sm:text-base">
+                    {f.description}
+                  </p>
+                </div>
               ))}
             </div>
           </div>
