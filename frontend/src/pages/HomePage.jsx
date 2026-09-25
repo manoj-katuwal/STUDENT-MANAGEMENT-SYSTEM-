@@ -1,800 +1,780 @@
-import React, { useEffect, useRef, useState } from "react";
-import { Link } from "react-router-dom";
+import React, { useState, useEffect, useMemo } from 'react';
 import {
-  ArrowUpRight,
+  Shield,
+  CreditCard,
+  Users,
   BarChart3,
-  Check,
+  CheckCircle2,
+  ChevronRight,
+  Menu,
+  X,
+  Search,
+  Filter,
+  ArrowRight,
+  Download,
+  HelpCircle,
+  Smartphone,
+  BookOpen,
+  DollarSign,
+  TrendingUp,
+  Award,
+  Sparkles,
   ChevronDown,
-  GraduationCap,
+  Moon,
+  Sun,
+  Phone,
   Mail,
   MapPin,
-  Menu,
-  Phone,
-  Receipt,
-  ShieldCheck,
-  X,
-} from "lucide-react";
-import { useAuth } from "../features/auth/auth.context";
+  Lock,
+  Zap,
+  Layout,
+  UserCheck,
+  Building,
+  GraduationCap
+} from 'lucide-react';
 
-const serif = "font-['Newsreader',Georgia,serif]";
-const sans = "font-['IBM_Plex_Sans',ui-sans-serif,system-ui,sans-serif]";
-const mono = "font-['IBM_Plex_Mono',ui-monospace,SFMono-Regular,monospace]";
-
-const roles = [
-  {
-    id: "STUDENT",
-    title: "Student",
-    subtitle: "Personal ledger & online payment",
-    icon: GraduationCap,
-    features: [
-      "Full fee breakdown — gross, discounts, scholarships, net",
-      "Pay outstanding balances instantly through eSewa",
-      "Download a signed PDF receipt after every payment",
-      "See the next due date before a fine is charged",
-    ],
-  },
-  {
-    id: "ADMIN",
-    title: "Administrator",
-    subtitle: "Institution & fee-policy control",
-    icon: ShieldCheck,
-    features: [
-      "Set fee structures per class and academic year",
-      "Manage students, classes, sections, and staff accounts",
-      "Approve individual discounts and scholarship awards",
-      "Read the audit log behind every entry in the ledger",
-    ],
-  },
-  {
-    id: "ACCOUNTANT",
-    title: "Accountant",
-    subtitle: "Counter collection & receipting",
-    icon: Receipt,
-    features: [
-      "Record cash, cheque, or bank-transfer payments on the spot",
-      "Print a receipt the moment a payment is entered",
-      "Watch the day's till against the ledger in real time",
-      "Export any collection period to Excel",
-    ],
-  },
-  {
-    id: "PRINCIPAL",
-    title: "Principal",
-    subtitle: "Read-only financial oversight",
-    icon: BarChart3,
-    features: [
-      "Compare collection across academic years at a glance",
-      "See which classes are carrying outstanding dues",
-      "Review reports without the power to alter a single entry",
-      "Pull board-ready exports on demand",
-    ],
-  },
+const INITIAL_LEDGER_DATA = [
+  { id: 'TXN-8092', student: 'Aarav Sharma', idNo: 'STU-2024-089', grade: 'Grade 10', amount: 18500, status: 'Paid', method: 'eSewa', date: '2026-09-24' },
+  { id: 'TXN-8093', student: 'Priya Adhikari', idNo: 'STU-2024-112', grade: 'Grade 8', amount: 12000, status: 'Paid', method: 'Khalti', date: '2026-09-24' },
+  { id: 'TXN-8094', student: 'Siddharth Thapa', idNo: 'STU-2024-045', grade: 'Grade 12', amount: 24500, status: 'Pending', method: 'Bank Transfer', date: '2026-09-23' },
+  { id: 'TXN-8095', student: 'Ananya Rai', idNo: 'STU-2024-201', grade: 'Grade 6', amount: 9500, status: 'Paid', method: 'eSewa', date: '2026-09-22' },
+  { id: 'TXN-8096', student: 'Rohan Karki', idNo: 'STU-2024-156', grade: 'Grade 11', amount: 21000, status: 'Overdue', method: 'Cash Deposit', date: '2026-09-18' },
 ];
 
-const ledgerFeatures = [
+const FAQ_ITEMS = [
   {
-    title: "One fee structure per class",
-    body: "Tuition, lab, library, sports, and exam fees are set once per class and academic year, then applied automatically to every student in it.",
+    q: "Is Fee Ledger customized for Nepal's educational payment ecosystem?",
+    a: "Yes! Fee Ledger natively integrates with eSewa, Khalti, ConnectIPS, and major Nepalese banking APIs. It supports dual currency/number formats (NPR / रू) and aligned academic sessions."
   },
   {
-    title: "eSewa, built in",
-    body: "Students settle a balance in full or in part from their own portal. The ledger reconciles the moment eSewa confirms payment.",
+    q: "How secure is the transaction and student billing data?",
+    a: "We deploy enterprise-grade AES-256 encryption at rest and TLS 1.3 in transit. Data is backed up across high-availability cloud servers with automated daily snapshots and strict role-based access control (RBAC)."
   },
   {
-    title: "Receipts that don't need reprinting",
-    body: "Every payment — online or at the counter — produces a numbered PDF receipt immediately, ready to download or print.",
+    q: "Can parents view breakdown of sibling discounts and late fines?",
+    a: "Absolutely. Parents receive access to a dedicated mobile-first portal displaying granular itemized bills, scholarship discounts, transport fees, and real-time payment receipts directly downloadable as PDFs."
   },
   {
-    title: "Discounts and scholarships, kept separate",
-    body: "A sibling discount and a merit scholarship are recorded as distinct entries against the same fee, so nothing is ever double-counted.",
-  },
-  {
-    title: "Fines that respect a grace period",
-    body: "Late fees accrue daily against a configurable policy and cap — never silently, and never past the limit a school has set.",
-  },
-  {
-    title: "An audit trail on everything",
-    body: "Every reversal, discount, and adjustment is logged against the fee it touched, so a question about any entry has an answer.",
-  },
+    q: "How long does implementation take for a school or college?",
+    a: "Our automated onboarding wizard allows standard integration within 48 hours. Our team in Kathmandu provides full data migration support from legacy Excel or software suites."
+  }
 ];
 
-const steps = [
-  {
-    n: "01",
-    title: "Set the structure",
-    body: "Define academic years, classes, sections, and the fee structure each class carries.",
-  },
-  {
-    n: "02",
-    title: "Assign and collect",
-    body: "Ledgers generate automatically. Students pay through eSewa, or the counter takes cash and cheque.",
-  },
-  {
-    n: "03",
-    title: "Receipt and report",
-    body: "Every payment issues a receipt on the spot, and the dashboard reflects it immediately.",
-  },
-];
-
-const faqs = [
-  {
-    q: "How does a student pay online?",
-    a: "From the student portal, under “My Fees,” they choose full or partial payment and confirm through eSewa. The ledger updates as soon as the gateway confirms, and a receipt is issued automatically.",
-  },
-  {
-    q: "Can the school still take cash at the counter?",
-    a: "Yes. Accountants record cash, cheque, or bank-transfer payments directly against a student's ledger, with a reference note and an instant printed receipt.",
-  },
-  {
-    q: "What stops one role from seeing another's data?",
-    a: "Access is enforced by role at the server, not just hidden in the interface. A student can only open their own ledger; a principal can read every ledger but change none of them.",
-  },
-  {
-    q: "Can I get the numbers out for a board meeting?",
-    a: "Collection reports, pending dues, and full student rosters export to Excel from the reports screen, filtered by class, date range, or academic year.",
-  },
-];
-
-const ledgerRows = [
-  {
-    no: "014",
-    name: "Anjali Rai",
-    status: "Paid",
-    statusClass: "text-emerald-700 bg-emerald-50 ring-1 ring-emerald-600/20",
-    amount: "12,000",
-  },
-  {
-    no: "015",
-    name: "Bikash Thapa",
-    status: "Due",
-    statusClass: "text-red-700 bg-red-50 ring-1 ring-red-600/20",
-    amount: "8,500",
-  },
-  {
-    no: "016",
-    name: "Sunita Gurung",
-    status: "Paid",
-    statusClass: "text-emerald-700 bg-emerald-50 ring-1 ring-emerald-600/20",
-    amount: "12,000",
-  },
-  {
-    no: "017",
-    name: "Prakash K.C.",
-    status: "Partial",
-    statusClass: "text-amber-700 bg-amber-50 ring-1 ring-amber-600/20",
-    amount: "6,000",
-  },
-];
-
-const navLinks = [
-  ["Features", "#features"],
-  ["Roles", "#roles"],
-  ["How it works", "#how-it-works"],
-  ["FAQ", "#faq"],
-];
-
-/* ───────────────────────── Shared primitives ─────────────────────────
-   Pulled out so every CTA in the page shares one focus ring, one radius
-   scale, and one hover treatment instead of five hand-copied variants. */
-
-const FOCUS_RING =
-  "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-600 focus-visible:ring-offset-2";
-
-function Button({
-  as: As = Link,
-  variant = "primary",
-  className = "",
-  children,
-  ...props
-}) {
-  const base = `inline-flex min-h-11 items-center justify-center gap-1.5 rounded-lg px-5 text-sm font-semibold transition-colors ${FOCUS_RING}`;
-  const variants = {
-    primary:
-      "bg-blue-600 text-white shadow-sm shadow-blue-600/20 hover:bg-blue-700",
-    dark: "bg-slate-900 text-white shadow-sm hover:bg-slate-800",
-    outline:
-      "border border-slate-200 bg-white text-slate-700 shadow-sm hover:border-slate-300 hover:bg-slate-50",
-    ghost: "text-slate-600 hover:bg-slate-100 hover:text-slate-900",
+const Badge = ({ children, variant = 'indigo' }) => {
+  const styles = {
+    indigo: 'bg-indigo-50 dark:bg-indigo-950/60 text-indigo-700 dark:text-indigo-300 border-indigo-200/60 dark:border-indigo-800/50',
+    emerald: 'bg-emerald-50 dark:bg-emerald-950/60 text-emerald-700 dark:text-emerald-300 border-emerald-200/60 dark:border-emerald-800/50',
+    amber: 'bg-amber-50 dark:bg-amber-950/60 text-amber-700 dark:text-amber-300 border-amber-200/60 dark:border-amber-800/50',
+    rose: 'bg-rose-50 dark:bg-rose-950/60 text-rose-700 dark:text-rose-300 border-rose-200/60 dark:border-rose-800/50',
   };
   return (
-    <As className={`${base} ${variants[variant]} ${className}`} {...props}>
+    <span className={`inline-flex items-center gap-1.5 px-2.5 py-1 text-xs font-semibold rounded-full border transition-all ${styles[variant]}`}>
       {children}
-    </As>
+    </span>
   );
-}
+};
 
-function SectionIntro({ eyebrow, title, body }) {
-  return (
-    <div className="max-w-2xl">
-      {eyebrow && (
-        <p className="text-sm font-medium text-blue-600">{eyebrow}</p>
-      )}
-      <h2
-        className={`${serif} mt-3 text-3xl leading-[1.15] tracking-[-0.02em] text-slate-900 sm:text-4xl`}
-      >
-        {title}
-      </h2>
-      {body && (
-        <p className="mt-4 text-base leading-7 text-slate-600">{body}</p>
-      )}
-    </div>
-  );
-}
+export default function App() {
+  const [darkMode, setDarkMode] = useState(false);
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  
+  // Interactive Ledger State
+  const [ledgerData, setLedgerData] = useState(INITIAL_LEDGER_DATA);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [statusFilter, setStatusFilter] = useState('All');
+  const [isSimulating, setIsSimulating] = useState(false);
 
-function HomePage() {
-  const { isAuthenticated, user } = useAuth();
-  const [activeRoleTab, setActiveRoleTab] = useState("STUDENT");
+  // Fee Calculator State
+  const [baseTuition, setBaseTuition] = useState(15000);
+  const [siblingCount, setSiblingCount] = useState(1);
+  const [meritDiscount, setMeritDiscount] = useState(10);
+  const [includeTransport, setIncludeTransport] = useState(true);
+
+  // Workbench Active Tab
+  const [activeRole, setActiveRole] = useState('administrator');
   const [openFaq, setOpenFaq] = useState(0);
-  const [mobileNavOpen, setMobileNavOpen] = useState(false);
-  const firstMobileLinkRef = useRef(null);
 
-  const activeRole = roles.find((r) => r.id === activeRoleTab) ?? roles[0];
-  const ActiveRoleIcon = activeRole.icon;
-
-  // Lock body scroll while the mobile drawer is open, close on Escape,
-  // and move focus into the drawer for keyboard users.
+  // Dark Mode Toggle Class Setup
   useEffect(() => {
-    if (!mobileNavOpen) return;
-    const previousOverflow = document.body.style.overflow;
-    document.body.style.overflow = "hidden";
-    firstMobileLinkRef.current?.focus();
-    const onKeyDown = (e) => {
-      if (e.key === "Escape") setMobileNavOpen(false);
-    };
-    document.addEventListener("keydown", onKeyDown);
-    return () => {
-      document.body.style.overflow = previousOverflow;
-      document.removeEventListener("keydown", onKeyDown);
-    };
-  }, [mobileNavOpen]);
+    if (darkMode) {
+      document.documentElement.classList.add('dark');
+    } else {
+      document.documentElement.classList.remove('dark');
+    }
+  }, [darkMode]);
 
-  const closeMobileNav = () => setMobileNavOpen(false);
+  // Filtered Ledger Entries calculation
+  const filteredLedger = useMemo(() => {
+    return ledgerData.filter((item) => {
+      const matchesSearch = item.student.toLowerCase().includes(searchQuery.toLowerCase()) || item.idNo.toLowerCase().includes(searchQuery.toLowerCase());
+      const matchesStatus = statusFilter === 'All' || item.status === statusFilter;
+      return matchesSearch && matchesStatus;
+    });
+  }, [ledgerData, searchQuery, statusFilter]);
+
+  // Total Ledger Revenue
+  const totalCollected = useMemo(() => {
+    return filteredLedger
+      .filter((i) => i.status === 'Paid')
+      .reduce((acc, curr) => acc + curr.amount, 0);
+  }, [filteredLedger]);
+
+  // Simulate Live Payment Entry
+  const handleSimulatePayment = () => {
+    setIsSimulating(true);
+    setTimeout(() => {
+      const newEntry = {
+        id: `TXN-${Math.floor(1000 + Math.random() * 9000)}`,
+        student: 'Kiran KC',
+        idNo: 'STU-2024-304',
+        grade: 'Grade 9',
+        amount: 14500,
+        status: 'Paid',
+        method: 'eSewa',
+        date: new Date().toISOString().split('T')[0],
+      };
+      setLedgerData([newEntry, ...ledgerData]);
+      setIsSimulating(false);
+    }, 800);
+  };
+
+  // Fee Calculation Logic
+  const calculatedFee = useMemo(() => {
+    let base = Number(baseTuition);
+    const siblingDiscountPct = Math.min((siblingCount - 1) * 10, 30); // 10% per sibling max 30
+    const totalDiscountPct = Math.min(siblingDiscountPct + Number(meritDiscount), 50);
+    const discountAmount = (base * totalDiscountPct) / 100;
+    const transportFee = includeTransport ? 3500 : 0;
+    const finalFee = base - discountAmount + transportFee;
+
+    return {
+      discountAmount,
+      totalDiscountPct,
+      transportFee,
+      finalFee,
+    };
+  }, [baseTuition, siblingCount, meritDiscount, includeTransport]);
 
   return (
-    <div
-      className={`min-h-screen overflow-x-hidden bg-white text-slate-900 ${sans} antialiased selection:bg-blue-600 selection:text-white`}
-    >
-      <a
-        href="#main-content"
-        className="sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-[100] focus:rounded-lg focus:bg-slate-900 focus:px-4 focus:py-3 focus:text-sm focus:font-semibold focus:text-white"
-      >
-        Skip to content
+    <div className={`min-h-screen font-sans antialiased transition-colors duration-300 ${darkMode ? 'bg-slate-950 text-slate-100' : 'bg-slate-50 text-slate-900'}`}>
+      {/* Skip to Main Content Link for Accessibility */}
+      <a href="#main-content" className="sr-only focus:not-sr-only focus:fixed focus:top-4 focus:left-4 focus:z-50 focus:px-4 focus:py-2 focus:bg-indigo-600 focus:text-white focus:rounded-lg">
+        Skip to main content
       </a>
 
-      {/* ───────────────────────── Header ───────────────────────── */}
-      <header className="sticky top-0 z-50 border-b border-slate-200/80 bg-white/85 backdrop-blur-lg">
-        <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-6 lg:px-8">
-          <Link
-            to="/"
-            aria-label="Fee Ledger home"
-            className={`group flex items-center gap-2.5 rounded-md ${FOCUS_RING}`}
-          >
-            <span className="flex h-9 w-9 items-center justify-center rounded-lg bg-slate-900 text-sm text-white shadow-sm transition-transform duration-200 motion-safe:group-hover:-translate-y-0.5">
-              <span className={serif}>रू</span>
-            </span>
-            <span
-              className={`${serif} text-lg font-medium tracking-[-0.01em] text-slate-900`}
-            >
-              Fee Ledger
-            </span>
-          </Link>
+      {}
+      <header className="sticky top-0 z-40 backdrop-blur-md bg-white/80 dark:bg-slate-950/80 border-b border-slate-200/80 dark:border-slate-800/80 transition-colors">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between">
+          <a href="#" className="flex items-center gap-2.5 group">
+            <div className="h-10 w-10 rounded-xl bg-gradient-to-tr from-indigo-600 to-violet-500 flex items-center justify-center text-white shadow-lg shadow-indigo-500/25 group-hover:scale-105 transition-transform">
+              <CreditCard className="w-5.5 h-5.5" />
+            </div>
+            <div>
+              <span className="text-xl font-bold tracking-tight bg-gradient-to-r from-slate-900 via-indigo-950 to-slate-800 dark:from-white dark:via-slate-200 dark:to-slate-400 bg-clip-text text-transparent">
+                Fee Ledger
+              </span>
+              <span className="block text-[10px] font-mono font-medium tracking-widest text-indigo-600 dark:text-indigo-400 uppercase">
+                Enterprise OS
+              </span>
+            </div>
+          </a>
 
-          <nav
-            aria-label="Primary navigation"
-            className="hidden items-center gap-1 md:flex"
-          >
-            {navLinks.map(([label, href]) => (
-              <a
-                key={href}
-                href={href}
-                className={`rounded-lg px-3 py-2 text-sm font-medium text-slate-600 transition-colors hover:bg-slate-100 hover:text-slate-900 ${FOCUS_RING}`}
-              >
-                {label}
-              </a>
-            ))}
+          {/* Desktop Nav Items */}
+          <nav className="hidden md:flex items-center gap-8 text-sm font-medium text-slate-600 dark:text-slate-300">
+            <a href="#sandbox" className="hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors">Live Sandbox</a>
+            <a href="#roles" className="hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors">Workbench</a>
+            <a href="#calculator" className="hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors">Fee Calculator</a>
+            <a href="#features" className="hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors">Features</a>
+            <a href="#faq" className="hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors">FAQ</a>
           </nav>
 
-          <div className="flex items-center gap-2">
-            {isAuthenticated ? (
-              <Button
-                as={Link}
-                to="/dashboard"
-                variant="dark"
-                className="hidden sm:inline-flex"
-              >
-                Dashboard
-                <span className="text-white/40">·</span>
-                <span className="max-w-24 truncate text-white/70">
-                  {user?.role}
-                </span>
-              </Button>
-            ) : (
-              <>
-                <Button
-                  as={Link}
-                  to="/login"
-                  variant="ghost"
-                  className="hidden sm:inline-flex"
-                >
-                  Sign in
-                </Button>
-                <Button
-                  as={Link}
-                  to="/register"
-                  variant="primary"
-                  className="hidden sm:inline-flex"
-                >
-                  Get started
-                </Button>
-              </>
-            )}
-
-            {/* Mobile menu trigger — the piece the original page was missing */}
+          {/* Actions & Theme Switcher */}
+          <div className="hidden md:flex items-center gap-4">
             <button
-              type="button"
-              onClick={() => setMobileNavOpen(true)}
-              aria-expanded={mobileNavOpen}
-              aria-controls="mobile-nav"
-              aria-label="Open menu"
-              className={`inline-flex h-10 w-10 items-center justify-center rounded-lg text-slate-700 hover:bg-slate-100 md:hidden ${FOCUS_RING}`}
+              onClick={() => setDarkMode(!darkMode)}
+              className="p-2 rounded-xl text-slate-500 hover:text-slate-900 dark:text-slate-400 dark:hover:text-white bg-slate-100 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 transition-all hover:scale-105"
+              aria-label="Toggle theme"
             >
-              <Menu className="h-5 w-5" strokeWidth={1.8} />
+              {darkMode ? <Sun className="w-4 h-4 text-amber-400" /> : <Moon className="w-4 h-4" />}
+            </button>
+            <a
+              href="#sandbox"
+              className="px-4 py-2.5 text-sm font-semibold rounded-xl text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-900 border border-slate-200 dark:border-slate-800 transition-all"
+            >
+              Sign In
+            </a>
+            <a
+              href="#calculator"
+              className="px-5 py-2.5 text-sm font-semibold rounded-xl text-white bg-gradient-to-r from-indigo-600 to-violet-600 hover:from-indigo-500 hover:to-violet-500 shadow-md shadow-indigo-500/20 hover:shadow-indigo-500/35 transition-all hover:-translate-y-0.5 active:translate-y-0"
+            >
+              Get Started Free
+            </a>
+          </div>
+
+          {/* Mobile Menu Button */}
+          <div className="flex md:hidden items-center gap-2">
+            <button
+              onClick={() => setDarkMode(!darkMode)}
+              className="p-2 rounded-lg text-slate-500 dark:text-slate-400 bg-slate-100 dark:bg-slate-900"
+              aria-label="Toggle theme"
+            >
+              {darkMode ? <Sun className="w-4 h-4" /> : <Moon className="w-4 h-4" />}
+            </button>
+            <button
+              onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+              className="p-2 rounded-lg text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-900"
+              aria-label="Open main menu"
+            >
+              {mobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
             </button>
           </div>
         </div>
-      </header>
 
-      {/* Mobile nav drawer */}
-      {mobileNavOpen && (
-        <div className="fixed inset-0 z-[60] md:hidden">
-          <button
-            type="button"
-            aria-label="Close menu"
-            onClick={closeMobileNav}
-            className="absolute inset-0 bg-slate-900/40"
-          />
-          <div
-            id="mobile-nav"
-            role="dialog"
-            aria-modal="true"
-            aria-label="Site menu"
-            className="absolute right-0 top-0 flex h-full w-[85%] max-w-sm flex-col bg-white shadow-2xl transition-transform duration-200"
-          >
-            <div className="flex h-16 items-center justify-between border-b border-slate-200 px-6">
-              <span className={`${serif} text-lg text-slate-900`}>Menu</span>
-              <button
-                type="button"
-                onClick={closeMobileNav}
-                aria-label="Close menu"
-                className={`inline-flex h-10 w-10 items-center justify-center rounded-lg text-slate-500 hover:bg-slate-100 ${FOCUS_RING}`}
-              >
-                <X className="h-5 w-5" strokeWidth={1.8} />
-              </button>
-            </div>
-
-            <nav
-              aria-label="Mobile"
-              className="flex flex-1 flex-col gap-1 px-4 py-5"
-            >
-              {navLinks.map(([label, href], i) => (
-                <a
-                  key={href}
-                  ref={i === 0 ? firstMobileLinkRef : undefined}
-                  href={href}
-                  onClick={closeMobileNav}
-                  className={`rounded-lg px-3 py-3 text-base font-medium text-slate-700 hover:bg-slate-100 ${FOCUS_RING}`}
-                >
-                  {label}
-                </a>
-              ))}
-            </nav>
-
-            <div className="flex flex-col gap-2 border-t border-slate-200 p-4">
-              {isAuthenticated ? (
-                <Button
-                  as={Link}
-                  to="/dashboard"
-                  variant="dark"
-                  onClick={closeMobileNav}
-                >
-                  Open dashboard
-                </Button>
-              ) : (
-                <>
-                  <Button
-                    as={Link}
-                    to="/login"
-                    variant="outline"
-                    onClick={closeMobileNav}
-                  >
-                    Sign in
-                  </Button>
-                  <Button
-                    as={Link}
-                    to="/register"
-                    variant="primary"
-                    onClick={closeMobileNav}
-                  >
-                    Get started
-                  </Button>
-                </>
-              )}
+        {/* Mobile Nav Drawer */}
+        {mobileMenuOpen && (
+          <div className="md:hidden border-b border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-950 px-4 pt-2 pb-6 space-y-3">
+            <a href="#sandbox" onClick={() => setMobileMenuOpen(false)} className="block py-2 text-base font-medium text-slate-700 dark:text-slate-200">Live Sandbox</a>
+            <a href="#roles" onClick={() => setMobileMenuOpen(false)} className="block py-2 text-base font-medium text-slate-700 dark:text-slate-200">Workbench</a>
+            <a href="#calculator" onClick={() => setMobileMenuOpen(false)} className="block py-2 text-base font-medium text-slate-700 dark:text-slate-200">Fee Calculator</a>
+            <a href="#features" onClick={() => setMobileMenuOpen(false)} className="block py-2 text-base font-medium text-slate-700 dark:text-slate-200">Features</a>
+            <a href="#faq" onClick={() => setMobileMenuOpen(false)} className="block py-2 text-base font-medium text-slate-700 dark:text-slate-200">FAQ</a>
+            <div className="pt-2 flex flex-col gap-2">
+              <a href="#calculator" className="w-full py-3 text-center font-semibold rounded-xl text-white bg-indigo-600">Get Started Free</a>
             </div>
           </div>
-        </div>
-      )}
+        )}
+      </header>
 
       <main id="main-content">
-        {/* ───────────────────────── Hero ───────────────────────── */}
-        <section className="relative isolate overflow-hidden border-b border-slate-200/70">
-          <div className="pointer-events-none absolute inset-0 -z-10 bg-[radial-gradient(ellipse_at_top_right,rgba(37,99,235,0.08),transparent_55%)]" />
-          <div className="pointer-events-none absolute inset-0 -z-10 bg-[linear-gradient(to_right,rgba(15,23,42,0.03)_1px,transparent_1px),linear-gradient(to_bottom,rgba(15,23,42,0.03)_1px,transparent_1px)] bg-[size:4rem_4rem] [mask-image:radial-gradient(ellipse_at_center,black,transparent_75%)]" />
+        {}
+        <section className="relative overflow-hidden pt-12 pb-20 lg:pt-20 lg:pb-28">
+          {/* Ambient Background Gradient Mesh */}
+          <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full max-w-7xl h-[500px] pointer-events-none opacity-40 dark:opacity-25 blur-3xl">
+            <div className="absolute top-10 left-10 w-96 h-96 bg-indigo-500 rounded-full mix-blend-multiply filter blur-3xl animate-pulse" />
+            <div className="absolute top-20 right-10 w-96 h-96 bg-violet-500 rounded-full mix-blend-multiply filter blur-3xl animate-pulse delay-1000" />
+            <div className="absolute bottom-10 left-1/3 w-96 h-96 bg-emerald-500 rounded-full mix-blend-multiply filter blur-3xl animate-pulse delay-700" />
+          </div>
 
-          <div className="mx-auto max-w-7xl px-6 pb-20 pt-16 sm:pb-28 sm:pt-24 lg:px-8 lg:pb-32 lg:pt-28">
-            <div className="grid items-center gap-16 lg:grid-cols-[1.05fr_0.95fr] lg:gap-12">
-              <div>
-                <h1
-                  className={`${serif} max-w-2xl text-[2.75rem] leading-[1.04] tracking-[-0.035em] text-slate-900 sm:text-6xl lg:text-[4.25rem]`}
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+            <div className="text-center max-w-3xl mx-auto space-y-6">
+              <Badge variant="indigo">
+                <Sparkles className="w-3.5 h-3.5" /> Next-Gen Nepalese Institution Billing OS
+              </Badge>
+
+              <h1 className="text-4xl sm:text-5xl lg:text-6xl font-extrabold tracking-tight text-slate-900 dark:text-white leading-[1.15]">
+                Automate Educational Fee Ledgers with <span className="bg-gradient-to-r from-indigo-600 via-violet-600 to-emerald-500 bg-clip-text text-transparent">Absolute Precision</span>
+              </h1>
+
+              <p className="text-lg sm:text-xl text-slate-600 dark:text-slate-400 font-normal leading-relaxed">
+                Streamline tuition processing, digital gate passes, automatic sibling discounts, and seamless eSewa/Khalti payouts for schools, colleges, and universities across Nepal.
+              </p>
+
+              <div className="flex flex-col sm:flex-row items-center justify-center gap-4 pt-4">
+                <a
+                  href="#sandbox"
+                  className="w-full sm:w-auto px-8 py-4 text-base font-semibold rounded-2xl text-white bg-indigo-600 hover:bg-indigo-500 shadow-lg shadow-indigo-600/30 hover:shadow-indigo-600/45 transition-all flex items-center justify-center gap-2 group"
                 >
-                  Every fee recorded.
-                  <br />
-                  <span className="text-slate-400">Every rupee receipted.</span>
-                </h1>
-
-                <p className="mt-7 max-w-xl text-base leading-7 text-slate-600 sm:text-lg sm:leading-8">
-                  A single ledger for tuition, fines, discounts, and
-                  scholarships — with eSewa payments, instant receipts, and a
-                  plain audit trail behind every entry.
-                </p>
-
-                <div className="mt-9 flex flex-col gap-3 sm:flex-row">
-                  <Button
-                    as={Link}
-                    to={isAuthenticated ? "/dashboard" : "/login"}
-                    variant="primary"
-                    className="min-h-12 px-6"
-                  >
-                    {isAuthenticated ? "Open my dashboard" : "Open the ledger"}
-                  </Button>
-                  <Button
-                    as={Link}
-                    to="/register"
-                    variant="outline"
-                    className="min-h-12 px-6"
-                  >
-                    Register a student
-                  </Button>
-                </div>
-
-                <dl className="mt-12 grid max-w-lg grid-cols-3 gap-6 border-t border-slate-200 pt-6">
-                  {[
-                    ["eSewa", "integrated gateway"],
-                    ["4 roles", "permission-based"],
-                    ["100%", "audit visibility"],
-                  ].map(([value, label]) => (
-                    <div key={value}>
-                      <dt
-                        className={`${mono} text-sm font-semibold text-slate-900`}
-                      >
-                        {value}
-                      </dt>
-                      <dd className="mt-1 text-xs leading-5 text-slate-500">
-                        {label}
-                      </dd>
-                    </div>
-                  ))}
-                </dl>
+                  Explore Interactive Ledger
+                  <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+                </a>
+                <a
+                  href="#calculator"
+                  className="w-full sm:w-auto px-8 py-4 text-base font-semibold rounded-2xl text-slate-800 dark:text-slate-100 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 hover:bg-slate-50 dark:hover:bg-slate-800 transition-all flex items-center justify-center gap-2 shadow-sm"
+                >
+                  Calculate Fee Distribution
+                </a>
               </div>
 
-              {/* App preview */}
-              <div className="relative mx-auto w-full max-w-xl lg:max-w-none">
-                <div className="absolute -inset-4 -z-10 rounded-[2rem] bg-linear-to-tr from-blue-600/10 via-slate-900/5 to-transparent blur-2xl" />
-                <div className="absolute -bottom-8 -left-8 z-10 hidden h-28 w-40 overflow-hidden rounded-2xl border-8 border-white shadow-xl shadow-slate-900/15 xl:block">
-                  <img
-                    src="/school.jpg"
-                    alt="Students and staff on the school campus"
-                    className="h-full w-full object-cover"
-                    loading="lazy"
+              {/* Key Proof Metrics */}
+              <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 pt-12 border-t border-slate-200/80 dark:border-slate-800/80 text-left">
+                <div>
+                  <div className="text-2xl font-bold font-mono text-slate-900 dark:text-white">रू 450M+</div>
+                  <div className="text-xs text-slate-500 dark:text-slate-400 font-medium mt-0.5">Processed Annually</div>
+                </div>
+                <div>
+                  <div className="text-2xl font-bold font-mono text-slate-900 dark:text-white">120+</div>
+                  <div className="text-xs text-slate-500 dark:text-slate-400 font-medium mt-0.5">Schools & Colleges</div>
+                </div>
+                <div>
+                  <div className="text-2xl font-bold font-mono text-slate-900 dark:text-white">99.98%</div>
+                  <div className="text-xs text-slate-500 dark:text-slate-400 font-medium mt-0.5">Reconciliation Accuracy</div>
+                </div>
+                <div>
+                  <div className="text-2xl font-bold font-mono text-slate-900 dark:text-white">&lt; 2 Sec</div>
+                  <div className="text-xs text-slate-500 dark:text-slate-400 font-medium mt-0.5">eSewa/Khalti Sync</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        {}
+        <section id="sandbox" className="py-16 bg-slate-100/70 dark:bg-slate-900/40 border-y border-slate-200 dark:border-slate-800">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 mb-8">
+              <div>
+                <Badge variant="emerald">Live Interactive Sandbox</Badge>
+                <h2 className="text-3xl font-bold text-slate-900 dark:text-white mt-2">
+                  Real-Time Fee Ledger Terminal
+                </h2>
+                <p className="text-slate-600 dark:text-slate-400 text-sm mt-1">
+                  Filter live receipts, test eSewa gateway simulation, and inspect automated status updating.
+                </p>
+              </div>
+
+              <div className="flex items-center gap-3">
+                <button
+                  onClick={handleSimulatePayment}
+                  disabled={isSimulating}
+                  className="px-4 py-2.5 text-xs font-semibold rounded-xl text-white bg-emerald-600 hover:bg-emerald-500 shadow-md shadow-emerald-600/20 transition-all flex items-center gap-2 disabled:opacity-50"
+                >
+                  <Zap className={`w-4 h-4 ${isSimulating ? 'animate-spin' : ''}`} />
+                  {isSimulating ? 'Processing Transaction...' : '+ Simulate Live eSewa Payment'}
+                </button>
+              </div>
+            </div>
+
+            {/* Sandbox Card Wrapper */}
+            <div className="bg-white dark:bg-slate-950 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-xl overflow-hidden">
+              {/* Filter Controls Toolbar */}
+              <div className="p-4 border-b border-slate-200 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-900/50 flex flex-col sm:flex-row gap-4 items-center justify-between">
+                <div className="relative w-full sm:w-72">
+                  <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
+                  <input
+                    type="text"
+                    placeholder="Search student or ID..."
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                    className="w-full pl-9 pr-4 py-2 text-xs rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-indigo-500"
                   />
                 </div>
 
-                <div className="absolute -right-3 -top-4 z-10 hidden items-center gap-2 rounded-xl border border-slate-200 bg-white px-3 py-2 shadow-lg shadow-slate-900/5 sm:flex">
-                  <span className="flex h-6 w-6 items-center justify-center rounded-full bg-emerald-50">
-                    <ShieldCheck
-                      className="h-3.5 w-3.5 text-emerald-600"
-                      strokeWidth={2}
-                    />
-                  </span>
-                  <span className="text-xs font-semibold text-slate-700">
-                    eSewa verified
-                  </span>
-                </div>
-
-                <div className="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-2xl shadow-slate-900/10">
-                  <div className="flex items-center justify-between border-b border-slate-100 px-5 py-4 sm:px-6">
-                    <div className="flex items-center gap-3">
-                      <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-slate-900 text-xs text-white">
-                        <span className={serif}>रू</span>
-                      </span>
-                      <div>
-                        <p className="text-sm font-semibold text-slate-900">
-                          Fee Register
-                        </p>
-                        <p className="text-[11px] text-slate-500">
-                          Academic year 2081/82
-                        </p>
-                      </div>
-                    </div>
-                    <span className="inline-flex items-center gap-1.5 rounded-full bg-emerald-50 px-2.5 py-1 text-[11px] font-medium text-emerald-700 ring-1 ring-emerald-600/20">
-                      <span className="h-1.5 w-1.5 rounded-full bg-emerald-500 motion-safe:animate-pulse" />
-                      Live
-                    </span>
-                  </div>
-
-                  <div
-                    className={`${mono} hidden grid-cols-[2.5rem_1fr_auto_5.5rem] gap-4 border-b border-slate-100 bg-slate-50/60 px-6 py-2.5 text-[10px] font-medium uppercase tracking-wider text-slate-400 sm:grid`}
-                  >
-                    <span>No.</span>
-                    <span>Student</span>
-                    <span>Status</span>
-                    <span className="text-right">Amount</span>
-                  </div>
-
-                  <div className="divide-y divide-slate-100">
-                    {ledgerRows.map((row) => (
-                      <div
-                        key={row.no}
-                        className="grid grid-cols-[2rem_1fr_auto] items-center gap-4 px-5 py-3.5 transition-colors hover:bg-slate-50/70 sm:grid-cols-[2.5rem_1fr_auto_5.5rem] sm:px-6"
+                <div className="flex items-center gap-2 w-full sm:w-auto justify-between sm:justify-end">
+                  <div className="flex items-center gap-1.5 bg-white dark:bg-slate-900 p-1 rounded-xl border border-slate-200 dark:border-slate-800 text-xs">
+                    {['All', 'Paid', 'Pending', 'Overdue'].map((status) => (
+                      <button
+                        key={status}
+                        onClick={() => setStatusFilter(status)}
+                        className={`px-3 py-1.5 rounded-lg font-medium transition-colors ${
+                          statusFilter === status
+                            ? 'bg-indigo-600 text-white shadow-sm'
+                            : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
+                        }`}
                       >
-                        <span className={`${mono} text-xs text-slate-400`}>
-                          {row.no}
-                        </span>
-                        <div className="min-w-0">
-                          <span className="block truncate text-sm font-medium text-slate-900">
-                            {row.name}
-                          </span>
-                          <span
-                            className={`${mono} mt-0.5 block text-[10px] text-slate-400 sm:hidden`}
-                          >
-                            रू {row.amount}
-                          </span>
-                        </div>
-                        <span
-                          className={`w-fit rounded-md px-2 py-0.5 text-[10px] font-semibold ${row.statusClass}`}
-                        >
-                          {row.status}
-                        </span>
-                        <span
-                          className={`${mono} hidden text-right text-xs font-medium text-slate-900 sm:block`}
-                        >
-                          रू {row.amount}
-                        </span>
-                      </div>
+                        {status}
+                      </button>
                     ))}
                   </div>
+                </div>
+              </div>
 
-                  <div className="flex items-center justify-between border-t border-slate-100 bg-slate-50/60 px-5 py-4 sm:px-6">
-                    <div>
-                      <p className="text-xs font-medium text-slate-600">
-                        Collected this month
-                      </p>
-                      <p className="text-[11px] text-slate-400">
-                        Across all active ledgers
-                      </p>
+              {/* Data Table */}
+              <div className="overflow-x-auto">
+                <table className="w-full text-left text-xs">
+                  <thead className="bg-slate-100/50 dark:bg-slate-900/80 text-slate-500 dark:text-slate-400 uppercase tracking-wider font-semibold border-b border-slate-200 dark:border-slate-800">
+                    <tr>
+                      <th className="px-6 py-3.5">Transaction ID</th>
+                      <th className="px-6 py-3.5">Student Details</th>
+                      <th className="px-6 py-3.5">Grade</th>
+                      <th className="px-6 py-3.5">Payment Method</th>
+                      <th className="px-6 py-3.5">Status</th>
+                      <th className="px-6 py-3.5 text-right">Amount (NPR)</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-slate-200 dark:divide-slate-800/60 text-slate-700 dark:text-slate-300">
+                    {filteredLedger.length > 0 ? (
+                      filteredLedger.map((row) => (
+                        <tr key={row.id} className="hover:bg-slate-50/80 dark:hover:bg-slate-900/40 transition-colors">
+                          <td className="px-6 py-4 font-mono text-xs font-semibold text-indigo-600 dark:text-indigo-400">
+                            {row.id}
+                          </td>
+                          <td className="px-6 py-4">
+                            <div className="font-semibold text-slate-900 dark:text-white">{row.student}</div>
+                            <div className="text-[11px] text-slate-400 font-mono">{row.idNo}</div>
+                          </td>
+                          <td className="px-6 py-4 text-slate-600 dark:text-slate-400">{row.grade}</td>
+                          <td className="px-6 py-4">
+                            <span className="inline-flex items-center gap-1 font-medium">
+                              <Smartphone className="w-3 h-3 text-slate-400" /> {row.method}
+                            </span>
+                          </td>
+                          <td className="px-6 py-4">
+                            {row.status === 'Paid' && <Badge variant="emerald">Paid</Badge>}
+                            {row.status === 'Pending' && <Badge variant="amber">Pending</Badge>}
+                            {row.status === 'Overdue' && <Badge variant="rose">Overdue</Badge>}
+                          </td>
+                          <td className="px-6 py-4 text-right font-mono font-bold text-slate-900 dark:text-white">
+                            रू {row.amount.toLocaleString('ne-NP')}
+                          </td>
+                        </tr>
+                      ))
+                    ) : (
+                      <tr>
+                        <td colSpan={6} className="px-6 py-8 text-center text-slate-400">
+                          No matching ledger entries found.
+                        </td>
+                      </tr>
+                    )}
+                  </tbody>
+                </table>
+              </div>
+
+              {/* Table Footer with Summary */}
+              <div className="p-4 bg-slate-50 dark:bg-slate-900 border-t border-slate-200 dark:border-slate-800 flex flex-col sm:flex-row items-center justify-between text-xs text-slate-500 gap-2">
+                <div>
+                  Showing <span className="font-semibold text-slate-900 dark:text-white">{filteredLedger.length}</span> of {ledgerData.length} records
+                </div>
+                <div className="font-medium text-slate-700 dark:text-slate-300">
+                  Total Collected (Filtered): <span className="font-mono font-bold text-emerald-600 dark:text-emerald-400 text-sm ml-1">रू {totalCollected.toLocaleString('ne-NP')}</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        {}
+        <section id="roles" className="py-20">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div className="text-center max-w-2xl mx-auto mb-12">
+              <Badge variant="indigo">Tailored Workspaces</Badge>
+              <h2 className="text-3xl font-bold text-slate-900 dark:text-white mt-2">
+                Purpose-Built Roles for Your Entire Institution
+              </h2>
+              <p className="text-slate-600 dark:text-slate-400 text-sm mt-2">
+                Select a role to preview how Fee Ledger transforms tailored workflows for students, accountants, and leadership.
+              </p>
+            </div>
+
+            {/* Role Tabs Nav */}
+            <div className="flex flex-wrap items-center justify-center gap-2 mb-8">
+              {[
+                { id: 'administrator', label: 'Administrator', icon: Shield },
+                { id: 'accountant', label: 'Accountant', icon: BarChart3 },
+                { id: 'student', label: 'Student / Parent', icon: GraduationCap },
+                { id: 'principal', label: 'Principal / Management', icon: Building },
+              ].map((tab) => {
+                const Icon = tab.icon;
+                const isActive = activeRole === tab.id;
+                return (
+                  <button
+                    key={tab.id}
+                    onClick={() => setActiveRole(tab.id)}
+                    className={`flex items-center gap-2 px-5 py-3 rounded-2xl text-xs font-semibold transition-all ${
+                      isActive
+                        ? 'bg-indigo-600 text-white shadow-lg shadow-indigo-600/25 scale-105'
+                        : 'bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-slate-600 dark:text-slate-400 hover:border-indigo-300'
+                    }`}
+                  >
+                    <Icon className="w-4 h-4" />
+                    {tab.label}
+                  </button>
+                );
+              })}
+            </div>
+
+            {/* Role Tab Detail Box */}
+            <div className="bg-white dark:bg-slate-950 rounded-3xl border border-slate-200 dark:border-slate-800 p-8 shadow-xl">
+              {activeRole === 'administrator' && (
+                <div className="grid md:grid-cols-2 gap-8 items-center">
+                  <div className="space-y-4">
+                    <Badge variant="indigo">Admin Workspace</Badge>
+                    <h3 className="text-2xl font-bold text-slate-900 dark:text-white">Centralized System Control</h3>
+                    <p className="text-sm text-slate-600 dark:text-slate-400 leading-relaxed">
+                      Configure fee structures per grade, manage custom late penalty rules, assign staff permissions, and execute system audits with full log history.
+                    </p>
+                    <ul className="space-y-2.5 text-xs text-slate-700 dark:text-slate-300">
+                      <li className="flex items-center gap-2"><CheckCircle2 className="w-4 h-4 text-emerald-500" /> Dynamic Fee Head Creation (Exam, Library, Transport)</li>
+                      <li className="flex items-center gap-2"><CheckCircle2 className="w-4 h-4 text-emerald-500" /> Automated SMS & Email Fee Reminder Triggers</li>
+                      <li className="flex items-center gap-2"><CheckCircle2 className="w-4 h-4 text-emerald-500" /> Bulk Student Import via Excel / CSV Wizard</li>
+                    </ul>
+                  </div>
+                  <div className="bg-slate-50 dark:bg-slate-900 p-6 rounded-2xl border border-slate-200 dark:border-slate-800 font-mono text-xs space-y-3">
+                    <div className="flex justify-between items-center text-slate-400 pb-2 border-b border-slate-200 dark:border-slate-800">
+                      <span>SYSTEM_ADMIN_LOG</span>
+                      <span className="text-emerald-500">LIVE</span>
                     </div>
-                    <span
-                      className={`${mono} text-sm font-semibold text-emerald-600`}
+                    <p className="text-slate-700 dark:text-slate-300">[10:42 AM] - Scholarship Matrix recalculated for Grade 11</p>
+                    <p className="text-slate-700 dark:text-slate-300">[10:38 AM] - eSewa API Key synced successfully</p>
+                    <p className="text-slate-700 dark:text-slate-300">[09:15 AM] - Automatic batch billing generated for 1,240 students</p>
+                  </div>
+                </div>
+              )}
+
+              {activeRole === 'accountant' && (
+                <div className="grid md:grid-cols-2 gap-8 items-center">
+                  <div className="space-y-4">
+                    <Badge variant="emerald">Accountant Desk</Badge>
+                    <h3 className="text-2xl font-bold text-slate-900 dark:text-white">Instant Bank Reconciliation</h3>
+                    <p className="text-sm text-slate-600 dark:text-slate-400 leading-relaxed">
+                      Zero manual ledger entry. Automatically match incoming mobile payments with student IDs, clear pending dues, and print physical receipts in one tap.
+                    </p>
+                    <ul className="space-y-2.5 text-xs text-slate-700 dark:text-slate-300">
+                      <li className="flex items-center gap-2"><CheckCircle2 className="w-4 h-4 text-emerald-500" /> 1-Click Tax Invoice & Receipt Printing</li>
+                      <li className="flex items-center gap-2"><CheckCircle2 className="w-4 h-4 text-emerald-500" /> Real-Time Cash Collection vs Gateway Tally</li>
+                      <li className="flex items-center gap-2"><CheckCircle2 className="w-4 h-4 text-emerald-500" /> Custom Late Fee Waiver Authorizations</li>
+                    </ul>
+                  </div>
+                  <div className="bg-slate-50 dark:bg-slate-900 p-6 rounded-2xl border border-slate-200 dark:border-slate-800 space-y-4">
+                    <div className="flex justify-between items-center">
+                      <span className="text-xs font-semibold text-slate-500">Today's Counter Cash</span>
+                      <span className="font-mono text-sm font-bold text-slate-900 dark:text-white">रू 142,500</span>
+                    </div>
+                    <div className="flex justify-between items-center">
+                      <span className="text-xs font-semibold text-slate-500">Gateway Collections (eSewa/Khalti)</span>
+                      <span className="font-mono text-sm font-bold text-emerald-600 dark:text-emerald-400">रू 389,000</span>
+                    </div>
+                    <div className="w-full bg-slate-200 dark:bg-slate-800 h-2 rounded-full overflow-hidden">
+                      <div className="bg-emerald-500 h-full w-[72%]" />
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {activeRole === 'student' && (
+                <div className="grid md:grid-cols-2 gap-8 items-center">
+                  <div className="space-y-4">
+                    <Badge variant="amber">Parent & Student Portal</Badge>
+                    <h3 className="text-2xl font-bold text-slate-900 dark:text-white">1-Tap Payment Portal</h3>
+                    <p className="text-sm text-slate-600 dark:text-slate-400 leading-relaxed">
+                      Parents receive instant mobile alerts with direct eSewa/Khalti deep links. Clear monthly tuition fees on the go and access exam pass cards digitally.
+                    </p>
+                    <ul className="space-y-2.5 text-xs text-slate-700 dark:text-slate-300">
+                      <li className="flex items-center gap-2"><CheckCircle2 className="w-4 h-4 text-emerald-500" /> Transparent Breakdown of Tuition, Transport, & Discounts</li>
+                      <li className="flex items-center gap-2"><CheckCircle2 className="w-4 h-4 text-emerald-500" /> Download PDF Tax Receipts Anytime</li>
+                      <li className="flex items-center gap-2"><CheckCircle2 className="w-4 h-4 text-emerald-500" /> Instant Digital Exam Clearance Card Badge</li>
+                    </ul>
+                  </div>
+                  <div className="bg-indigo-600 text-white p-6 rounded-2xl shadow-lg space-y-4">
+                    <div className="text-xs opacity-80">Parent Quick Pay</div>
+                    <div className="text-2xl font-mono font-bold">Grade 10 Tuition Fee</div>
+                    <div className="flex justify-between items-end pt-4 border-t border-indigo-400/30">
+                      <div>
+                        <div className="text-[10px] uppercase opacity-75">Due Date</div>
+                        <div className="text-xs font-semibold">Oct 05, 2026</div>
+                      </div>
+                      <div className="text-right">
+                        <div className="text-[10px] uppercase opacity-75">Payable Amount</div>
+                        <div className="text-xl font-mono font-bold">रू 16,500</div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {activeRole === 'principal' && (
+                <div className="grid md:grid-cols-2 gap-8 items-center">
+                  <div className="space-y-4">
+                    <Badge variant="rose">Leadership Executive View</Badge>
+                    <h3 className="text-2xl font-bold text-slate-900 dark:text-white">High-Level Financial Intelligence</h3>
+                    <p className="text-sm text-slate-600 dark:text-slate-400 leading-relaxed">
+                      Comprehensive financial dashboards showing revenue projections, outstanding aging reports, grade-wise default trends, and scholarship distribution.
+                    </p>
+                    <ul className="space-y-2.5 text-xs text-slate-700 dark:text-slate-300">
+                      <li className="flex items-center gap-2"><CheckCircle2 className="w-4 h-4 text-emerald-500" /> Predictive Monthly Revenue Forecasting</li>
+                      <li className="flex items-center gap-2"><CheckCircle2 className="w-4 h-4 text-emerald-500" /> Defaulter Aging Analysis (30 / 60 / 90 Days)</li>
+                      <li className="flex items-center gap-2"><CheckCircle2 className="w-4 h-4 text-emerald-500" /> Executive Board Meeting PDF Reports</li>
+                    </ul>
+                  </div>
+                  <div className="bg-slate-50 dark:bg-slate-900 p-6 rounded-2xl border border-slate-200 dark:border-slate-800 space-y-3">
+                    <div className="text-xs font-semibold text-slate-500">Year-to-Date Revenue Realization</div>
+                    <div className="text-3xl font-mono font-bold text-indigo-600 dark:text-indigo-400">94.8%</div>
+                    <div className="text-xs text-slate-400">Total outstanding balance across all faculties: रू 1.2M</div>
+                  </div>
+                </div>
+              )}
+            </div>
+          </div>
+        </section>
+
+        {}
+        <section id="calculator" className="py-20 bg-slate-100/70 dark:bg-slate-900/40 border-y border-slate-200 dark:border-slate-800">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div className="text-center max-w-2xl mx-auto mb-12">
+              <Badge variant="amber">Interactive Fee Estimator</Badge>
+              <h2 className="text-3xl font-bold text-slate-900 dark:text-white mt-2">
+                Simulate Tuition & Discount Distribution
+              </h2>
+              <p className="text-slate-600 dark:text-slate-400 text-sm mt-2">
+                Test how our automated engine calculates sibling waivers, merit scholarships, and optional transport fees in NPR (रू).
+              </p>
+            </div>
+
+            <div className="grid lg:grid-cols-12 gap-8 items-start">
+              {/* Calculator Inputs */}
+              <div className="lg:col-span-7 bg-white dark:bg-slate-950 p-6 sm:p-8 rounded-3xl border border-slate-200 dark:border-slate-800 shadow-xl space-y-6">
+                <div>
+                  <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider mb-2">
+                    Base Monthly Tuition Fee (NPR / रू)
+                  </label>
+                  <input
+                    type="range"
+                    min="5000"
+                    max="50000"
+                    step="1000"
+                    value={baseTuition}
+                    onChange={(e) => setBaseTuition(Number(e.target.value))}
+                    className="w-full accent-indigo-600 cursor-pointer"
+                  />
+                  <div className="flex justify-between items-center mt-2 font-mono text-sm font-bold text-slate-900 dark:text-white">
+                    <span>रू 5,000</span>
+                    <span className="text-indigo-600 dark:text-indigo-400 text-lg">रू {Number(baseTuition).toLocaleString('ne-NP')}</span>
+                    <span>रू 50,000</span>
+                  </div>
+                </div>
+
+                <div className="grid sm:grid-cols-2 gap-6">
+                  <div>
+                    <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider mb-2">
+                      Enrolled Siblings ({siblingCount})
+                    </label>
+                    <select
+                      value={siblingCount}
+                      onChange={(e) => setSiblingCount(Number(e.target.value))}
+                      className="w-full p-3 text-xs rounded-xl bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-indigo-500"
                     >
-                      रू 39,20,000
+                      <option value={1}>1 Student (0% Sibling Waiver)</option>
+                      <option value={2}>2 Siblings (10% Waiver)</option>
+                      <option value={3}>3 Siblings (20% Waiver)</option>
+                      <option value={4}>4+ Siblings (30% Cap Waiver)</option>
+                    </select>
+                  </div>
+
+                  <div>
+                    <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider mb-2">
+                      Merit / Scholarship Discount
+                    </label>
+                    <select
+                      value={meritDiscount}
+                      onChange={(e) => setMeritDiscount(Number(e.target.value))}
+                      className="w-full p-3 text-xs rounded-xl bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                    >
+                      <option value={0}>0% No Merit Discount</option>
+                      <option value={10}>10% Top 10 Rank Waiver</option>
+                      <option value={20}>20% Top 3 Rank Waiver</option>
+                      <option value={30}>30% Full Merit Scholarship</option>
+                    </select>
+                  </div>
+                </div>
+
+                <div className="flex items-center justify-between p-4 rounded-2xl bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800">
+                  <div className="flex items-center gap-3">
+                    <BookOpen className="w-5 h-5 text-indigo-600 dark:text-indigo-400" />
+                    <div>
+                      <div className="text-xs font-semibold text-slate-900 dark:text-white">Include Transport Service</div>
+                      <div className="text-[11px] text-slate-500">Fixed rate: रू 3,500 / month</div>
+                    </div>
+                  </div>
+                  <input
+                    type="checkbox"
+                    checked={includeTransport}
+                    onChange={(e) => setIncludeTransport(e.target.checked)}
+                    className="h-5 w-5 rounded border-slate-300 text-indigo-600 focus:ring-indigo-500 cursor-pointer"
+                  />
+                </div>
+              </div>
+
+              {/* Calculator Live Output Card */}
+              <div className="lg:col-span-5 bg-gradient-to-br from-indigo-900 via-slate-900 to-indigo-950 text-white p-8 rounded-3xl border border-indigo-800 shadow-2xl space-y-6">
+                <h3 className="text-lg font-bold border-b border-indigo-800/80 pb-4 flex items-center justify-between">
+                  <span>Net Fee Summary</span>
+                  <Badge variant="emerald">Live Calculation</Badge>
+                </h3>
+
+                <div className="space-y-3 text-xs">
+                  <div className="flex justify-between text-indigo-200">
+                    <span>Base Tuition Fee</span>
+                    <span className="font-mono font-semibold">रू {Number(baseTuition).toLocaleString('ne-NP')}</span>
+                  </div>
+
+                  <div className="flex justify-between text-emerald-400 font-medium">
+                    <span>Combined Waivers ({calculatedFee.totalDiscountPct}%)</span>
+                    <span className="font-mono">- रू {calculatedFee.discountAmount.toLocaleString('ne-NP')}</span>
+                  </div>
+
+                  <div className="flex justify-between text-indigo-200">
+                    <span>Transport Fee</span>
+                    <span className="font-mono">+ रू {calculatedFee.transportFee.toLocaleString('ne-NP')}</span>
+                  </div>
+
+                  <div className="pt-4 border-t border-indigo-800/80 flex justify-between items-baseline">
+                    <span className="text-sm font-semibold">Final Monthly Payable</span>
+                    <span className="text-3xl font-mono font-bold text-white">
+                      रू {calculatedFee.finalFee.toLocaleString('ne-NP')}
                     </span>
                   </div>
                 </div>
-              </div>
-            </div>
-          </div>
-        </section>
 
-        {/* ───────────────────────── Features ───────────────────────── */}
-        <section
-          id="features"
-          className="border-b border-slate-200/70 bg-slate-50/50"
-        >
-          <div className="mx-auto max-w-7xl px-6 py-20 sm:py-28 lg:px-8">
-            <SectionIntro
-              eyebrow="The ledger"
-              title="The details that make a fee system trustworthy."
-              body="A production-ready fee workflow needs more than a payment button. Every amount, adjustment, and receipt should remain understandable after the transaction is over."
-            />
-
-            <div className="mt-14 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-              {ledgerFeatures.map((feature) => (
-                <article
-                  key={feature.title}
-                  className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm transition-shadow duration-200 hover:shadow-md hover:shadow-slate-900/5"
-                >
-                  <h3
-                    className={`${serif} text-xl leading-snug tracking-[-0.01em] text-slate-900`}
+                <div className="pt-2">
+                  <a
+                    href="#faq"
+                    className="w-full py-3 text-xs font-semibold rounded-xl bg-white text-slate-900 hover:bg-slate-100 transition-colors flex items-center justify-center gap-2"
                   >
-                    {feature.title}
-                  </h3>
-                  <p className="mt-3 text-sm leading-6 text-slate-600">
-                    {feature.body}
-                  </p>
-                </article>
-              ))}
-            </div>
-          </div>
-        </section>
-
-        {/* ───────────────────────── Roles ───────────────────────── */}
-        <section id="roles" className="border-b border-slate-200/70">
-          <div className="mx-auto max-w-7xl px-6 py-20 sm:py-28 lg:px-8">
-            <SectionIntro
-              eyebrow="Access"
-              title="Four roles. One source of truth."
-              body="Everyone works from the same ledger, while permissions determine exactly what each role can view or change."
-            />
-
-            <div className="mt-12 overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
-              <div
-                role="tablist"
-                aria-label="Fee Ledger roles"
-                className="grid grid-cols-2 border-b border-slate-200 sm:grid-cols-4"
-              >
-                {roles.map((role) => {
-                  const selected = activeRoleTab === role.id;
-                  return (
-                    <button
-                      key={role.id}
-                      type="button"
-                      role="tab"
-                      aria-selected={selected}
-                      aria-controls={`role-panel-${role.id}`}
-                      id={`role-tab-${role.id}`}
-                      onClick={() => setActiveRoleTab(role.id)}
-                      className={`relative min-h-14 border-b-2 px-4 text-sm font-semibold transition-colors focus-visible:z-10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-blue-600 ${
-                        selected
-                          ? "border-blue-600 bg-blue-50/50 text-blue-700"
-                          : "border-transparent text-slate-500 hover:bg-slate-50 hover:text-slate-900"
-                      }`}
-                    >
-                      {role.title}
-                    </button>
-                  );
-                })}
-              </div>
-
-              <div
-                role="tabpanel"
-                tabIndex={0}
-                id={`role-panel-${activeRole.id}`}
-                aria-labelledby={`role-tab-${activeRole.id}`}
-                className="p-6 outline-none sm:p-9"
-              >
-                <div className="flex flex-col gap-6 border-b border-slate-200 pb-7 sm:flex-row sm:items-center sm:justify-between">
-                  <div className="flex items-center gap-4">
-                    <span className="flex h-11 w-11 items-center justify-center rounded-xl bg-slate-900">
-                      <ActiveRoleIcon
-                        className="h-5 w-5 text-white"
-                        strokeWidth={1.8}
-                      />
-                    </span>
-                    <div>
-                      <h3 className={`${serif} text-2xl text-slate-900`}>
-                        {activeRole.title}
-                      </h3>
-                      <p className="mt-0.5 text-sm text-slate-500">
-                        {activeRole.subtitle}
-                      </p>
-                    </div>
-                  </div>
-                  <Button
-                    as={Link}
-                    to="/login"
-                    variant="outline"
-                    className="w-fit"
-                  >
-                    Sign in as {activeRole.title}
-                  </Button>
-                </div>
-
-                <div className="grid gap-4 pt-7 sm:grid-cols-2">
-                  {activeRole.features.map((feature) => (
-                    <div key={feature} className="flex gap-3">
-                      <span className="mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-emerald-50 text-emerald-600 ring-1 ring-emerald-600/20">
-                        <Check className="h-3 w-3" strokeWidth={3} />
-                      </span>
-                      <span className="text-sm leading-6 text-slate-700">
-                        {feature}
-                      </span>
-                    </div>
-                  ))}
+                    Deploy This Fee Logic To Your Institution
+                    <ChevronRight className="w-4 h-4" />
+                  </a>
                 </div>
               </div>
             </div>
           </div>
         </section>
 
-        {/* ───────────────────────── How it works ───────────────────────── */}
-        <section
-          id="how-it-works"
-          className="border-b border-slate-200/70 bg-slate-50/50"
-        >
-          <div className="mx-auto max-w-7xl px-6 py-20 sm:py-28 lg:px-8">
-            <SectionIntro
-              eyebrow="Workflow"
-              title="A clear path from setup to receipt."
-              body="The core workflow stays deliberately simple, so staff can move quickly without losing financial traceability."
-            />
+        {}
+        <section id="features" className="py-20">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div className="text-center max-w-2xl mx-auto mb-16">
+              <Badge variant="indigo">Platform Architecture</Badge>
+              <h2 className="text-3xl font-bold text-slate-900 dark:text-white mt-2">
+                Engineered for Modern Nepalese Education
+              </h2>
+              <p className="text-slate-600 dark:text-slate-400 text-sm mt-2">
+                Everything required to run financial operations smoothly with absolute auditability.
+              </p>
+            </div>
 
-            <ol className="relative mt-16 grid gap-10 md:grid-cols-3 md:gap-8">
-              <div
-                className="absolute left-0 right-0 top-6 hidden h-px bg-linear-to-r from-transparent via-slate-300 to-transparent md:block"
-                aria-hidden="true"
-              />
-              {steps.map((step) => (
-                <li key={step.n} className="relative">
-                  <span className="relative z-10 flex h-12 w-12 items-center justify-center rounded-full border border-slate-200 bg-white text-sm font-semibold text-slate-900 shadow-sm">
-                    {step.n}
-                  </span>
-                  <h3 className={`${serif} mt-6 text-2xl text-slate-900`}>
-                    {step.title}
-                  </h3>
-                  <p className="mt-3 max-w-sm text-sm leading-6 text-slate-600">
-                    {step.body}
-                  </p>
-                </li>
-              ))}
-            </ol>
-          </div>
-        </section>
-
-        {/* ───────────────────────── FAQ ───────────────────────── */}
-        <section id="faq" className="border-b border-slate-200/70">
-          <div className="mx-auto max-w-3xl px-6 py-20 sm:py-28 lg:px-8">
-            <SectionIntro
-              eyebrow="FAQ"
-              title="Questions from the front office."
-            />
-
-            <div className="mt-12 overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
-              {faqs.map((faq, index) => {
-                const open = openFaq === index;
+            <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-8">
+              {[
+                {
+                  icon: Smartphone,
+                  title: 'Native eSewa & Khalti Sync',
+                  desc: 'Direct API integrations automatically match wallet payments to student roll numbers within seconds.',
+                },
+                {
+                  icon: Shield,
+                  title: 'Bank-Grade AES-256 Security',
+                  desc: 'Multi-layer security, role-based access restrictions, and automated daily off-site cloud backups.',
+                },
+                {
+                  icon: TrendingUp,
+                  title: 'Defaulter Aging Engine',
+                  desc: 'Automate fine caps, dynamic late fee calculations, and scheduled parent SMS nudges.',
+                },
+                {
+                  icon: Award,
+                  title: 'Scholarship Matrix',
+                  desc: 'Easily manage merit-based discounts, staff ward concessions, and government quotas effortlessly.',
+                },
+                {
+                  icon: BookOpen,
+                  title: 'Digital Gate & Exam Clearance',
+                  desc: 'Generate instant QR-code exam clearance slips once dues are reconciled.',
+                },
+                {
+                  icon: Users,
+                  title: 'Multi-Campus Support',
+                  desc: 'Manage multiple branches, faculties, or campuses under a single master administrative view.',
+                },
+              ].map((feat, idx) => {
+                const Icon = feat.icon;
                 return (
                   <div
-                    key={faq.q}
-                    className="border-b border-slate-200 last:border-b-0"
+                    key={idx}
+                    className="p-8 rounded-3xl bg-white dark:bg-slate-950 border border-slate-200 dark:border-slate-800 hover:border-indigo-500/50 dark:hover:border-indigo-500/50 hover:shadow-xl transition-all group"
                   >
-                    <h3>
-                      <button
-                        type="button"
-                        aria-expanded={open}
-                        aria-controls={`faq-answer-${index}`}
-                        onClick={() => setOpenFaq(open ? null : index)}
-                        className={`flex w-full items-center justify-between gap-5 px-6 py-5 text-left transition-colors hover:bg-slate-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-blue-600`}
-                      >
-                        <span
-                          className={`${serif} text-lg leading-6 text-slate-900`}
-                        >
-                          {faq.q}
-                        </span>
-                        <ChevronDown
-                          className={`h-4 w-4 shrink-0 text-slate-400 transition-transform duration-200 ${
-                            open ? "rotate-180 text-blue-600" : ""
-                          }`}
-                          aria-hidden="true"
-                        />
-                      </button>
-                    </h3>
-                    <div
-                      id={`faq-answer-${index}`}
-                      hidden={!open}
-                      className="px-6 pb-6 pr-12"
-                    >
-                      <p className="text-sm leading-6 text-slate-600">
-                        {faq.a}
-                      </p>
+                    <div className="h-12 w-12 rounded-2xl bg-indigo-50 dark:bg-indigo-950/60 border border-indigo-100 dark:border-indigo-900 flex items-center justify-center text-indigo-600 dark:text-indigo-400 mb-6 group-hover:scale-110 transition-transform">
+                      <Icon className="w-6 h-6" />
                     </div>
+                    <h3 className="text-lg font-bold text-slate-900 dark:text-white mb-2">{feat.title}</h3>
+                    <p className="text-xs text-slate-600 dark:text-slate-400 leading-relaxed">{feat.desc}</p>
                   </div>
                 );
               })}
@@ -802,151 +782,137 @@ function HomePage() {
           </div>
         </section>
 
-        {/* ───────────────────────── CTA ───────────────────────── */}
-        <section className="relative isolate overflow-hidden border-y border-blue-100 bg-blue-50">
-          <div className="pointer-events-none absolute inset-0 -z-10 bg-[radial-gradient(ellipse_at_top,rgba(37,99,235,0.12),transparent_60%)]" />
-          <div className="mx-auto max-w-3xl px-6 py-20 text-center sm:py-24 lg:px-8">
-            <h2
-              className={`${serif} text-3xl tracking-[-0.02em] text-slate-900 sm:text-4xl`}
-            >
-              Open the ledger for your school.
-            </h2>
-            <p className="mx-auto mt-4 max-w-xl text-base leading-7 text-slate-600">
-              Set up the fee structure once. Let payments, receipts, and reports
-              take care of themselves after that.
-            </p>
-            <Button
-              as={Link}
-              to={isAuthenticated ? "/dashboard" : "/login"}
-              variant="primary"
-              className="mt-9 min-h-12 px-6"
-            >
-              {isAuthenticated ? "Open my dashboard" : "Sign in to the portal"}
-              <ArrowUpRight className="h-4 w-4" aria-hidden="true" />
-            </Button>
+        {}
+        <section id="faq" className="py-20 bg-slate-100/70 dark:bg-slate-900/40 border-t border-slate-200 dark:border-slate-800">
+          <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div className="text-center mb-12">
+              <Badge variant="indigo">Got Questions?</Badge>
+              <h2 className="text-3xl font-bold text-slate-900 dark:text-white mt-2">
+                Frequently Asked Questions
+              </h2>
+            </div>
+
+            <div className="space-y-4">
+              {FAQ_ITEMS.map((item, idx) => {
+                const isOpen = openFaq === idx;
+                return (
+                  <div
+                    key={idx}
+                    className="bg-white dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-2xl overflow-hidden transition-all"
+                  >
+                    <button
+                      onClick={() => setOpenFaq(isOpen ? null : idx)}
+                      className="w-full p-6 text-left flex justify-between items-center gap-4 focus:outline-none"
+                      aria-expanded={isOpen}
+                    >
+                      <span className="font-semibold text-sm sm:text-base text-slate-900 dark:text-white">
+                        {item.q}
+                      </span>
+                      <ChevronDown className={`w-5 h-5 text-slate-400 transition-transform ${isOpen ? 'rotate-180 text-indigo-600' : ''}`} />
+                    </button>
+                    {isOpen && (
+                      <div className="px-6 pb-6 text-xs sm:text-sm text-slate-600 dark:text-slate-400 leading-relaxed border-t border-slate-100 dark:border-slate-900/60 pt-4">
+                        {item.a}
+                      </div>
+                    )}
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+        </section>
+
+        {}
+        <section className="py-20 relative overflow-hidden">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div className="relative rounded-3xl bg-gradient-to-r from-indigo-700 via-indigo-600 to-violet-700 text-white p-10 sm:p-16 shadow-2xl overflow-hidden">
+              {/* Subtle visual accent rings */}
+              <div className="absolute -right-10 -bottom-10 w-80 h-80 bg-white/10 rounded-full blur-2xl pointer-events-none" />
+
+              <div className="max-w-2xl space-y-6 relative z-10">
+                <Badge variant="emerald">Ready to Transform Your Campus?</Badge>
+                <h2 className="text-3xl sm:text-4xl font-extrabold tracking-tight">
+                  Modernize Your Institution's Financial Ledger Today
+                </h2>
+                <p className="text-indigo-100 text-sm sm:text-base leading-relaxed">
+                  Join 120+ leading institutions across Nepal. Schedule a live walkthrough or start testing in our cloud sandbox right now.
+                </p>
+                <div className="flex flex-col sm:flex-row gap-4 pt-2">
+                  <a
+                    href="#calculator"
+                    className="px-8 py-4 text-sm font-bold rounded-2xl bg-white text-indigo-900 hover:bg-indigo-50 shadow-lg transition-all text-center"
+                  >
+                    Schedule Campus Demo
+                  </a>
+                  <a
+                    href="tel:+97714000000"
+                    className="px-8 py-4 text-sm font-bold rounded-2xl bg-indigo-800/60 hover:bg-indigo-800 border border-indigo-400/30 text-white transition-all text-center flex items-center justify-center gap-2"
+                  >
+                    <Phone className="w-4 h-4" /> Call (+977) 01-4100200
+                  </a>
+                </div>
+              </div>
+            </div>
           </div>
         </section>
       </main>
 
-      {/* ───────────────────────── Footer ───────────────────────── */}
-      <footer className="border-t border-slate-200 bg-white text-slate-800">
-        <div className="mx-auto max-w-7xl px-6 py-16 lg:px-8">
-          <div className="grid gap-10 lg:grid-cols-[1.3fr_0.8fr_0.8fr_1.2fr]">
-            <div>
-              <div className="flex items-center gap-3">
-                <span className="flex h-11 w-11 items-center justify-center rounded-xl bg-slate-900 text-base font-semibold text-white">
-                  <span className={serif}>रू</span>
-                </span>
-                <div>
-                  <span className={`${serif} block text-2xl tracking-tight`}>
-                    Fee Ledger
-                  </span>
-                  <span className="text-xs text-slate-500">
-                    School finance, simplified
-                  </span>
-                </div>
+      {}
+      <footer className="bg-slate-900 text-slate-400 border-t border-slate-800 pt-16 pb-12 text-xs">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 grid grid-cols-2 md:grid-cols-5 gap-8 mb-12">
+          <div className="col-span-2 space-y-4">
+            <div className="flex items-center gap-2">
+              <div className="h-8 w-8 rounded-lg bg-indigo-600 flex items-center justify-center text-white">
+                <CreditCard className="w-4 h-4" />
               </div>
-
-              <p className="mt-5 max-w-sm text-sm leading-7 text-slate-600">
-                A dependable fee ledger for schools that want cleaner records,
-                faster collections, and complete visibility from assignment to
-                receipt.
-              </p>
-
-              <div className="mt-6 inline-flex items-center gap-2 rounded-full border border-emerald-200 bg-emerald-50 px-3 py-1.5 text-xs font-medium text-emerald-700">
-                <span className="h-2 w-2 rounded-full bg-emerald-500" />
-                Secure records, always available
-              </div>
+              <span className="text-lg font-bold text-white tracking-tight">Fee Ledger</span>
             </div>
-
-            <nav aria-label="Explore">
-              <h3 className="text-sm font-semibold text-slate-900">Explore</h3>
-              <ul className="mt-5 space-y-3 text-sm text-slate-600">
-                {navLinks.map(([label, href]) => (
-                  <li key={href}>
-                    <a
-                      href={href}
-                      className="transition-colors hover:text-blue-600"
-                    >
-                      {label}
-                    </a>
-                  </li>
-                ))}
-              </ul>
-            </nav>
-
-            <nav aria-label="Portals">
-              <h3 className="text-sm font-semibold text-slate-900">Portals</h3>
-              <ul className="mt-5 space-y-3 text-sm text-slate-600">
-                <li>
-                  <Link
-                    to="/login"
-                    className="transition-colors hover:text-blue-600"
-                  >
-                    Student login
-                  </Link>
-                </li>
-                <li>
-                  <Link
-                    to="/login"
-                    className="transition-colors hover:text-blue-600"
-                  >
-                    Staff &amp; admin login
-                  </Link>
-                </li>
-                <li>
-                  <Link
-                    to="/register"
-                    className="transition-colors hover:text-blue-600"
-                  >
-                    Register a student
-                  </Link>
-                </li>
-              </ul>
-            </nav>
-
-            <div>
-              <h3 className="text-sm font-semibold text-slate-900">Contact</h3>
-              <address className="mt-5 space-y-4 text-sm not-italic text-slate-600">
-                <p className="flex items-center gap-3">
-                  <MapPin
-                    className="h-4 w-4 text-blue-600"
-                    aria-hidden="true"
-                  />
-                  Kathmandu, Nepal
-                </p>
-                <p className="flex items-center gap-3">
-                  <Mail className="h-4 w-4 text-blue-600" aria-hidden="true" />
-                  <a
-                    href="mailto:hello@feeledger.edu.np"
-                    className="hover:text-blue-600"
-                  >
-                    hello@feeledger.edu.np
-                  </a>
-                </p>
-                <p className="flex items-center gap-3">
-                  <Phone className="h-4 w-4 text-blue-600" aria-hidden="true" />
-                  <a href="tel:+977015550101" className="hover:text-blue-600">
-                    +977 01 555 0101
-                  </a>
-                </p>
-              </address>
+            <p className="text-slate-400 max-w-sm leading-relaxed">
+              Nepal’s leading enterprise educational fee ledger management operating system. Empowering accounts departments with seamless automation and digital wallet integrations.
+            </p>
+            <div className="flex items-center gap-3 pt-2 text-slate-300">
+              <MapPin className="w-4 h-4 text-indigo-400" /> Kathmandu, Nepal
+              <span className="text-slate-600">|</span>
+              <Mail className="w-4 h-4 text-indigo-400" /> support@feeledger.com.np
             </div>
           </div>
 
-          <div className="mt-12 flex flex-col items-start justify-between gap-4 border-t border-slate-200 pt-6 text-xs text-slate-500 sm:flex-row sm:items-center">
-            <p>
-              © {new Date().getFullYear()} Fee Ledger. Built for better school
-              operations.
-            </p>
-            <p className="text-slate-600">
-              Every entry logged. Every rupee accounted for.
-            </p>
+          <div>
+            <h4 className="text-white font-semibold mb-4 text-sm">Product</h4>
+            <ul className="space-y-2.5">
+              <li><a href="#sandbox" className="hover:text-white transition-colors">Live Sandbox</a></li>
+              <li><a href="#roles" className="hover:text-white transition-colors">Role Workbench</a></li>
+              <li><a href="#calculator" className="hover:text-white transition-colors">Fee Estimator</a></li>
+              <li><a href="#features" className="hover:text-white transition-colors">Integrations</a></li>
+            </ul>
           </div>
+
+          <div>
+            <h4 className="text-white font-semibold mb-4 text-sm">Gateways</h4>
+            <ul className="space-y-2.5">
+              <li><a href="#" className="hover:text-white transition-colors">eSewa Pay</a></li>
+              <li><a href="#" className="hover:text-white transition-colors">Khalti SDK</a></li>
+              <li><a href="#" className="hover:text-white transition-colors">ConnectIPS Gateway</a></li>
+              <li><a href="#" className="hover:text-white transition-colors">NIBL Direct Bank Sync</a></li>
+            </ul>
+          </div>
+
+          <div>
+            <h4 className="text-white font-semibold mb-4 text-sm">Compliance</h4>
+            <ul className="space-y-2.5">
+              <li><a href="#" className="hover:text-white transition-colors">Privacy Policy</a></li>
+              <li><a href="#" className="hover:text-white transition-colors">Terms of Service</a></li>
+              <li><a href="#" className="hover:text-white transition-colors">Data Security (AES-256)</a></li>
+              <li><a href="#" className="hover:text-white transition-colors">Audit Readiness</a></li>
+            </ul>
+          </div>
+        </div>
+
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 border-t border-slate-800/80 pt-8 flex flex-col sm:flex-row items-center justify-between text-slate-500">
+          <div>© {new Date().getFullYear()} Fee Ledger Nepal Pvt. Ltd. All rights reserved.</div>
+          <div className="mt-4 sm:mt-0 font-mono text-[11px]">Designed with Senior Enterprise Standards</div>
         </div>
       </footer>
     </div>
   );
 }
-
-export default HomePage;
