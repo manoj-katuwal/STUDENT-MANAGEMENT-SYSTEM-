@@ -1,7 +1,6 @@
-import React, { useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { Link } from "react-router-dom";
 import {
-  ArrowRight,
   ArrowUpRight,
   BarChart3,
   Check,
@@ -9,9 +8,11 @@ import {
   GraduationCap,
   Mail,
   MapPin,
+  Menu,
   Phone,
   Receipt,
   ShieldCheck,
+  X,
 } from "lucide-react";
 import { useAuth } from "../features/auth/auth.context";
 
@@ -72,32 +73,26 @@ const roles = [
 
 const ledgerFeatures = [
   {
-    no: "01",
     title: "One fee structure per class",
     body: "Tuition, lab, library, sports, and exam fees are set once per class and academic year, then applied automatically to every student in it.",
   },
   {
-    no: "02",
     title: "eSewa, built in",
     body: "Students settle a balance in full or in part from their own portal. The ledger reconciles the moment eSewa confirms payment.",
   },
   {
-    no: "03",
     title: "Receipts that don't need reprinting",
     body: "Every payment — online or at the counter — produces a numbered PDF receipt immediately, ready to download or print.",
   },
   {
-    no: "04",
     title: "Discounts and scholarships, kept separate",
     body: "A sibling discount and a merit scholarship are recorded as distinct entries against the same fee, so nothing is ever double-counted.",
   },
   {
-    no: "05",
     title: "Fines that respect a grace period",
     body: "Late fees accrue daily against a configurable policy and cap — never silently, and never past the limit a school has set.",
   },
   {
-    no: "06",
     title: "An audit trail on everything",
     body: "Every reversal, discount, and adjustment is logged against the fee it touched, so a question about any entry has an answer.",
   },
@@ -178,17 +173,44 @@ const navLinks = [
   ["FAQ", "#faq"],
 ];
 
+/* ───────────────────────── Shared primitives ─────────────────────────
+   Pulled out so every CTA in the page shares one focus ring, one radius
+   scale, and one hover treatment instead of five hand-copied variants. */
+
+const FOCUS_RING =
+  "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-600 focus-visible:ring-offset-2";
+
+function Button({
+  as: As = Link,
+  variant = "primary",
+  className = "",
+  children,
+  ...props
+}) {
+  const base = `inline-flex min-h-11 items-center justify-center gap-1.5 rounded-lg px-5 text-sm font-semibold transition-colors ${FOCUS_RING}`;
+  const variants = {
+    primary:
+      "bg-blue-600 text-white shadow-sm shadow-blue-600/20 hover:bg-blue-700",
+    dark: "bg-slate-900 text-white shadow-sm hover:bg-slate-800",
+    outline:
+      "border border-slate-200 bg-white text-slate-700 shadow-sm hover:border-slate-300 hover:bg-slate-50",
+    ghost: "text-slate-600 hover:bg-slate-100 hover:text-slate-900",
+  };
+  return (
+    <As className={`${base} ${variants[variant]} ${className}`} {...props}>
+      {children}
+    </As>
+  );
+}
+
 function SectionIntro({ eyebrow, title, body }) {
   return (
     <div className="max-w-2xl">
-      <div className="flex items-center gap-2.5">
-        <span className="h-px w-6 bg-blue-600" />
-        <p className="text-xs font-semibold uppercase tracking-[0.14em] text-blue-600">
-          {eyebrow}
-        </p>
-      </div>
+      {eyebrow && (
+        <p className="text-sm font-medium text-blue-600">{eyebrow}</p>
+      )}
       <h2
-        className={`${serif} mt-4 text-3xl leading-[1.15] tracking-[-0.02em] text-slate-900 sm:text-4xl`}
+        className={`${serif} mt-3 text-3xl leading-[1.15] tracking-[-0.02em] text-slate-900 sm:text-4xl`}
       >
         {title}
       </h2>
@@ -203,9 +225,30 @@ function HomePage() {
   const { isAuthenticated, user } = useAuth();
   const [activeRoleTab, setActiveRoleTab] = useState("STUDENT");
   const [openFaq, setOpenFaq] = useState(0);
+  const [mobileNavOpen, setMobileNavOpen] = useState(false);
+  const firstMobileLinkRef = useRef(null);
 
   const activeRole = roles.find((r) => r.id === activeRoleTab) ?? roles[0];
   const ActiveRoleIcon = activeRole.icon;
+
+  // Lock body scroll while the mobile drawer is open, close on Escape,
+  // and move focus into the drawer for keyboard users.
+  useEffect(() => {
+    if (!mobileNavOpen) return;
+    const previousOverflow = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    firstMobileLinkRef.current?.focus();
+    const onKeyDown = (e) => {
+      if (e.key === "Escape") setMobileNavOpen(false);
+    };
+    document.addEventListener("keydown", onKeyDown);
+    return () => {
+      document.body.style.overflow = previousOverflow;
+      document.removeEventListener("keydown", onKeyDown);
+    };
+  }, [mobileNavOpen]);
+
+  const closeMobileNav = () => setMobileNavOpen(false);
 
   return (
     <div
@@ -224,9 +267,9 @@ function HomePage() {
           <Link
             to="/"
             aria-label="Fee Ledger home"
-            className="group flex items-center gap-2.5"
+            className={`group flex items-center gap-2.5 rounded-md ${FOCUS_RING}`}
           >
-            <span className="flex h-9 w-9 items-center justify-center rounded-lg bg-slate-900 text-sm text-white shadow-sm transition-transform duration-200 group-hover:-translate-y-0.5">
+            <span className="flex h-9 w-9 items-center justify-center rounded-lg bg-slate-900 text-sm text-white shadow-sm transition-transform duration-200 motion-safe:group-hover:-translate-y-0.5">
               <span className={serif}>रू</span>
             </span>
             <span
@@ -244,7 +287,7 @@ function HomePage() {
               <a
                 key={href}
                 href={href}
-                className="rounded-lg px-3 py-2 text-sm font-medium text-slate-600 transition-colors hover:bg-slate-100 hover:text-slate-900 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-600/40"
+                className={`rounded-lg px-3 py-2 text-sm font-medium text-slate-600 transition-colors hover:bg-slate-100 hover:text-slate-900 ${FOCUS_RING}`}
               >
                 {label}
               </a>
@@ -253,41 +296,139 @@ function HomePage() {
 
           <div className="flex items-center gap-2">
             {isAuthenticated ? (
-              <Link
+              <Button
+                as={Link}
                 to="/dashboard"
-                className="inline-flex min-h-10 items-center gap-1.5 rounded-lg bg-slate-900 px-4 text-sm font-semibold text-white shadow-sm transition-colors hover:bg-slate-800 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-600 focus-visible:ring-offset-2"
+                variant="dark"
+                className="hidden sm:inline-flex"
               >
-                <span className="hidden sm:inline">Dashboard</span>
-                <span className="sm:hidden">Open</span>
-                <span className="hidden text-white/40 sm:inline">·</span>
+                Dashboard
+                <span className="text-white/40">·</span>
                 <span className="max-w-24 truncate text-white/70">
                   {user?.role}
                 </span>
-              </Link>
+              </Button>
             ) : (
               <>
-                <Link
+                <Button
+                  as={Link}
                   to="/login"
-                  className="hidden min-h-10 items-center rounded-lg px-3 text-sm font-medium text-slate-600 transition-colors hover:bg-slate-100 hover:text-slate-900 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-600/40 sm:inline-flex"
+                  variant="ghost"
+                  className="hidden sm:inline-flex"
                 >
                   Sign in
-                </Link>
-                <Link
+                </Button>
+                <Button
+                  as={Link}
                   to="/register"
-                  className="inline-flex min-h-10 items-center gap-1.5 rounded-lg bg-blue-600 px-4 text-sm font-semibold text-white shadow-sm transition-colors hover:bg-blue-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-600 focus-visible:ring-offset-2"
+                  variant="primary"
+                  className="hidden sm:inline-flex"
                 >
-                  Get started <ArrowRight className="h-3.5 w-3.5" />
-                </Link>
+                  Get started
+                </Button>
               </>
             )}
+
+            {/* Mobile menu trigger — the piece the original page was missing */}
+            <button
+              type="button"
+              onClick={() => setMobileNavOpen(true)}
+              aria-expanded={mobileNavOpen}
+              aria-controls="mobile-nav"
+              aria-label="Open menu"
+              className={`inline-flex h-10 w-10 items-center justify-center rounded-lg text-slate-700 hover:bg-slate-100 md:hidden ${FOCUS_RING}`}
+            >
+              <Menu className="h-5 w-5" strokeWidth={1.8} />
+            </button>
           </div>
         </div>
       </header>
 
+      {/* Mobile nav drawer */}
+      {mobileNavOpen && (
+        <div className="fixed inset-0 z-[60] md:hidden">
+          <button
+            type="button"
+            aria-label="Close menu"
+            onClick={closeMobileNav}
+            className="absolute inset-0 bg-slate-900/40"
+          />
+          <div
+            id="mobile-nav"
+            role="dialog"
+            aria-modal="true"
+            aria-label="Site menu"
+            className="absolute right-0 top-0 flex h-full w-[85%] max-w-sm flex-col bg-white shadow-2xl transition-transform duration-200"
+          >
+            <div className="flex h-16 items-center justify-between border-b border-slate-200 px-6">
+              <span className={`${serif} text-lg text-slate-900`}>Menu</span>
+              <button
+                type="button"
+                onClick={closeMobileNav}
+                aria-label="Close menu"
+                className={`inline-flex h-10 w-10 items-center justify-center rounded-lg text-slate-500 hover:bg-slate-100 ${FOCUS_RING}`}
+              >
+                <X className="h-5 w-5" strokeWidth={1.8} />
+              </button>
+            </div>
+
+            <nav
+              aria-label="Mobile"
+              className="flex flex-1 flex-col gap-1 px-4 py-5"
+            >
+              {navLinks.map(([label, href], i) => (
+                <a
+                  key={href}
+                  ref={i === 0 ? firstMobileLinkRef : undefined}
+                  href={href}
+                  onClick={closeMobileNav}
+                  className={`rounded-lg px-3 py-3 text-base font-medium text-slate-700 hover:bg-slate-100 ${FOCUS_RING}`}
+                >
+                  {label}
+                </a>
+              ))}
+            </nav>
+
+            <div className="flex flex-col gap-2 border-t border-slate-200 p-4">
+              {isAuthenticated ? (
+                <Button
+                  as={Link}
+                  to="/dashboard"
+                  variant="dark"
+                  onClick={closeMobileNav}
+                >
+                  Open dashboard
+                </Button>
+              ) : (
+                <>
+                  <Button
+                    as={Link}
+                    to="/login"
+                    variant="outline"
+                    onClick={closeMobileNav}
+                  >
+                    Sign in
+                  </Button>
+                  <Button
+                    as={Link}
+                    to="/register"
+                    variant="primary"
+                    onClick={closeMobileNav}
+                  >
+                    Get started
+                  </Button>
+                </>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
+
       <main id="main-content">
+        {/* ───────────────────────── Hero ───────────────────────── */}
         <section className="relative isolate overflow-hidden border-b border-slate-200/70">
-          <div className="pointer-events-none absolute inset-0 -z-10 bg-[radial-gradient(ellipse_at_top_right,rgba(37,99,235,0.08),transparent_55%),radial-gradient(ellipse_at_bottom_left,rgba(15,23,42,0.05),transparent_50%)]" />
-          <div className="absolute inset-0 -z-10 bg-[linear-gradient(to_right,rgba(15,23,42,0.03)_1px,transparent_1px),linear-gradient(to_bottom,rgba(15,23,42,0.03)_1px,transparent_1px)] bg-[size:4rem_4rem] [mask-image:radial-gradient(ellipse_at_center,black,transparent_75%)]" />
+          <div className="pointer-events-none absolute inset-0 -z-10 bg-[radial-gradient(ellipse_at_top_right,rgba(37,99,235,0.08),transparent_55%)]" />
+          <div className="pointer-events-none absolute inset-0 -z-10 bg-[linear-gradient(to_right,rgba(15,23,42,0.03)_1px,transparent_1px),linear-gradient(to_bottom,rgba(15,23,42,0.03)_1px,transparent_1px)] bg-[size:4rem_4rem] [mask-image:radial-gradient(ellipse_at_center,black,transparent_75%)]" />
 
           <div className="mx-auto max-w-7xl px-6 pb-20 pt-16 sm:pb-28 sm:pt-24 lg:px-8 lg:pb-32 lg:pt-28">
             <div className="grid items-center gap-16 lg:grid-cols-[1.05fr_0.95fr] lg:gap-12">
@@ -307,19 +448,22 @@ function HomePage() {
                 </p>
 
                 <div className="mt-9 flex flex-col gap-3 sm:flex-row">
-                  <Link
+                  <Button
+                    as={Link}
                     to={isAuthenticated ? "/dashboard" : "/login"}
-                    className="inline-flex min-h-12 items-center justify-center gap-2 rounded-lg bg-blue-600 px-6 text-sm font-semibold text-white shadow-sm shadow-blue-600/20 transition-colors hover:bg-blue-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-600 focus-visible:ring-offset-2"
+                    variant="primary"
+                    className="min-h-12 px-6"
                   >
                     {isAuthenticated ? "Open my dashboard" : "Open the ledger"}
-                    <ArrowUpRight className="h-4 w-4" />
-                  </Link>
-                  <Link
+                  </Button>
+                  <Button
+                    as={Link}
                     to="/register"
-                    className="inline-flex min-h-12 items-center justify-center rounded-lg border border-slate-200 bg-white px-6 text-sm font-semibold text-slate-700 shadow-sm transition-colors hover:border-slate-300 hover:bg-slate-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-600/40"
+                    variant="outline"
+                    className="min-h-12 px-6"
                   >
                     Register a student
-                  </Link>
+                  </Button>
                 </div>
 
                 <dl className="mt-12 grid max-w-lg grid-cols-3 gap-6 border-t border-slate-200 pt-6">
@@ -344,16 +488,16 @@ function HomePage() {
 
               {/* App preview */}
               <div className="relative mx-auto w-full max-w-xl lg:max-w-none">
-                <div className="absolute -inset-4 -z-10 rounded-4xl bg-linear-to-tr from-blue-600/10 via-slate-900/5 to-transparent blur-2xl" />
+                <div className="absolute -inset-4 -z-10 rounded-[2rem] bg-linear-to-tr from-blue-600/10 via-slate-900/5 to-transparent blur-2xl" />
                 <div className="absolute -bottom-8 -left-8 z-10 hidden h-28 w-40 overflow-hidden rounded-2xl border-8 border-white shadow-xl shadow-slate-900/15 xl:block">
                   <img
                     src="/school.jpg"
-                    alt="School campus"
+                    alt="Students and staff on the school campus"
                     className="h-full w-full object-cover"
+                    loading="lazy"
                   />
                 </div>
 
-                {/* Floating verified badge */}
                 <div className="absolute -right-3 -top-4 z-10 hidden items-center gap-2 rounded-xl border border-slate-200 bg-white px-3 py-2 shadow-lg shadow-slate-900/5 sm:flex">
                   <span className="flex h-6 w-6 items-center justify-center rounded-full bg-emerald-50">
                     <ShieldCheck
@@ -361,9 +505,7 @@ function HomePage() {
                       strokeWidth={2}
                     />
                   </span>
-                  <span
-                    className={`${mono} text-[10px] font-semibold uppercase tracking-wider text-slate-700`}
-                  >
+                  <span className="text-xs font-semibold text-slate-700">
                     eSewa verified
                   </span>
                 </div>
@@ -383,8 +525,8 @@ function HomePage() {
                         </p>
                       </div>
                     </div>
-                    <span className="inline-flex items-center gap-1.5 rounded-full bg-emerald-50 px-2.5 py-1 text-[10px] font-semibold uppercase tracking-wider text-emerald-700 ring-1 ring-emerald-600/20">
-                      <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-emerald-500" />
+                    <span className="inline-flex items-center gap-1.5 rounded-full bg-emerald-50 px-2.5 py-1 text-[11px] font-medium text-emerald-700 ring-1 ring-emerald-600/20">
+                      <span className="h-1.5 w-1.5 rounded-full bg-emerald-500 motion-safe:animate-pulse" />
                       Live
                     </span>
                   </div>
@@ -459,7 +601,7 @@ function HomePage() {
         >
           <div className="mx-auto max-w-7xl px-6 py-20 sm:py-28 lg:px-8">
             <SectionIntro
-              eyebrow="01 / Ledger"
+              eyebrow="The ledger"
               title="The details that make a fee system trustworthy."
               body="A production-ready fee workflow needs more than a payment button. Every amount, adjustment, and receipt should remain understandable after the transaction is over."
             />
@@ -467,19 +609,11 @@ function HomePage() {
             <div className="mt-14 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
               {ledgerFeatures.map((feature) => (
                 <article
-                  key={feature.no}
-                  className="group relative rounded-2xl border border-slate-200 bg-white p-6 shadow-sm transition-all duration-200 hover:-translate-y-1 hover:border-slate-300 hover:shadow-lg hover:shadow-slate-900/5"
+                  key={feature.title}
+                  className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm transition-shadow duration-200 hover:shadow-md hover:shadow-slate-900/5"
                 >
-                  <div className="flex items-center justify-between">
-                    <span
-                      className={`${mono} text-xs font-semibold text-blue-600`}
-                    >
-                      {feature.no}
-                    </span>
-                    <span className="h-px w-8 bg-slate-200 transition-colors group-hover:bg-blue-600" />
-                  </div>
                   <h3
-                    className={`${serif} mt-5 text-xl leading-snug tracking-[-0.01em] text-slate-900`}
+                    className={`${serif} text-xl leading-snug tracking-[-0.01em] text-slate-900`}
                   >
                     {feature.title}
                   </h3>
@@ -496,7 +630,7 @@ function HomePage() {
         <section id="roles" className="border-b border-slate-200/70">
           <div className="mx-auto max-w-7xl px-6 py-20 sm:py-28 lg:px-8">
             <SectionIntro
-              eyebrow="02 / Access"
+              eyebrow="Access"
               title="Four roles. One source of truth."
               body="Everyone works from the same ledger, while permissions determine exactly what each role can view or change."
             />
@@ -554,13 +688,14 @@ function HomePage() {
                       </p>
                     </div>
                   </div>
-                  <Link
+                  <Button
+                    as={Link}
                     to="/login"
-                    className="inline-flex w-fit items-center gap-1.5 rounded-lg border border-slate-200 bg-white px-4 py-2 text-sm font-semibold text-slate-700 transition-colors hover:border-slate-300 hover:bg-slate-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-600/40"
+                    variant="outline"
+                    className="w-fit"
                   >
                     Sign in as {activeRole.title}
-                    <ArrowUpRight className="h-3.5 w-3.5" />
-                  </Link>
+                  </Button>
                 </div>
 
                 <div className="grid gap-4 pt-7 sm:grid-cols-2">
@@ -587,17 +722,18 @@ function HomePage() {
         >
           <div className="mx-auto max-w-7xl px-6 py-20 sm:py-28 lg:px-8">
             <SectionIntro
-              eyebrow="03 / Workflow"
+              eyebrow="Workflow"
               title="A clear path from setup to receipt."
               body="The core workflow stays deliberately simple, so staff can move quickly without losing financial traceability."
             />
 
-            <div className="relative mt-16 grid gap-10 md:grid-cols-3 md:gap-8">
-              {/* connector line */}
-              <div className="absolute left-0 right-0 top-6 hidden h-px bg-linear-to-r from-transparent via-slate-300 to-transparent md:block" />
-
+            <ol className="relative mt-16 grid gap-10 md:grid-cols-3 md:gap-8">
+              <div
+                className="absolute left-0 right-0 top-6 hidden h-px bg-linear-to-r from-transparent via-slate-300 to-transparent md:block"
+                aria-hidden="true"
+              />
               {steps.map((step) => (
-                <article key={step.n} className="relative">
+                <li key={step.n} className="relative">
                   <span className="relative z-10 flex h-12 w-12 items-center justify-center rounded-full border border-slate-200 bg-white text-sm font-semibold text-slate-900 shadow-sm">
                     {step.n}
                   </span>
@@ -607,9 +743,9 @@ function HomePage() {
                   <p className="mt-3 max-w-sm text-sm leading-6 text-slate-600">
                     {step.body}
                   </p>
-                </article>
+                </li>
               ))}
-            </div>
+            </ol>
           </div>
         </section>
 
@@ -617,7 +753,7 @@ function HomePage() {
         <section id="faq" className="border-b border-slate-200/70">
           <div className="mx-auto max-w-3xl px-6 py-20 sm:py-28 lg:px-8">
             <SectionIntro
-              eyebrow="04 / FAQ"
+              eyebrow="FAQ"
               title="Questions from the front office."
             />
 
@@ -629,35 +765,31 @@ function HomePage() {
                     key={faq.q}
                     className="border-b border-slate-200 last:border-b-0"
                   >
-                    <button
-                      type="button"
-                      aria-expanded={open}
-                      aria-controls={`faq-answer-${index}`}
-                      onClick={() => setOpenFaq(open ? null : index)}
-                      className="flex w-full items-center justify-between gap-5 px-6 py-5 text-left transition-colors hover:bg-slate-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-blue-600"
-                    >
-                      <span className="flex items-start gap-4">
-                        <span
-                          className={`${mono} pt-1 text-[10px] font-semibold text-blue-600`}
-                        >
-                          Q{index + 1}
-                        </span>
+                    <h3>
+                      <button
+                        type="button"
+                        aria-expanded={open}
+                        aria-controls={`faq-answer-${index}`}
+                        onClick={() => setOpenFaq(open ? null : index)}
+                        className={`flex w-full items-center justify-between gap-5 px-6 py-5 text-left transition-colors hover:bg-slate-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-blue-600`}
+                      >
                         <span
                           className={`${serif} text-lg leading-6 text-slate-900`}
                         >
                           {faq.q}
                         </span>
-                      </span>
-                      <ChevronDown
-                        className={`h-4 w-4 shrink-0 text-slate-400 transition-transform duration-200 ${
-                          open ? "rotate-180 text-blue-600" : ""
-                        }`}
-                      />
-                    </button>
+                        <ChevronDown
+                          className={`h-4 w-4 shrink-0 text-slate-400 transition-transform duration-200 ${
+                            open ? "rotate-180 text-blue-600" : ""
+                          }`}
+                          aria-hidden="true"
+                        />
+                      </button>
+                    </h3>
                     <div
                       id={`faq-answer-${index}`}
                       hidden={!open}
-                      className="px-6 pb-6 pl-[3.9rem] pr-12"
+                      className="px-6 pb-6 pr-12"
                     >
                       <p className="text-sm leading-6 text-slate-600">
                         {faq.a}
@@ -674,11 +806,8 @@ function HomePage() {
         <section className="relative isolate overflow-hidden border-y border-blue-100 bg-blue-50">
           <div className="pointer-events-none absolute inset-0 -z-10 bg-[radial-gradient(ellipse_at_top,rgba(37,99,235,0.12),transparent_60%)]" />
           <div className="mx-auto max-w-3xl px-6 py-20 text-center sm:py-24 lg:px-8">
-            <p className="text-xs font-semibold uppercase tracking-[0.18em] text-blue-600">
-              Ready when you are
-            </p>
             <h2
-              className={`${serif} mt-4 text-3xl tracking-[-0.02em] text-slate-900 sm:text-4xl`}
+              className={`${serif} text-3xl tracking-[-0.02em] text-slate-900 sm:text-4xl`}
             >
               Open the ledger for your school.
             </h2>
@@ -686,113 +815,131 @@ function HomePage() {
               Set up the fee structure once. Let payments, receipts, and reports
               take care of themselves after that.
             </p>
-            <Link
+            <Button
+              as={Link}
               to={isAuthenticated ? "/dashboard" : "/login"}
-              className="mt-9 inline-flex min-h-12 items-center gap-2 rounded-lg bg-blue-600 px-6 text-sm font-semibold text-white shadow-lg shadow-blue-600/20 transition-colors hover:bg-blue-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 focus-visible:ring-offset-blue-50"
+              variant="primary"
+              className="mt-9 min-h-12 px-6"
             >
               {isAuthenticated ? "Open my dashboard" : "Sign in to the portal"}
-              <ArrowUpRight className="h-4 w-4" />
-            </Link>
+              <ArrowUpRight className="h-4 w-4" aria-hidden="true" />
+            </Button>
           </div>
         </section>
       </main>
 
       {/* ───────────────────────── Footer ───────────────────────── */}
-      <footer className="relative overflow-hidden border-t border-slate-200 bg-white text-slate-800">
-        <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_top_left,rgba(59,130,246,0.08),transparent_28%),radial-gradient(circle_at_bottom_right,rgba(14,165,233,0.06),transparent_25%)]" />
-        <div className="relative mx-auto max-w-7xl px-6 py-16 lg:px-8">
-          <div className="rounded-4xl border border-slate-200 bg-slate-50 p-6 shadow-[0_18px_60px_rgba(15,23,42,0.06)] sm:p-8 lg:p-10">
-            <div className="grid gap-10 lg:grid-cols-[1.3fr_0.8fr_0.8fr_1.2fr]">
-              <div>
-                <div className="flex items-center gap-3">
-                  <span className="flex h-11 w-11 items-center justify-center rounded-2xl bg-linear-to-br from-blue-500 to-cyan-400 text-base font-semibold text-white shadow-lg shadow-blue-500/25">
-                    <span className={serif}>रू</span>
+      <footer className="border-t border-slate-200 bg-white text-slate-800">
+        <div className="mx-auto max-w-7xl px-6 py-16 lg:px-8">
+          <div className="grid gap-10 lg:grid-cols-[1.3fr_0.8fr_0.8fr_1.2fr]">
+            <div>
+              <div className="flex items-center gap-3">
+                <span className="flex h-11 w-11 items-center justify-center rounded-xl bg-slate-900 text-base font-semibold text-white">
+                  <span className={serif}>रू</span>
+                </span>
+                <div>
+                  <span className={`${serif} block text-2xl tracking-tight`}>
+                    Fee Ledger
                   </span>
-                  <div>
-                    <span className={`${serif} block text-2xl tracking-tight`}>
-                      Fee Ledger
-                    </span>
-                    <span className={`${mono} text-[9px] uppercase tracking-[0.22em] text-blue-600`}>
-                      School finance, simplified
-                    </span>
-                  </div>
+                  <span className="text-xs text-slate-500">
+                    School finance, simplified
+                  </span>
                 </div>
+              </div>
 
-                <p className="mt-5 max-w-sm text-sm leading-7 text-slate-600">
-                  A dependable fee ledger for schools that want cleaner records,
-                  faster collections, and complete visibility from assignment to
-                  receipt.
+              <p className="mt-5 max-w-sm text-sm leading-7 text-slate-600">
+                A dependable fee ledger for schools that want cleaner records,
+                faster collections, and complete visibility from assignment to
+                receipt.
+              </p>
+
+              <div className="mt-6 inline-flex items-center gap-2 rounded-full border border-emerald-200 bg-emerald-50 px-3 py-1.5 text-xs font-medium text-emerald-700">
+                <span className="h-2 w-2 rounded-full bg-emerald-500" />
+                Secure records, always available
+              </div>
+            </div>
+
+            <nav aria-label="Explore">
+              <h3 className="text-sm font-semibold text-slate-900">Explore</h3>
+              <ul className="mt-5 space-y-3 text-sm text-slate-600">
+                {navLinks.map(([label, href]) => (
+                  <li key={href}>
+                    <a
+                      href={href}
+                      className="transition-colors hover:text-blue-600"
+                    >
+                      {label}
+                    </a>
+                  </li>
+                ))}
+              </ul>
+            </nav>
+
+            <nav aria-label="Portals">
+              <h3 className="text-sm font-semibold text-slate-900">Portals</h3>
+              <ul className="mt-5 space-y-3 text-sm text-slate-600">
+                <li>
+                  <Link
+                    to="/login"
+                    className="transition-colors hover:text-blue-600"
+                  >
+                    Student login
+                  </Link>
+                </li>
+                <li>
+                  <Link
+                    to="/login"
+                    className="transition-colors hover:text-blue-600"
+                  >
+                    Staff &amp; admin login
+                  </Link>
+                </li>
+                <li>
+                  <Link
+                    to="/register"
+                    className="transition-colors hover:text-blue-600"
+                  >
+                    Register a student
+                  </Link>
+                </li>
+              </ul>
+            </nav>
+
+            <div>
+              <h3 className="text-sm font-semibold text-slate-900">Contact</h3>
+              <address className="mt-5 space-y-4 text-sm not-italic text-slate-600">
+                <p className="flex items-center gap-3">
+                  <MapPin
+                    className="h-4 w-4 text-blue-600"
+                    aria-hidden="true"
+                  />
+                  Kathmandu, Nepal
                 </p>
-
-                <div className="mt-6 inline-flex items-center gap-2 rounded-full border border-emerald-200 bg-emerald-50 px-3 py-1.5 text-xs font-medium text-emerald-700">
-                  <span className="h-2 w-2 rounded-full bg-emerald-500 shadow-[0_0_0_4px_rgba(16,185,129,0.12)]" />
-                  Secure records, always available
-                </div>
-              </div>
-
-              <div>
-                <h3 className="text-xs font-semibold uppercase tracking-[0.18em] text-slate-700">
-                  Explore
-                </h3>
-                <ul className="mt-5 space-y-3 text-sm text-slate-600">
-                  {navLinks.map(([label, href]) => (
-                    <li key={href}>
-                      <a href={href} className="transition-colors hover:text-blue-600">
-                        {label}
-                      </a>
-                    </li>
-                  ))}
-                </ul>
-              </div>
-
-              <div>
-                <h3 className="text-xs font-semibold uppercase tracking-[0.18em] text-slate-700">
-                  Portals
-                </h3>
-                <ul className="mt-5 space-y-3 text-sm text-slate-600">
-                  <li>
-                    <Link to="/login" className="transition-colors hover:text-blue-600">
-                      Student login
-                    </Link>
-                  </li>
-                  <li>
-                    <Link to="/login" className="transition-colors hover:text-blue-600">
-                      Staff &amp; admin login
-                    </Link>
-                  </li>
-                  <li>
-                    <Link to="/register" className="transition-colors hover:text-blue-600">
-                      Register a student
-                    </Link>
-                  </li>
-                </ul>
-              </div>
-
-              <div>
-                <h3 className="text-xs font-semibold uppercase tracking-[0.18em] text-slate-700">
-                  Contact
-                </h3>
-                <div className="mt-5 space-y-4 text-sm text-slate-600">
-                  <p className="flex items-center gap-3">
-                    <MapPin className="h-4 w-4 text-blue-600" />
-                    Kathmandu, Nepal
-                  </p>
-                  <p className="flex items-center gap-3">
-                    <Mail className="h-4 w-4 text-blue-600" />
+                <p className="flex items-center gap-3">
+                  <Mail className="h-4 w-4 text-blue-600" aria-hidden="true" />
+                  <a
+                    href="mailto:hello@feeledger.edu.np"
+                    className="hover:text-blue-600"
+                  >
                     hello@feeledger.edu.np
-                  </p>
-                  <p className="flex items-center gap-3">
-                    <Phone className="h-4 w-4 text-blue-600" />
+                  </a>
+                </p>
+                <p className="flex items-center gap-3">
+                  <Phone className="h-4 w-4 text-blue-600" aria-hidden="true" />
+                  <a href="tel:+977015550101" className="hover:text-blue-600">
                     +977 01 555 0101
-                  </p>
-                </div>
-              </div>
+                  </a>
+                </p>
+              </address>
             </div>
           </div>
 
-          <div className="mt-8 flex flex-col items-start justify-between gap-4 border-t border-slate-200 pt-6 text-xs text-slate-500 sm:flex-row sm:items-center">
-            <p>© {new Date().getFullYear()} Fee Ledger. Built for better school operations.</p>
-            <p className={`${mono} text-slate-600`}>
+          <div className="mt-12 flex flex-col items-start justify-between gap-4 border-t border-slate-200 pt-6 text-xs text-slate-500 sm:flex-row sm:items-center">
+            <p>
+              © {new Date().getFullYear()} Fee Ledger. Built for better school
+              operations.
+            </p>
+            <p className="text-slate-600">
               Every entry logged. Every rupee accounted for.
             </p>
           </div>
