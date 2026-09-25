@@ -841,7 +841,7 @@ function HomePage() {
                 as={Link}
                 to={isAuthenticated ? "/dashboard" : "/login"}
                 variant="primary"
-                className="mt-9 min-h-12 bg-[#F7F5EE] px-6 text-[#17233B] hover:bg-white"
+                className="mt-9 min-h-12 bg-[#F7F5EE] px-6 !text-[#17233B] hover:bg-white"
               >
                 {isAuthenticated
                   ? "Open my dashboard"
