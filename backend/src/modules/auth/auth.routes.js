@@ -1,6 +1,6 @@
 import express from "express";
 import validate from "../../middleware/validate.js";
-import { loginSchema, registerUserSchema } from "./auth.validation.js";
+import { forgotPasswordSchema, loginSchema, registerUserSchema, resetPasswordSchema } from "./auth.validation.js";
 import * as authController from "./auth.controller.js";
 import authenticate from "../../middleware/authenticate.js";
 
@@ -19,8 +19,8 @@ router.post("/change-password",authenticate , authController.changePasswordContr
 router.post("/logout-all", authenticate,authController.logoutAllSessionsController);
 router.get("/verify-email", authController.verifyEmailController);
 router.post("/resend-verification", authController.resendVerificationEmailController);
-router.post("/forgot-password",authController.forgotPasswordController);
+router.post("/forgot-password", validate(forgotPasswordSchema), authController.forgotPasswordController);
 
-router.post("/reset-password",authController.resetPasswordController);
+router.post("/reset-password", validate(resetPasswordSchema), authController.resetPasswordController);
 
 export default router;
