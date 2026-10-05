@@ -213,6 +213,23 @@ The application will be running at `http://localhost:5173`.
 
 ---
 
+## Admin Panel
+
+After logging in, users are redirected to the **Dashboard**. Depending on your role, you will see different panels:
+
+- **Admin**: Full access to user and role management, fee structure configuration, audit logs, and all reports.
+- **Principal**: Read‑only view of dashboards and reports.
+- **Accountant**: Access to payment entry, receipt generation, and daily till overview.
+- **Student**: Personal fee ledger, payment history, and receipt downloads.
+
+Use the navigation links at the top‑right to access **Users**, **Fee Structures**, **Payments**, and **Reports**. The admin panel is built into the same React app; no separate URL is required.
+
+## Register Page Role Selection
+
+The registration form now includes a **Role** dropdown (Student, Accountant, Principal, Administrator). Choose the appropriate role for the new user; the selected role is stored in the user record and determines the permissions shown in the admin panel.
+
+---
+
 ## 🔒 Security Architecture
 
 1. **Strict Ownership Validation**: Student routes enforce ownership (`studentFee.studentId === req.user.studentProfile._id`), preventing horizontal authorization bypasses.
