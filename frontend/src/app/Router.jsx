@@ -24,6 +24,8 @@ import SectionEditPage from "../components/sections/SectionEditPage";
 import AcademicYearPage from "../pages/AcademicYearPage";
 import FeeStructurePage from "../pages/FeeStructurePage";
 import StudentFeePage from "../pages/StudentFeePage";
+import ForgotPasswordPage from "../pages/ForgotPasswordPage";
+import ResetPasswordPage from "../pages/ResetPasswordPage";
 
 const Router = () => {
   return (
@@ -32,6 +34,8 @@ const Router = () => {
         <Routes>
           <Route path="/" element={<HomePage />} />
           <Route path="/login" element={<LoginPage />} />
+          <Route path="/forgot-password" element={<ForgotPasswordPage />} />
+          <Route path="/reset-password" element={<ResetPasswordPage />} />
           <Route path="/register" element={<RegisterPage />} />
           <Route path="/unauthorized" element={<UnauthorizedPage />} />
           <Route element={<ProtectedRoute />}>

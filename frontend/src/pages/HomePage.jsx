@@ -605,11 +605,6 @@ function HomePage() {
                     </span>
                   </div>
                 </div>
-                <p
-                  className={`${mono} mt-3 text-right text-[10px] tracking-[0.06em] text-[#17233B]/35`}
-                >
-                  Fig. 1 — sample fee register
-                </p>
               </div>
             </div>
           </div>
