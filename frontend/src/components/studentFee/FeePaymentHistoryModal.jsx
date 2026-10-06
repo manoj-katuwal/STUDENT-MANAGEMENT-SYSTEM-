@@ -170,7 +170,9 @@ function FeePaymentHistoryModal({ open, onClose, studentFee }) {
                                 : "bg-rose-50 text-rose-700 ring-rose-600/20"
                           }`}
                         >
-                          {p.paymentStatus}
+                          {p.paymentStatus === "PENDING"
+                            ? "Awaiting eSewa"
+                            : p.paymentStatus}
                         </span>
                       </td>
                       <td className="py-3 pr-4 text-slate-500 text-[11px]">

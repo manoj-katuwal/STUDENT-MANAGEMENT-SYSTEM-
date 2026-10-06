@@ -394,7 +394,9 @@ function StudentDashboard() {
                                 : "bg-rose-50 text-rose-700 ring-rose-600/20"
                           }`}
                         >
-                          {payment.paymentStatus}
+                          {payment.paymentStatus === "PENDING"
+                            ? "Awaiting eSewa"
+                            : payment.paymentStatus}
                         </span>
                       </td>
 

@@ -34,8 +34,8 @@ function MyFeesPage() {
   const isLoading = isFeesLoading || isSummaryLoading;
 
   const totalFee = summary?.totalNetAmount ?? 0;
-  const totalPaid = summary?.totalPaidAmount ?? 0;
-  const totalDue = summary?.totalDueAmount ?? 0;
+  const totalPaid = summary?.totalPaidAmount ?? summary?.summary?.totalPaid ?? 0;
+  const totalDue = summary?.totalDueAmount ?? summary?.summary?.totalOutstanding ?? 0;
 
   // Filter fees
   const feesList = Array.isArray(feesData)
@@ -48,11 +48,12 @@ function MyFeesPage() {
     if (
       statusFilter === "DUE" &&
       fee.status !== "UNPAID" &&
+      fee.status !== "PENDING" &&
       fee.status !== "PARTIAL"
     )
       return false;
     if (statusFilter === "PARTIAL" && fee.status !== "PARTIAL") return false;
-    if (statusFilter === "UNPAID" && fee.status !== "UNPAID") return false;
+    if (statusFilter === "UNPAID" && fee.status !== "UNPAID" && fee.status !== "PENDING") return false;
 
     // Search query
     if (searchQuery.trim()) {
@@ -79,6 +80,19 @@ function MyFeesPage() {
       year: "numeric",
     });
   };
+
+  const getDueAmount = (fee) =>
+    Number(
+      fee.dueAmount ??
+        Math.max(
+          (fee.netAmount ?? fee.finalAmount ?? 0) - (fee.paidAmount ?? 0),
+          0,
+        ),
+    );
+
+  const firstPayableFee = feesList.find(
+    (fee) => getDueAmount(fee) > 0 && fee.status !== "CANCELLED",
+  );
 
   const getStatusBadge = (status) => {
     switch (status) {
@@ -134,14 +148,26 @@ function MyFeesPage() {
   return (
     <div className="min-h-full p-6 lg:p-8 space-y-6">
       {/* Header */}
-      <div>
-        <h1 className="text-2xl font-bold font-poppins text-slate-900">
-          My Fees & Statements
-        </h1>
-        <p className="text-sm text-slate-500 mt-0.5">
-          View your assigned fee structures, payment status, and make online
-          payments.
-        </p>
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+        <div>
+          <h1 className="text-2xl font-bold font-poppins text-slate-900">
+            My Fees & Statements
+          </h1>
+          <p className="text-sm text-slate-500 mt-0.5">
+            View your assigned fee structures, payment status, and make online
+            payments.
+          </p>
+        </div>
+        {firstPayableFee && (
+          <button
+            type="button"
+            onClick={() => setSelectedFeeForPay(firstPayableFee)}
+            className="inline-flex shrink-0 items-center justify-center gap-2 rounded-lg bg-emerald-600 px-4 py-2.5 text-sm font-semibold text-white shadow-xs transition-colors hover:bg-emerald-700"
+          >
+            <CreditCard className="h-4 w-4" />
+            Pay fees with eSewa
+          </button>
+        )}
       </div>
 
       {/* Summary Cards */}
@@ -283,8 +309,8 @@ function MyFeesPage() {
               (fee.academicYearId?.year
                 ? `Year ${fee.academicYearId.year}`
                 : "-");
-            const hasDue =
-              (fee.dueAmount || 0) > 0 && fee.status !== "CANCELLED";
+            const dueAmount = getDueAmount(fee);
+            const hasDue = dueAmount > 0 && fee.status !== "CANCELLED";
             const discountAmount =
               fee.discountAmount ||
               (fee.grossAmount && fee.netAmount
@@ -370,7 +396,7 @@ function MyFeesPage() {
                             hasDue ? "text-rose-600" : "text-slate-800"
                           }`}
                         >
-                          {formatCurrency(fee.dueAmount || 0)}
+                          {formatCurrency(dueAmount)}
                         </p>
                       </div>
                     </div>
